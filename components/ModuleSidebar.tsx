@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, BookOpen } from 'lucide-react'
 import { modules } from '@/lib/modules'
 import { getAllModulesProgress, ModuleStatus } from '@/lib/progress'
 
@@ -76,6 +76,17 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
           </nav>
         </div>
       )}
+
+      <div className="mt-auto pt-6 border-t border-[#e4e4e7]">
+        <Link
+          href="/glossary"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#71717a] hover:text-[#18181b] hover:bg-[#f4f4f5] transition-colors"
+        >
+          <BookOpen size={14} className="flex-shrink-0" />
+          Glosario de términos
+        </Link>
+      </div>
     </div>
   )
 
