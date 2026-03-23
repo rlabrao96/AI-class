@@ -34,9 +34,9 @@ export default async function ModulePage({
         <div className="max-w-[720px] mx-auto px-6 py-10">
           <Link
             href="/"
-            className="text-sm text-[#71717a] hover:text-[#18181b] transition-colors mb-6 inline-block"
+            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-[#18181b] text-white text-sm font-medium rounded-lg hover:bg-[#27272a] transition-colors"
           >
-            ← Volver al curso
+            ← Volver al menú principal
           </Link>
 
           <div className="flex items-center gap-2 mb-3">

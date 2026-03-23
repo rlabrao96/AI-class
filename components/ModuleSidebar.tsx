@@ -50,7 +50,7 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
                 >
                   {status === 'completed' ? '✓' : mod.number}
                 </span>
-                <span className="truncate">{mod.title}</span>
+                <span className="leading-snug">{mod.title}</span>
               </Link>
             )
           })}
@@ -108,7 +108,7 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:block w-60 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-[#e4e4e7] px-6 py-8">
+      <aside className="hidden md:block w-64 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-[#e4e4e7] px-6 py-8">
         {sidebarContent}
       </aside>
     </>
