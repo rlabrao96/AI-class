@@ -1,0 +1,251 @@
+# Copilot en Microsoft 365
+
+Microsoft 365 Copilot es el asistente de inteligencia artificial integrado en las herramientas que ya usas cada día: Outlook, Teams, Word, Excel, PowerPoint y SharePoint. En este módulo entenderás cómo funciona por dentro, cómo escribir prompts que aprovechen sus capacidades únicas de acceso a tu contexto organizacional, y cómo aplicarlo de forma concreta en las tareas más frecuentes de tu rol. Para los profesionales de Novartis Switzerland, donde Copilot ya está habilitado por DD&IT, este conocimiento marca la diferencia entre usarlo como un buscador glorificado y convertirlo en un multiplicador real de productividad.
+
+---
+
+## Cómo funciona Copilot en M365
+
+Copilot en M365 no es simplemente ChatGPT dentro de Office. Es una capa de inteligencia construida sobre tres pilares que trabajan juntos: un modelo de lenguaje de gran escala (LLM) basado en GPT-4, el grafo de conocimiento organizacional de Microsoft conocido como **Microsoft Graph**, y el índice semántico de tu tenant.
+
+### El modelo de lenguaje
+
+El núcleo de Copilot es un LLM de la familia GPT-4, el mismo tipo de modelo que impulsa las interfaces de IA generativa más avanzadas del mercado. Este modelo entiende lenguaje natural, puede razonar sobre textos complejos, sintetizar información de múltiples fuentes y generar respuestas coherentes y bien estructuradas. Pero a diferencia de un chatbot genérico, Copilot no opera en el vacío: siempre trabaja con contexto real de tu organización.
+
+### Microsoft Graph: el sistema nervioso de tu tenant
+
+Microsoft Graph es la API central de Microsoft 365 que conecta todos los servicios: correo, calendario, archivos en OneDrive y SharePoint, conversaciones de Teams, contactos, y más. Cuando haces una pregunta a Copilot, el sistema no simplemente pasa tu texto al LLM — primero usa Microsoft Graph para recuperar el contenido relevante de tu entorno: los emails recientes de esa persona, el documento que compartieron contigo ayer, las notas de la reunión de la semana pasada. Ese contenido se convierte en el contexto que el LLM usa para generar su respuesta.
+
+### El índice semántico
+
+Una de las capacidades más potentes de Copilot es su **índice semántico**, que va mucho más allá de la búsqueda por palabras clave. El índice semántico crea representaciones vectoriales del contenido de tu organización — emails, documentos, mensajes de Teams — que capturan el significado, no solo las palabras exactas. Esto significa que si preguntas "¿cuál fue la decisión sobre el presupuesto de Q4?", Copilot puede encontrar el email relevante aunque no contenga exactamente esas palabras, porque entiende que el concepto de "aprobación de recursos para el último trimestre" es semánticamente equivalente.
+
+### El modelo de seguridad
+
+Uno de los aspectos más críticos para entender Copilot correctamente es su modelo de seguridad. Copilot **respeta estrictamente los permisos existentes** de M365 — solo puede acceder y mostrar contenido al que tú ya tienes acceso. No existe escalación de privilegios: si un documento está marcado como confidencial y no tienes permisos de lectura, Copilot no puede acceder a él ni incluirlo en sus respuestas. El sistema opera dentro del mismo marco de control de acceso que rige todo M365.
+
+### El pipeline de procesamiento
+
+El flujo completo cuando haces una consulta a Copilot sigue estos pasos: primero, tu prompt es analizado para identificar qué tipo de información se necesita; segundo, Microsoft Graph recupera el contenido relevante de tu tenant (emails, archivos, reuniones) respetando tus permisos; tercero, ese contenido se combina con tu prompt y se envía al LLM como contexto enriquecido; finalmente, el LLM genera una respuesta fundamentada en ese contexto real, no en suposiciones genéricas.
+
+### Compliance y privacidad para Novartis Switzerland
+
+Para los profesionales de Novartis, hay un punto de cumplimiento fundamental: **todos los datos permanecen dentro de tu tenant**. Microsoft no usa el contenido de tu organización para entrenar sus modelos. Además, Novartis Switzerland está cubierta por el **EU Data Boundary** de Microsoft, lo que significa que los datos procesados por Copilot no salen de la región europea. Las respuestas de Copilot se generan con el contexto de tu tenant y no se comparten con otros tenants ni usuarios externos.
+
+La implicación práctica de toda esta arquitectura es importante: la calidad de las respuestas de Copilot depende directamente de la calidad y organización de los datos en tu entorno. Si tus documentos están bien nombrados, organizados en SharePoint con estructura clara, y los permisos están bien gestionados, Copilot podrá encontrar y usar esa información de forma mucho más efectiva.
+
+---
+
+## Prompting en el contexto M365
+
+Promtear en M365 Copilot es fundamentalmente distinto a promtear en una interfaz de chat genérica. La diferencia clave es que tienes acceso a **tu contexto real**: puedes apuntar Copilot directamente a tus archivos, tus reuniones recientes, tus conversaciones de email, y las personas de tu organización. Esta capacidad cambia completamente la estructura del prompt efectivo.
+
+### La estructura de cuatro partes para M365
+
+En el contexto de M365, el prompt más efectivo tiene cuatro componentes que trabajan juntos:
+
+**1. Goal (objetivo):** Qué quieres que Copilot haga. Define el verbo de acción con precisión — no "ayúdame con esto" sino "resume", "redacta", "analiza", "extrae los puntos de acción", "compara".
+
+**2. Context (contexto):** El antecedente relevante para la tarea. "Para la revisión de negocio de Q3", "para enviárselo a mi directora antes de la reunión de comité", "en el contexto del proyecto de transformación digital". El contexto orienta el tono, el nivel de detalle y el enfoque de la respuesta.
+
+**3. Source (fuente):** Aquí está la superpotencia de M365 Copilot. Puedes apuntar Copilot a datos reales de tu entorno usando referencias específicas: `/nombre_del_archivo.docx` para un documento concreto, "mis últimos 5 emails de [persona]", "la reunión de Teams de ayer con el equipo de finanzas", "el canal de proyecto en Teams de los últimos 7 días". Esta referenciación directa es lo que separa M365 Copilot de cualquier chatbot genérico.
+
+**4. Format (formato/expectativa):** Cómo quieres el resultado. "Resume en 5 bullets ejecutivos", "redacta como email formal de menos de 150 palabras", "crea una tabla con columnas X, Y, Z", "lista las acciones con propietario y fecha".
+
+### Ejemplos comparativos
+
+La diferencia entre un prompt débil y uno efectivo en M365 no es de cortesía ni de extensión — es de especificidad y de aprovechamiento del contexto disponible.
+
+**Excel — Análisis de datos:**
+- Débil: *"Resume este documento"*
+- Efectivo: *"Analiza la tabla en /Reporte_Ventas_Q3.xlsx y resume en 5 bullets ejecutivos las principales variaciones vs. objetivo, enfocándote en los mercados con mayor desviación negativa. Formato para audiencia directiva."*
+
+**Teams — Reuniones perdidas:**
+- Débil: *"¿Qué discutimos en la reunión?"*
+- Efectivo: *"Resume los principales puntos de decisión y las acciones acordadas en mi reunión de Teams con el equipo de supply chain de ayer. Organiza el resumen por propietario de acción e incluye los plazos mencionados."*
+
+**Outlook — Gestión de hilos:**
+- Débil: *"Ayúdame con este email"*
+- Efectivo: *"Redacta un email de seguimiento a este hilo que resuma dónde quedamos y los próximos pasos acordados. Tono profesional pero directo. Máximo 120 palabras."*
+
+### El principio de la fuente explícita
+
+El error más frecuente de los usuarios nuevos de Copilot M365 es no especificar la fuente. Cuando no señalas un archivo, reunión o conversación concretos, Copilot hace su mejor esfuerzo con contexto general — que puede ser correcto pero genérico. Cuando apuntas a una fuente específica, Copilot trabaja con información real y verificable de tu entorno.
+
+### Aviso de compliance
+
+Aunque Copilot opera dentro de los límites de tu tenant, hay datos que nunca deben incluirse en prompts: **datos de pacientes, datos de ensayos clínicos, términos confidenciales de acuerdos comerciales o cualquier información regulada bajo GxP o marcos legales de confidencialidad**. El motivo es práctico: las respuestas de Copilot pueden ser copiadas, referenciadas o compartidas en otros contextos, y la trazabilidad de esa información se vuelve difícil de controlar una vez que sale del prompt original. En caso de duda, consulta con tu equipo de compliance antes de usar Copilot con información sensible.
+
+---
+
+## Casos prácticos: Excel, Teams, Outlook, Word
+
+La teoría tiene valor, pero el impacto real de Copilot se entiende mejor a través de casos concretos. Aquí exploramos los cuatro entornos donde los profesionales de Novartis tienen más oportunidades de ganar tiempo y calidad.
+
+### Excel: análisis en lenguaje natural
+
+Copilot en Excel cambia la relación entre el usuario y los datos. Ya no necesitas recordar la sintaxis exacta de una fórmula compleja ni pasar 20 minutos creando una tabla dinámica — puedes describir lo que quieres en lenguaje natural.
+
+Casos de uso clave:
+
+- **Análisis de variaciones:** "Analiza esta tabla e identifica los 3 principales factores que explican la variación en la columna F vs. el objetivo de la columna G." Copilot puede identificar patrones, outliers y tendencias sin que tengas que escribir una sola fórmula.
+- **Generación y explicación de fórmulas:** Usa *Insertar → Copilot → Generar fórmula* para describir lo que necesitas calcular en español. Copilot no solo escribe la fórmula — si le pides "explícame qué hace esta fórmula paso a paso", desglosará cada función y argumento. Esto es especialmente útil para validar fórmulas heredadas en archivos que nadie entiende del todo.
+- **Formato condicional inteligente:** "Resalta en rojo todas las filas donde el margen sea inferior al 15% y el volumen sea superior a 1.000 unidades." En lugar de construir la regla manualmente, describes la lógica y Copilot la implementa.
+
+**Limitaciones a tener en cuenta:** Copilot en Excel funciona mejor con tablas bien estructuradas, con encabezados claros en la primera fila y sin celdas fusionadas. Las referencias entre múltiples hojas o libros externos pueden generar resultados inconsistentes. Si tu archivo tiene estructura compleja, vale la pena simplificarlo antes de invocar Copilot.
+
+### Teams: desde reuniones perdidas hasta gestión de canales
+
+Teams es probablemente donde Copilot ahorra más tiempo en el día a día, especialmente para profesionales con agendas fragmentadas y múltiples proyectos en paralelo.
+
+- **Resumen de reunión perdida:** Si no pudiste asistir a una reunión que quedó grabada o transcrita, pregunta: "¿Cuáles fueron las decisiones tomadas y quién es propietario de cada acción?" Copilot analiza la transcripción completa y te entrega un resumen estructurado en segundos.
+- **Puesta al día en un canal:** "Resume las discusiones clave en este canal de proyecto durante los últimos 7 días." Ideal cuando vuelves de vacaciones o cuando necesitas contexto rápido antes de una reunión de estado.
+- **Durante la reunión:** Cuando está habilitado por el administrador, Copilot puede sugerir preguntas de seguimiento en tiempo real y tomar notas automáticas, permitiéndote estar más presente en la conversación en lugar de escribir todo.
+- **Búsqueda en conversaciones:** "¿En qué conversación de Teams acordamos la fecha de entrega del informe de validación?" Copilot puede buscar semánticamente en tu historial de mensajes para recuperar esa decisión que sabes que se tomó pero no recuerdas dónde.
+
+### Outlook: de la bandeja de entrada al control
+
+El email sigue siendo el canal de comunicación dominante en entornos corporativos, y Copilot en Outlook puede transformar cómo lo gestionas.
+
+- **Resumen de hilos largos:** Un hilo de 40 emails sobre un tema complejo se puede resumir en 30 segundos. Copilot extrae los puntos clave, las posiciones de cada parte y el estado actual del tema.
+- **Redacción con contexto:** "Redacta un email de seguimiento a este hilo que resuma dónde quedamos y los próximos pasos acordados, con tono profesional y menos de 150 palabras." El resultado es un borrador editable que ya tiene el contexto correcto.
+- **Reformulación de tono:** "Reescribe este email para que sea más conciso y directo, manteniendo los puntos clave." Útil cuando tienes un borrador que es demasiado largo o que puede interpretarse como agresivo o poco claro.
+- **Preparación para reuniones:** Antes de una reunión importante, puedes pedir a Copilot que revise tu historial de email con esa persona o equipo y te dé un resumen de los temas pendientes o compromisos previos.
+
+**Limitación importante:** Copilot solo puede acceder al contenido de emails que están en tu buzón. No puede leer el contenido de mensajes de personas externas que no te hayan enviado directamente a ti.
+
+### Word: desde resúmenes hasta documentos completos
+
+Copilot en Word es especialmente poderoso para tareas de síntesis y redacción que históricamente consumen horas.
+
+- **Resúmenes ejecutivos:** "Resume este informe de 50 páginas en un resumen ejecutivo de 1 página, estructurado en: contexto, hallazgos principales, recomendaciones." Copilot analiza el documento completo y genera el resumen manteniendo los datos clave.
+- **Reescritura por audiencia:** "Reescribe la sección 3 para que sea más persuasiva para una audiencia regulatoria, enfatizando el cumplimiento de estándares GxP." Puedes ajustar el tono, la densidad técnica y el enfoque sin reescribir desde cero.
+- **Redacción a partir de múltiples fuentes:** "Redacta un project brief para el proyecto de migración de datos basándote en /scope_document.docx y /notas_kickoff.docx." Esta capacidad de sintetizar múltiples documentos de tu SharePoint en un nuevo documento es una de las más valoradas por equipos de proyecto.
+- **Revisión y mejora:** Copilot puede señalar inconsistencias, sugerir mejoras de claridad y proponer reestructuraciones de secciones, actuando como un revisor siempre disponible.
+
+**Aviso de compliance:** Cuando redactes documentos destinados a uso externo, a procesos regulados, o que serán referenciados en auditorías, **siempre debe haber una revisión humana** antes del envío. Copilot puede cometer errores factuales sutiles — especialmente al sintetizar múltiples fuentes — y la responsabilidad final sobre el contenido es siempre del autor humano.
+
+---
+
+## Copilot Agents: más allá del chat
+
+Hasta ahora hemos explorado Copilot como un asistente reactivo: tú preguntas, él responde. Los **Copilot Agents** amplían esa lógica hacia automatizaciones más proactivas y especializadas, que pueden operar sobre conocimiento específico de tu organización o responder preguntas de todo un equipo.
+
+### Qué son los Copilot Agents
+
+Un Copilot Agent es esencialmente una versión especializada de Copilot que tiene acceso a una fuente de conocimiento definida y puede ser invocada por múltiples usuarios. En lugar de que cada persona pregunte a Copilot sobre el sitio de RRHH de forma individual, puedes crear un agente que todos los empleados puedan consultar y que siempre responda basándose en el contenido actualizado de ese SharePoint.
+
+### Agentes integrados en M365
+
+M365 ya incluye algunos agentes preconstruidos sin necesidad de desarrollo adicional:
+
+- **SharePoint Agent:** Cada sitio de SharePoint puede tener su propio agente de preguntas y respuestas. Los usuarios pueden hacerle preguntas en lenguaje natural al sitio ("¿cuál es el proceso para solicitar acceso a SAP?") y el agente responde basándose en el contenido del sitio, citando las fuentes.
+- **Teams Agent:** Puede monitorear un canal de proyecto específico y generar resúmenes periódicos, responder preguntas sobre el estado del proyecto, o enviar alertas cuando se mencionan ciertos temas.
+
+### Copilot Studio: construye tus propios agentes
+
+**Copilot Studio** es la herramienta low-code de Microsoft para crear agentes personalizados. Sin necesidad de escribir código, puedes conectar un agente a una biblioteca de SharePoint, una base de conocimiento, o una API REST externa, y convertirlo en una interfaz conversacional para tu equipo.
+
+Casos de uso con relevancia directa para Novartis:
+
+- **Agente de políticas de RRHH:** Conecta el agente al sitio de SharePoint de HR que contiene las políticas de vacaciones, procedimientos de onboarding, y beneficios. Los empleados pueden preguntar en lenguaje natural en lugar de buscar manualmente entre PDFs.
+- **Agente de SOPs regulatorios:** Para procesos que tienen documentación de procedimientos estándar en una biblioteca regulada, el agente puede responder preguntas como "¿cuál es el procedimiento de desviación para este tipo de incidente?" citando el SOP exacto y la versión vigente.
+- **Agente de estado de proyecto:** Monitorea un canal de Teams y genera digestos semanales automáticos con el estado de las tareas, los bloqueantes mencionados y los próximos hitos, reduciendo el tiempo invertido en reuniones de status update.
+
+### Gobernanza de agentes
+
+Los agentes heredan el mismo modelo de seguridad de M365: respetan los permisos existentes y operan dentro del límite del tenant. Sin embargo, hay consideraciones adicionales de gobernanza que son importantes:
+
+- **Control sobre quién puede crear agentes:** Copilot Studio tiene controles de administrador que determinan qué usuarios pueden crear y publicar agentes. En un entorno corporativo como Novartis, esto debe estar gestionado por DD&IT.
+- **Alcance de datos del agente:** Al crear un agente, defines a qué fuentes de datos tiene acceso. Es importante ser preciso — un agente que tiene acceso demasiado amplio puede exponer información no intencionada a usuarios que hacen preguntas.
+- **Proceso de aprobación para datos regulados:** Cualquier agente que acceda a datos clínicos, financieros, de RRHH o cualquier información bajo marcos regulatorios específicos **requiere aprobación de IT y compliance antes de ser desplegado en producción**. Esto no es opcional — es parte del marco de cumplimiento de Novartis.
+
+La promesa de los Copilot Agents es significativa: en lugar de que el conocimiento institucional quede atrapado en documentos que nadie encuentra, puede volverse accesible de forma conversacional para todos los que tienen los permisos correctos. Pero esa promesa solo se realiza con una gobernanza sólida desde el principio.
+
+---
+
+<Quiz
+  moduleSlug="copilot-m365"
+  questions={[
+    {
+      question: "¿Cómo accede Copilot a los datos de tu organización en M365?",
+      options: [
+        "Copia todos los archivos de tu tenant a los servidores de Microsoft",
+        "Usa Microsoft Graph para recuperar contenido relevante, respetando los permisos existentes",
+        "Requiere que subas manualmente los archivos que quieres que analice",
+        "Accede a todos los datos de todos los usuarios del tenant"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuál es el componente más importante de un prompt efectivo en M365 Copilot?",
+      options: [
+        "Escribirlo en inglés para mejores resultados",
+        "Incluir goal + context + source + formato esperado",
+        "Hacerlo lo más corto posible",
+        "Empezar siempre con 'Por favor'"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué es Copilot Studio?",
+      options: [
+        "Una nueva versión de Microsoft Office",
+        "Una herramienta para entrenar modelos de IA personalizados",
+        "Una plataforma low-code para construir agentes de Copilot personalizados",
+        "El nombre del departamento de IA de Microsoft"
+      ],
+      correct: 2
+    },
+    {
+      question: "¿Qué tipo de dato NO deberías incluir en un prompt de Copilot M365?",
+      options: [
+        "El nombre de un proyecto interno",
+        "Datos de pacientes, ensayos clínicos o términos confidenciales de acuerdos",
+        "Una fecha límite de entrega",
+        "El nombre de tu manager"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuál de estos es un caso de uso apropiado para un Copilot Agent en Copilot Studio?",
+      options: [
+        "Entrenar un nuevo modelo de lenguaje con datos de Novartis",
+        "Reemplazar al equipo de IT para gestión de incidentes",
+        "Un asistente conversacional sobre políticas de RRHH que lee el SharePoint de HR",
+        "Acceder a datos de competidores de forma automática"
+      ],
+      correct: 2
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="Microsoft Copilot for M365 — Documentación oficial"
+  url="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-overview"
+  description="Guía oficial de Microsoft sobre Copilot en M365: arquitectura, capacidades por aplicación, requisitos de licencia y despliegue."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Copilot Lab — Prompts recomendados por Microsoft"
+  url="https://copilot.cloud.microsoft/en-US/prompts"
+  description="Biblioteca oficial de prompts de Microsoft para Copilot en Teams, Outlook, Word, Excel y PowerPoint. Organizada por rol y caso de uso."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Microsoft Copilot Studio — Guía de inicio"
+  url="https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio"
+  description="Documentación oficial de Copilot Studio: cómo construir agentes personalizados, conectar knowledge bases, y publicar en Teams o web."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Microsoft 365 Copilot — Seguridad y compliance"
+  url="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy"
+  description="Documentación de Microsoft sobre cómo Copilot maneja datos, privacidad, límites del tenant, y cumplimiento regulatorio (incluyendo EU Data Boundary)."
+  type="doc"
+/>
