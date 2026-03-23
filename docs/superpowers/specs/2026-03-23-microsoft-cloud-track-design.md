@@ -166,7 +166,51 @@ The certificate shows:
 
 ---
 
-### Module 3 · AWS Bedrock — "Modelos de IA en la infraestructura de AWS"
+### Module 3 · Azure AI Foundry — "Construye tu propio asistente de IA"
+**Slug:** `azure-ai-foundry`
+**Estimated time:** 60 min
+**Track:** `microsoft-cloud`
+
+**Intro:** Azure AI Foundry es la plataforma de Microsoft para que equipos con bajo o nulo código construyan chatbots y asistentes de IA conectados a sus propios datos internos. Está habilitada por DD&IT en Novartis y es la opción natural para quien ya trabaja en el ecosistema Microsoft. Este módulo explica cómo funciona, cómo conectar datos internos con Prompt Flow, cómo crear un asistente que responda sobre tus documentos, y cómo desplegarlo de forma segura.
+
+**H2 sections (rehype-slug IDs):**
+1. `## Qué es Azure AI Foundry y cómo encaja en el ecosistema` → `qué-es-azure-ai-foundry-y-cómo-encaja-en-el-ecosistema`
+   - Foundry (antes Azure AI Studio) es el hub central de Microsoft para desarrollo de IA: acceso a modelos (GPT-4, Llama, Mistral, Phi), Prompt Flow para orquestar flujos, connections para datos internos, y deployment a Azure.
+   - Diferencia con Copilot: Copilot es consumo de IA en apps existentes. Foundry es construcción de tus propias apps de IA.
+   - Diferencia con Azure AI Foundry vs AWS Bedrock: mismo concepto, distinto cloud. Foundry se integra con Azure AD, SharePoint, Teams. Bedrock con S3, IAM, VPC. Para Novartis con stack Microsoft, Foundry es el punto de partida natural.
+   - Compliance note: Foundry corre dentro del tenant de Azure de Novartis. Los datos nunca salen del perímetro corporativo. DD&IT habilita el acceso y gestiona las políticas.
+
+2. `## Prompt Flow: orquestar tu asistente paso a paso` → `prompt-flow-orquestar-tu-asistente-paso-a-paso`
+   - Prompt Flow es el motor de orquestación visual de Foundry: defines un grafo de pasos (input → retrieve → prompt → output) y cada paso tiene inputs/outputs tipados.
+   - Conexión con track 1 (Sistemas Confiables + Agentes): Prompt Flow implementa LLM-Modulo visualmente — cada nodo puede ser un critic, una herramienta, o el LLM generador.
+   - Tipos de nodos: LLM (llamada al modelo), Python (código arbitrario), Prompt (template), Tool (función externa), Retrieval (búsqueda en índice).
+   - Ejemplo: flujo de Q&A sobre reportes de ventas: input pregunta → retrieve fragmentos relevantes de SharePoint → prompt con contexto → output respuesta con citas.
+   - Compliance note: los flows solo pueden acceder a las connections configuradas por el admin. No puedes conectar fuentes de datos sin aprobación previa de DD&IT.
+
+3. `## Conectar tus datos: Azure AI Search + SharePoint` → `conectar-tus-datos-azure-ai-search--sharepoint`
+   - Azure AI Search es el motor de búsqueda vectorial que indexa tus documentos para RAG. Se conecta directamente a SharePoint, Blob Storage, y otras fuentes Azure.
+   - Cómo funciona: tus documentos se dividen en chunks → se convierten en embeddings → se almacenan en el índice. Cuando el usuario pregunta, el sistema recupera los chunks más relevantes y los pasa al LLM.
+   - Ejemplo práctico: indexar el SharePoint del equipo de Business Execution (reportes de ventas, análisis de mercado, guías de proceso) para que el asistente pueda responder preguntas específicas del negocio.
+   - Compliance note: el índice hereda los permisos de SharePoint — si un usuario no tiene acceso a un documento, el asistente tampoco puede usarlo para responder sus preguntas (security trimming).
+
+4. `## Desplegar y monitorear tu asistente` → `desplegar-y-monitorear-tu-asistente`
+   - Deployment en Foundry: el flow se despliega como un endpoint REST. Puede integrarse en Teams (como bot), en una web app, o consumirse desde Power Apps.
+   - Evaluation integrada: Foundry incluye evaluadores automáticos (groundedness, relevance, coherence) — conexión directa con LLM-as-judge del track 1.
+   - Monitoreo: métricas de uso (llamadas por día, latencia, tokens consumidos), trazas de cada conversación para debugging, alertas configurables.
+   - Compliance note: los endpoints deben configurarse con autenticación Azure AD. No uses endpoints públicos sin autenticación para datos internos.
+
+**Quiz:** 5 questions about Foundry vs Copilot distinction, Prompt Flow node types, RAG with Azure AI Search, security trimming, and deployment options.
+
+**ResourceCards:**
+- Azure AI Foundry overview (MS Learn) — `https://learn.microsoft.com/en-us/azure/ai-studio/what-is-ai-studio` — doc
+- Prompt Flow documentation (MS Learn) — `https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/overview-what-is-prompt-flow` — doc
+- Azure AI Search for RAG (MS Learn) — `https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview` — doc
+- Build a RAG solution with Foundry (MS Learn) — `https://learn.microsoft.com/en-us/azure/ai-studio/tutorials/deploy-chat-web-app` — doc
+- Azure AI Foundry pricing — `https://azure.microsoft.com/en-us/pricing/details/ai-studio/` — doc
+
+---
+
+### Module 4 · AWS Bedrock — "Modelos de IA en la infraestructura de AWS"
 **Slug:** `aws-bedrock`
 **Estimated time:** 60 min
 **Track:** `microsoft-cloud`
@@ -228,14 +272,15 @@ The certificate shows:
 | `lib/modules.ts` | Modify | Add `Track` interface, `track: string` field to `Module`, add `tracks` array, add 3 new module entries with `track: 'microsoft-cloud'`. Add `track: 'fundamentos'` to all 6 existing modules. |
 | `lib/progress.ts` | Modify | Add `getTrackProgress(track: Track): number` helper returning count of completed modules in that track |
 | `app/page.tsx` | Modify | Two-section layout with track headers, per-track progress bars, per-track certificate banners |
-| `app/modules/[slug]/page.tsx` | Modify | (1) Add 3 new entries to `moduleMap` static import map (`copilot-m365`, `microsoft-fabric`, `aws-bedrock`). (2) Pass `trackSlug={mod.track}` to `ModuleSidebar`. (3) Pass `trackSlug={mod.track}` to `MarkCompleteButton`. |
+| `app/modules/[slug]/page.tsx` | Modify | (1) Add 4 new entries to `moduleMap` static import map (`copilot-m365`, `microsoft-fabric`, `azure-ai-foundry`, `aws-bedrock`). (2) Pass `trackSlug={mod.track}` to `ModuleSidebar`. (3) Pass `trackSlug={mod.track}` to `MarkCompleteButton`. |
 | `components/ModuleSidebar.tsx` | Modify | New prop interface: `{ currentSlug: string; trackSlug: string }`. Filter module nav list to `modules.filter(m => m.track === trackSlug)`. |
 | `components/MarkCompleteButton.tsx` | Modify | New prop interface: `{ slug: string; trackSlug: string }`. Compute `nextModule` from `modules.filter(m => m.track === trackSlug)` not global array. Celebration banner links to `/certificate/${trackSlug}`. |
 | `app/certificate/[trackSlug]/page.tsx` | Create | Parameterized certificate page. Must include `generateStaticParams` returning `tracks.map(t => ({ trackSlug: t.slug }))`. |
 | `app/certificate/page.tsx` | Modify | Server-side redirect to `/certificate/fundamentos` using Next.js `redirect()` from `next/navigation`. Remove `'use client'` directive. Replace entire file body with `export default function CertificatePage() { redirect('/certificate/fundamentos') }`. |
 | `content/copilot-m365.mdx` | Create | Module 1 of track 2 |
 | `content/microsoft-fabric.mdx` | Create | Module 2 of track 2 |
-| `content/aws-bedrock.mdx` | Create | Module 3 of track 2 |
+| `content/azure-ai-foundry.mdx` | Create | Module 3 of track 2 |
+| `content/aws-bedrock.mdx` | Create | Module 4 of track 2 |
 
 ## TOC IDs (rehype-slug, Unicode preserved)
 
@@ -250,6 +295,12 @@ The certificate shows:
 - `conectar-tus-datos-pipelines-con-data-factory`
 - `analizar-con-lenguaje-natural-copilot-en-fabric`
 - `governance-y-seguridad-en-fabric`
+
+### azure-ai-foundry
+- `qué-es-azure-ai-foundry-y-cómo-encaja-en-el-ecosistema`
+- `prompt-flow-orquestar-tu-asistente-paso-a-paso`
+- `conectar-tus-datos-azure-ai-search--sharepoint`
+- `desplegar-y-monitorear-tu-asistente`
 
 ### aws-bedrock
 - `qué-es-amazon-bedrock-y-por-qué-usarlo`
@@ -270,7 +321,7 @@ export const tracks: Track[] = [
   {
     slug: 'microsoft-cloud',
     title: 'Aplicaciones Microsoft + Cloud',
-    description: 'Tres módulos para aplicar lo aprendido en las herramientas Microsoft y AWS que ya usas en tu trabajo.',
+    description: 'Cuatro módulos para aplicar lo aprendido en las herramientas Microsoft y AWS que ya usas en tu trabajo.',
     modules: modules.filter(m => m.track === 'microsoft-cloud'),
   },
 ]
@@ -287,7 +338,7 @@ Seis módulos para entender, usar y aprovechar la IA...
 ────────────────────────────────────
 
 [Aplicaciones Microsoft + Cloud]
-Tres módulos para aplicar lo aprendido...
-[░░░░░░░░░░░░░░] 0 de 3 módulos
-[M1 card] [M2 card] [M3 card]
+Cuatro módulos para aplicar lo aprendido...
+[░░░░░░░░░░░░░░] 0 de 4 módulos
+[M1 card] [M2 card] [M3 card] [M4 card]
 ```
