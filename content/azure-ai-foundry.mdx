@@ -1,0 +1,289 @@
+# Azure AI Foundry: Construye tu Asistente
+
+Azure AI Foundry es la plataforma unificada de Microsoft para diseñar, evaluar y desplegar aplicaciones de IA generativa dentro de tu propio tenant de Azure. En este módulo aprenderás cómo funciona Foundry, cómo construir un flujo RAG con Prompt Flow, cómo conectar tus documentos corporativos mediante Azure AI Search, y cómo desplegar y monitorear tu asistente de forma responsable en un entorno regulado como Novartis.
+
+---
+
+## Qué es Azure AI Foundry y cómo encaja en el ecosistema
+
+Azure AI Foundry es la consolidación de tres servicios que antes existían por separado: Azure OpenAI Service, Azure AI Studio y partes de Azure Machine Learning orientadas a IA generativa. Microsoft los unificó bajo un único portal y SDK para simplificar el ciclo completo de desarrollo: explorar modelos, diseñar flujos, evaluar calidad, y desplegar a producción sin salir del mismo entorno.
+
+### Capacidades principales
+
+Foundry da acceso a un catálogo de más de 1 800 modelos: los modelos de OpenAI (GPT-4o, GPT-4, GPT-3.5 Turbo), los modelos propios de Microsoft (Phi-3 mini, small y medium — modelos compactos altamente eficientes), y modelos open-source de terceros (Llama 3 de Meta, Mistral, Cohere Command R+, entre muchos otros). Puedes desplegar cualquiera de ellos a un managed endpoint en tu suscripción de Azure y consumirlo desde tu aplicación.
+
+Además de los modelos, Foundry incluye Prompt Flow (un editor visual para construir flujos multi-paso de IA), herramientas de evaluación (groundedness, relevance, coherence, fluency), y gestión de despliegues con versionado y traffic splitting.
+
+### Foundry vs Copilot M365
+
+La confusión más frecuente entre profesionales de negocio es pensar que Copilot M365 y Azure AI Foundry son lo mismo o que son intercambiables. No lo son.
+
+**Copilot M365** es un asistente pre-construido que Microsoft integra en Word, Excel, PowerPoint, Teams, Outlook y SharePoint. Tú no lo programas — lo activas con una licencia y lo usas. Responde preguntas sobre tus correos, resume reuniones, redacta borradores. Su comportamiento es fijo (aunque configurable marginalmente con Copilot Studio).
+
+**Azure AI Foundry** es donde construyes tu propia aplicación de IA. Si necesitas un asistente que responda preguntas sobre los SOPs de tu planta de fabricación, o una herramienta que analice protocolos clínicos contra regulaciones específicas, o un chatbot para empleados de RRHH que consulte tu política interna de vacaciones — eso se construye en Foundry, no en Copilot M365.
+
+### Foundry vs Microsoft Fabric
+
+**Microsoft Fabric** es la plataforma de datos de Microsoft: unificación de datos, pipelines de ingesta, análisis con Power BI, y ciencia de datos sobre datos estructurados. Fabric es donde viven tus datos y donde los procesas.
+
+**Azure AI Foundry** es donde construyes razonamiento sobre esos datos. La relación es complementaria: Fabric organiza y unifica tu inventario de datos de producción; Foundry construye el asistente que permite a un analista hacer preguntas en lenguaje natural sobre ese inventario. Los dos servicios se integran directamente: puedes usar un lakeouse de Fabric como fuente de datos para un índice de Azure AI Search que alimenta un flujo en Foundry.
+
+### Casos de uso típicos en Novartis
+
+- **Asistente de submissions regulatorias:** responde preguntas sobre los SOPs de tu empresa, mapea requisitos de agencias reguladoras a procedimientos internos, reduce el tiempo de búsqueda de analistas de Regulatory Affairs.
+- **Revisión de protocolos clínicos:** compara un borrador de protocolo contra criterios de ICH E6(R3) o FDA guidance almacenados en SharePoint, devuelve gaps estructurados.
+- **Asistente de RRHH interno:** responde preguntas de empleados sobre políticas de la empresa (vacaciones, beneficios, on-boarding) grounded en los documentos oficiales del intranet.
+- **Detector de anomalías en supply chain:** combina un flujo de datos de Fabric con un LLM que explica en lenguaje natural por qué un lote está en riesgo de retraso.
+
+### El modelo hub + proyecto
+
+Foundry organiza el trabajo en dos niveles. Un **Hub** es la infraestructura compartida: el tenant de Azure, la suscripción, los recursos de Azure OpenAI, la configuración de red y seguridad, y la facturación. Un administrador de DD&IT crea el Hub y lo conecta a los recursos aprobados de la organización.
+
+Un **Proyecto** vive dentro del Hub y es donde tu equipo construye una aplicación específica. Cada proyecto tiene su propio espacio de trabajo, sus conexiones a datos, sus flujos en Prompt Flow, y su historial de evaluaciones. Puedes tener múltiples proyectos en el mismo Hub — por ejemplo, uno para el asistente de RRHH y otro para la herramienta de revisión de protocolos — compartiendo la infraestructura y los controles de seguridad del Hub.
+
+> **Nota de compliance:** Azure AI Foundry corre dentro de tu tenant de Azure. Los datos enviados a los modelos mediante la API no salen de tu región de Azure y no se usan para el entrenamiento de modelos de Microsoft. Para casos de uso GxP y clínicos, se requieren pasos adicionales de validación del sistema y configuración de audit trail conforme a las políticas de IT governance de Novartis.
+
+---
+
+## Prompt Flow: orquestar tu asistente paso a paso
+
+Prompt Flow es el editor de flujos de Azure AI Foundry. En lugar de un único prompt que recibe una pregunta y devuelve una respuesta, Prompt Flow te permite construir un pipeline de pasos encadenados: recuperar contexto, formatear ese contexto, llamar al modelo, validar el output, y estructurar la respuesta final.
+
+### Por qué importa el pipeline multi-paso
+
+El patrón más simple de uso de un LLM — envías un prompt, recibes texto — es suficiente para tareas de generación abierta. Pero en un asistente empresarial necesitas más control:
+
+- El modelo no debe contestar de memoria: debe contestar desde **tus documentos**.
+- La respuesta debe incluir **referencias** a las fuentes.
+- El output puede necesitar **validación** (¿la respuesta cita documentos que el usuario tiene permiso de ver?).
+- Puede ser necesario **transformar** la pregunta antes de buscar (expandir acrónimos, reformular en inglés si los documentos están en inglés).
+
+Prompt Flow modela este pipeline como un grafo dirigido acíclico (DAG): cada nodo recibe entradas y produce salidas, y las conexiones entre nodos definen el orden de ejecución y el flujo de datos.
+
+### Tipos de nodos
+
+**Nodo LLM:** hace una llamada a un modelo de lenguaje (GPT-4o, Phi-3, Mistral, etc.). Recibes un system prompt y un user input, y el nodo devuelve el texto generado. Puedes configurar temperatura, top-p, número máximo de tokens, y si quieres streaming.
+
+**Nodo Python:** ejecuta una función Python. Úsalo para lógica personalizada que un LLM no debería manejar: limpiar texto, llamar a una API externa, validar que el output del LLM cumple un schema, transformar datos entre pasos.
+
+**Nodo Prompt (Jinja2):** ensambla el prompt final desde múltiples variables usando una plantilla Jinja2. Mantiene el prompt limpio y versionable por separado de la lógica de orquestación.
+
+**Nodo Tool / integración:** conectores built-in para Azure AI Search (búsqueda vectorial e híbrida), Bing (búsqueda en web), y APIs personalizadas. Abstrae la complejidad de conectarse al servicio.
+
+### Un flujo RAG completo paso a paso
+
+Este es el flujo mínimo viable para un asistente grounded en documentos propios:
+
+1. **Nodo de entrada:** recibe la pregunta del usuario como string.
+2. **Nodo de embedding:** llama a Azure OpenAI Embeddings (text-embedding-3-small o large) y convierte la pregunta en un vector de alta dimensión.
+3. **Nodo de búsqueda:** consulta el índice de Azure AI Search con el vector, recupera los 5 fragmentos más relevantes de tus documentos junto con sus metadatos (nombre de archivo, fecha, URL de SharePoint).
+4. **Nodo de ensamblado de prompt (Jinja2):** inserta la pregunta original y los 5 fragmentos recuperados en una plantilla estructurada. La plantilla incluye instrucciones para que el modelo cite sus fuentes y no use información fuera del contexto proporcionado.
+5. **Nodo LLM (GPT-4o):** genera la respuesta basándose exclusivamente en el contexto del prompt ensamblado.
+6. **Nodo de salida:** devuelve la respuesta más un array de referencias con los nombres de archivo y URLs de los fragmentos usados.
+
+### Variantes: probar múltiples versiones en paralelo
+
+Prompt Flow permite definir **variantes** de un nodo: versiones alternativas del mismo nodo (por ejemplo, dos redacciones distintas del system prompt, o el mismo prompt con GPT-4o vs Phi-3) que se ejecutan en paralelo sobre el mismo conjunto de test. Foundry muestra las métricas de evaluación de cada variante en paralelo para que puedas elegir la que mejor funciona antes de promocionar a producción.
+
+> **Nota de compliance:** Prompt Flow orquesta llamadas entre servicios dentro de tu tenant de Azure. Todos los flujos de datos permanecen dentro de tu tenant a menos que configures explícitamente conexiones externas. Antes de desplegar un flujo que maneje datos personales o regulados, documenta el flujo de datos completo (qué datos entran, qué servicios los procesan, dónde se almacenan los logs) y obtén revisión de IT/Seguridad.
+
+---
+
+## Conectar tus datos: Azure AI Search + SharePoint
+
+Para que un asistente de IA sea útil en un entorno corporativo no puede contestar desde el conocimiento general de su entrenamiento — debe contestar desde tus documentos, tus procedimientos, tus regulaciones internas. Eso requiere un sistema de recuperación de información. Azure AI Search es el servicio de Microsoft diseñado exactamente para este propósito.
+
+### Qué es Azure AI Search
+
+Azure AI Search es el servicio de búsqueda empresarial de Microsoft que soporta tres modalidades:
+
+- **Búsqueda por keywords (BM25):** el modelo clásico de relevancia textual — busca documentos que contengan las palabras exactas de la query.
+- **Búsqueda vectorial:** convierte tanto los documentos como la query en vectores numéricos y busca por similitud semántica en el espacio de embeddings. Encuentra "contraindicación" aunque el documento diga "interacción farmacológica".
+- **Búsqueda híbrida (keyword + vector):** combina los dos modelos anteriores y fusiona los rankings con el algoritmo RRF (Reciprocal Rank Fusion). Es la configuración recomendada para la mayoría de los casos porque captura tanto coincidencias exactas de terminología técnica como similitud semántica.
+
+### Por qué necesitas indexar para RAG
+
+El patrón RAG (Retrieval-Augmented Generation) requiere dos infraestructuras trabajando juntas: un **sistema de recuperación** que encuentra los fragmentos relevantes dado una pregunta, y un **LLM** que genera una respuesta coherente a partir de esos fragmentos.
+
+Sin el paso de recuperación, el LLM solo puede contestar desde su memoria de entrenamiento — que no incluye tus SOPs internos, tus etiquetas de producto actualizadas, ni tus contratos vigentes. Con el paso de recuperación, el LLM recibe el contexto justo antes de contestar, y la respuesta queda "grounded" (anclada) en tus fuentes.
+
+### El pipeline de indexación
+
+Para que Azure AI Search pueda responder queries sobre tus documentos, primero debes indexarlos. El pipeline tiene tres componentes:
+
+1. **Fuente de datos:** una biblioteca de SharePoint, un contenedor de Azure Blob Storage, una base de datos SQL, o OneDrive. Azure AI Search se conecta a la fuente y extrae el contenido de los documentos (Word, PDF, PowerPoint, texto plano).
+
+2. **Skillset (habilidades de procesamiento):**
+   - *Chunking (fragmentación):* divide cada documento en segmentos de aproximadamente 500 tokens con solapamiento de 50–100 tokens para no cortar ideas a la mitad.
+   - *Vectorización:* llama a Azure OpenAI Embeddings para convertir cada fragmento en un vector de 1 536 dimensiones (con text-embedding-3-small) o 3 072 dimensiones (con text-embedding-3-large).
+
+3. **Índice:** el almacén de búsqueda. Cada fragmento se guarda con su texto original, su vector, y metadatos estructurados: nombre del archivo fuente, URL de SharePoint, fecha de última modificación, sección del documento, y opcionalmente los permisos del archivo.
+
+### El conector de SharePoint
+
+Azure AI Search incluye un conector built-in para SharePoint Online que:
+
+- Rastrea una o varias bibliotecas de documentos de SharePoint de forma programada (cada hora, cada día).
+- Respeta los permisos de documento a nivel de SharePoint: si un usuario no tiene acceso a un archivo en SharePoint, ese archivo no aparece en los resultados de búsqueda del asistente cuando ese usuario hace una pregunta.
+- Mantiene el índice actualizado automáticamente cuando se agregan, modifican o eliminan documentos en la biblioteca.
+
+### Vectorización integrada en Foundry
+
+Azure AI Foundry incluye una funcionalidad de **integrated vectorization** que automatiza todo el pipeline anterior sin escribir código: apuntas al sitio de SharePoint (o al contenedor de Blob Storage), configuras el modelo de embeddings, el tamaño de chunk y el solapamiento, y Foundry crea el índice, el skillset y el indexer automáticamente. Para equipos sin mucha experiencia técnica, esta es la vía de entrada recomendada.
+
+### Caso práctico: asistente de Medical Affairs
+
+El equipo de Medical Affairs de Novartis gestiona etiquetas de producto (SmPCs y PILs) para múltiples países y múltiples productos. Estas etiquetas se actualizan con frecuencia a medida que cambia la evidencia clínica y se obtienen nuevas aprobaciones regulatorias. El equipo recibe preguntas de médicos sobre contraindicaciones, posología, e interacciones que requieren buscar en el documento correcto para el país correcto.
+
+Con Azure AI Search + SharePoint:
+- Las etiquetas oficiales se almacenan en una biblioteca de SharePoint con metadatos de país y producto.
+- Azure AI Search indexa la biblioteca con vectorización integrada.
+- El asistente de Medical Affairs recibe preguntas en lenguaje natural, busca en el índice con búsqueda híbrida, y el LLM genera respuestas citando el documento y la sección exacta.
+- Cuando se publica una nueva versión de una etiqueta en SharePoint, el indexer la reindexe automáticamente en el siguiente ciclo.
+
+> **Nota de compliance:** el conector de SharePoint respeta los permisos de SharePoint en el momento de la búsqueda — los usuarios solo ven resultados de documentos a los que ya tienen acceso. Sin embargo, el índice de Azure AI Search contiene el texto de esos documentos. Asegúrate de que el recurso de Azure AI Search esté protegido adecuadamente con RBAC y sea accesible únicamente desde la aplicación, nunca directamente desde usuarios finales.
+
+---
+
+## Desplegar y monitorear tu asistente
+
+Construir un asistente que funciona en Prompt Flow es solo la mitad del trabajo. La otra mitad es desplegarlo de forma que los usuarios correctos puedan usarlo, monitorearlo para detectar problemas, y mantenerlo con el tiempo.
+
+### Opciones de despliegue desde Foundry
+
+**Managed online endpoint (REST API):** despliega el flujo como un endpoint HTTPS que recibe una petición JSON y devuelve la respuesta. Cualquier aplicación puede llamarlo: Power Apps, SharePoint Framework (SPFx), un bot de Teams, una aplicación React interna, o un script de Python. Esta es la opción más flexible.
+
+**Bot de Teams:** integra tu asistente directamente en Microsoft Teams usando Azure Bot Service. Los usuarios hacen preguntas en un chat de Teams sin salir de su entorno de trabajo. Para audiencias de negocio en Novartis que viven en Teams, este es el canal de menor fricción.
+
+**Web app generada automáticamente:** Foundry puede generar una aplicación de chat básica en React y desplegarla a Azure App Service con un solo clic. El resultado es una URL interna con una interfaz de chat lista para usar. Ideal para pilotos internos rápidos donde no hay capacidad de desarrollo frontend.
+
+### Gestión de entornos
+
+Usa proyectos separados de Foundry para cada entorno: Development → Staging → Production. La razón práctica es que cada proyecto tiene sus propias cuotas de tokens de Azure OpenAI. Si Development comparte cuota con Production, un test intensivo puede agotar la cuota disponible y dejar el asistente de producción sin servicio.
+
+Define un proceso de promoción: los cambios en el flujo se desarrollan en Dev, se evalúan en Staging con el dataset de test, y solo se despliegan a Production cuando las métricas de evaluación superan los umbrales definidos.
+
+### Evaluación antes de desplegar
+
+Foundry incluye un sistema de evaluación batch: preparas un dataset de 50–100 pares de pregunta y respuesta esperada, ejecutas tu flujo contra todo el dataset, y Foundry calcula métricas agregadas usando evaluadores built-in:
+
+- **Groundedness (fundamentación):** ¿está la respuesta basada en el contexto recuperado, o el modelo está inventando información? Puntuación de 1 a 5.
+- **Relevance (relevancia):** ¿responde la respuesta a la pregunta formulada? Puntuación de 1 a 5.
+- **Coherence (coherencia):** ¿es la respuesta internamente consistente y bien estructurada?
+- **Fluency (fluidez):** ¿está la respuesta gramaticalmente bien formada?
+
+Además de los evaluadores built-in, puedes crear **evaluadores personalizados en Python**: por ejemplo, un evaluador que verifica si la respuesta recomienda consultar a un médico cuando la pregunta es clínica, o un evaluador que verifica que la respuesta no cita documentos de una versión obsoleta del label.
+
+### Monitoreo en producción
+
+Una vez desplegado, configura monitoreo desde el primer día:
+
+**Azure Monitor + Application Insights:** latencia por request (P50, P95, P99), tasa de errores, consumo de tokens por request y por día. Define alertas cuando la latencia P95 supere tu SLA o cuando el consumo de tokens se acerque al límite de cuota.
+
+**Filtros de contenido:** Azure OpenAI incluye filtros de seguridad activados por defecto en todos los despliegues de Foundry: detectan y bloquean contenido de odio, violencia, autolesiones y contenido sexual, tanto en el input del usuario como en el output del modelo. Los eventos filtrados quedan registrados y puedes revisarlos periódicamente.
+
+**Tracing de flujos:** cada request a un flujo en producción genera un trace completo: qué nodos se ejecutaron, qué recibió y qué devolvió cada nodo, cuánto tiempo tardó cada paso. Cuando un usuario reporta una respuesta incorrecta, el trace te permite reproducir exactamente qué ocurrió: qué fragmentos recuperó el buscador, qué prompt se ensamblió, qué generó el modelo.
+
+**Gestión de costos:** define spending alerts en las cuotas de Azure OpenAI para cada entorno. Un flujo con un bug (por ejemplo, un loop que no termina o un input que genera requests repetidos) puede consumir el presupuesto de tokens del mes en pocas horas.
+
+### El checklist de despliegue
+
+Antes de pasar cualquier asistente de Foundry a producción:
+
+- [ ] Evaluar con 50+ preguntas de test, objetivo groundedness > 4/5
+- [ ] Configurar filtros de contenido apropiados para el caso de uso
+- [ ] Activar Application Insights y definir alertas de latencia y errores
+- [ ] Documentar el flujo de datos para revisión de IT/Seguridad
+- [ ] Configurar spending alerts en las cuotas de tokens
+- [ ] Definir el procedimiento de rollback (volver a la versión anterior del despliegue)
+- [ ] Establecer quién es el responsable del mantenimiento y la revisión periódica
+
+> **Nota de compliance:** antes de poner en producción cualquier asistente de Foundry en un contexto regulado, completa el AI impact assessment requerido por el IT governance de Novartis. Incluso para casos de uso de bajo riesgo (bots de FAQ internos), documenta: qué datos accede el sistema, qué modelo utiliza, quién tiene acceso, y cuál es el fallback si el sistema no está disponible. Para casos de uso GxP o con datos de pacientes, este proceso incluye validación del sistema conforme a los procedimientos de Novartis.
+
+---
+
+<Quiz
+  moduleSlug="azure-ai-foundry"
+  questions={[
+    {
+      question: "¿Cuál es la diferencia principal entre Azure AI Foundry y Copilot M365?",
+      options: [
+        "Foundry es más caro que Copilot M365",
+        "Copilot M365 es un asistente pre-construido para apps de productividad; Foundry es donde construyes aplicaciones de IA personalizadas",
+        "No hay diferencia, son el mismo producto con distintos nombres",
+        "Foundry solo funciona con modelos GPT-4 de OpenAI"
+      ],
+      correct: 1
+    },
+    {
+      question: "En Prompt Flow, ¿qué hace un nodo de búsqueda (Search node)?",
+      options: [
+        "Busca en Google resultados relevantes",
+        "Consulta un índice de Azure AI Search y devuelve fragmentos relevantes de tus documentos",
+        "Busca errores en el código Python",
+        "Hace una búsqueda en el historial de conversaciones"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Por qué es importante usar hybrid search (keyword + vector) en Azure AI Search?",
+      options: [
+        "Es más barato que usar solo búsqueda vectorial",
+        "Porque combina coincidencias exactas de palabras con similitud semántica, mejorando el recall para terminología técnica",
+        "Porque solo hybrid search es compatible con SharePoint",
+        "No hay diferencia práctica entre hybrid y vector search"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué evalúa el evaluador de 'groundedness' en Foundry?",
+      options: [
+        "Si la respuesta es gramaticalmente correcta",
+        "Si la respuesta está basada en el contexto recuperado, no en inventada por el modelo",
+        "Si el usuario está satisfecho con la respuesta",
+        "Si el tiempo de respuesta es menor de 2 segundos"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué debes hacer antes de desplegar un asistente de Foundry en un contexto regulado?",
+      options: [
+        "Nada especial si el assistant tiene groundedness > 4/5",
+        "Completar el AI impact assessment de IT governance, documentar el flujo de datos, modelo usado, acceso, y fallback",
+        "Solo necesitas aprobación del manager directo",
+        "Esperar a que el modelo GPT-4o sea certificado para uso farmacéutico"
+      ],
+      correct: 1
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="Azure AI Foundry — Documentación oficial"
+  url="https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry"
+  description="Visión general de Azure AI Foundry: arquitectura hub/project, modelos disponibles, Prompt Flow, evaluación y despliegue."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Prompt Flow — Guía de inicio"
+  url="https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/flow-develop"
+  description="Cómo crear y ejecutar flujos en Prompt Flow: tipos de nodos, variables, testing, y despliegue a managed endpoints."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Azure AI Search — RAG con Azure OpenAI"
+  url="https://learn.microsoft.com/en-us/azure/search/search-get-started-rag"
+  description="Tutorial oficial para construir un sistema RAG con Azure AI Search y Azure OpenAI: indexar documentos, hacer búsqueda vectorial, y grounding de respuestas."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Evaluación de flujos en Azure AI Foundry"
+  url="https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-approach-gen-ai"
+  description="Cómo evaluar aplicaciones de IA generativa en Foundry: evaluadores built-in (groundedness, relevance, coherence), evaluadores custom, y mejores prácticas."
+  type="doc"
+/>
