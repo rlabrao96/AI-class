@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Capacitaciones AI',
-  description: 'AI Course Platform',
+  title: 'Capacitación en IA',
+  description: 'Programa de capacitación en Inteligencia Artificial',
 }
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={inter.className}>{children}</body>
     </html>
   )
