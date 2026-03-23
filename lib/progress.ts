@@ -1,3 +1,5 @@
+import type { Track } from './modules'
+
 const PREFIX = 'progress_'
 const QUIZ_PREFIX = 'quiz_'
 const QUIZ_SUFFIX = '_completed'
@@ -37,4 +39,11 @@ export function getQuizCompleted(slug: string): boolean {
 export function setQuizCompleted(slug: string): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(`${QUIZ_PREFIX}${slug}${QUIZ_SUFFIX}`, 'true')
+}
+
+export function getTrackProgress(track: Track): number {
+  if (typeof window === 'undefined') return 0
+  return track.modules.filter(
+    (m) => localStorage.getItem(`${PREFIX}${m.slug}`) === 'completed'
+  ).length
 }
