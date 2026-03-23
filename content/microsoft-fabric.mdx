@@ -28,9 +28,9 @@ Una organización típica crea workspaces separados por dominio de negocio (Fina
 
 Las organizaciones farmacéuticas manejan volúmenes y variedad de datos que hacen de Fabric una plataforma especialmente relevante: datos clínicos de ensayos, datos de farmacovigilancia, datos de supply chain global, datos comerciales por mercado, datos financieros por entidad. Hoy muchos de estos datos viven en silos separados — SAP para finanzas y supply chain, sistemas de CRM para datos comerciales, plataformas específicas para datos clínicos — con poco o ningún análisis transversal. Fabric puede unificar estos datos en una plataforma gobernada para análisis integrado.
 
-Novartis Switzerland tiene Fabric habilitado a través de DD&IT, lo que significa que el entorno ya está disponible para comenzar a trabajar.
+Novartis tiene Fabric habilitado a través de DD&IT, lo que significa que el entorno ya está disponible para comenzar a trabajar.
 
-> **Nota de compliance:** Fabric corre dentro del tenant de Microsoft 365 de Novartis, con los mismos controles de residencia de datos y compliance que aplican al resto de M365. Para Novartis Switzerland, los datos permanecen en la región EU. Sin embargo, **los datos regulados — datos de ensayos clínicos, datos GxP, datos de farmacovigilancia — requieren controles de governance adicionales antes de conectarse a Fabric**. Antes de crear pipelines que muevan este tipo de datos, consulta con IT/compliance para confirmar que el workspace y la configuración cumplen con los requerimientos regulatorios aplicables.
+> **Nota de compliance:** Fabric corre dentro del tenant de Microsoft 365 de Novartis, con los mismos controles de residencia de datos y compliance que aplican al resto de M365. Sin embargo, **los datos regulados — datos de ensayos clínicos, datos GxP, datos de farmacovigilancia — requieren controles de governance adicionales antes de conectarse a Fabric**. Antes de crear pipelines que muevan este tipo de datos, consulta con IT/compliance para confirmar que el workspace y la configuración cumplen con los requerimientos regulatorios aplicables.
 
 ---
 
@@ -64,7 +64,7 @@ Con Dataflows puedes: conectarte a una fuente, ver los datos en una grilla inter
 
 ### Ejemplo práctico: datos de ventas desde SAP a Power BI
 
-Imagina este escenario: el equipo comercial de Novartis Switzerland quiere un dashboard semanal de ventas por producto y región, con datos que vienen del sistema SAP. El flujo completo con Data Factory:
+Imagina este escenario: el equipo comercial quiere un dashboard semanal de ventas por producto y región, con datos que vienen del sistema SAP. El flujo completo con Data Factory:
 
 1. El pipeline se conecta a la tabla de ventas en SAP HANA mediante el conector nativo de SAP HANA en Data Factory.
 2. Una actividad de transformación limpia los datos: elimina registros con campos obligatorios vacíos, estandariza los códigos de región (SAP usa códigos internos que el equipo comercial no reconoce — se mapean a nombres legibles), y elimina duplicados.

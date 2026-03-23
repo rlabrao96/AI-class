@@ -41,7 +41,7 @@ Una pregunta frecuente: si Novartis ya puede usar Claude, ¿por qué hacerlo a t
 
 Cuando llamas a Claude a través de la API directa de Anthropic, los datos salen de la infraestructura de Novartis y viajan a los servidores de Anthropic. Cuando llamas a Claude a través de Bedrock, la llamada permanece dentro de tu VPC de AWS. Anthropic no ve los datos — AWS sí, pero dentro de los términos de tu contrato empresarial con AWS. Los datos no se usan para entrenar los modelos fundacionales por defecto.
 
-**Nota de compliance:** Bedrock está disponible en múltiples regiones de AWS. Para Novartis Switzerland, los despliegues deben usar regiones dentro de la UE — preferentemente `eu-central-1` (Frankfurt) o `eu-west-1` (Irlanda) — para mantener residencia de datos en la UE. Antes de usar Bedrock para casos de uso con datos sensibles, verifica con IT el estado del model invocation logging en tu cuenta: los logs de invocación pueden contener prompts y respuestas, y necesitan el mismo nivel de protección que los datos que procesan.
+**Nota de compliance:** Bedrock está disponible en múltiples regiones de AWS. Los despliegues deben usar la región configurada por DD&IT para tu cuenta. Antes de usar Bedrock para casos de uso con datos sensibles, verifica con IT el estado del model invocation logging en tu cuenta: los logs de invocación pueden contener prompts y respuestas, y necesitan el mismo nivel de protección que los datos que procesan.
 
 ---
 
@@ -93,7 +93,7 @@ Cuando necesitas integrar Bedrock en una aplicación o script, usas boto3 — el
 import boto3
 import json
 
-bedrock = boto3.client('bedrock-runtime', region_name='eu-central-1')
+bedrock = boto3.client('bedrock-runtime', region_name='TU_REGION_AWS')
 
 response = bedrock.invoke_model(
     modelId='anthropic.claude-3-5-sonnet-20241022-v2:0',
@@ -109,7 +109,7 @@ result = json.loads(response['body'].read())
 print(result['content'][0]['text'])
 ```
 
-Algunos aspectos clave de este código: el `region_name` debe apuntar a una región de la UE para Novartis Switzerland. El `modelId` usa el identificador completo de Bedrock (no solo el nombre del modelo). El `body` sigue el formato específico del proveedor del modelo — para Claude de Anthropic, el formato de mensajes es el mismo que la API directa de Anthropic, pero envuelto en la estructura de boto3.
+Algunos aspectos clave de este código: el `region_name` debe apuntar a la región configurada por DD&IT para tu cuenta. El `modelId` usa el identificador completo de Bedrock (no solo el nombre del modelo). El `body` sigue el formato específico del proveedor del modelo — para Claude de Anthropic, el formato de mensajes es el mismo que la API directa de Anthropic, pero envuelto en la estructura de boto3.
 
 **Nota de compliance:** todas las llamadas a la API de Bedrock desde dentro de la red de Novartis deben enrutar a través de VPC endpoints, no por internet público. Esto es normalmente pre-configurado por IT cuando se aprovisiona acceso a Bedrock para tu cuenta. Antes de construir aplicaciones de producción, verifica con IT que el VPC endpoint de Bedrock está configurado correctamente para tu entorno.
 
@@ -166,7 +166,7 @@ Este tipo de sistema tiene ventajas significativas sobre simplemente dar acceso 
 
 Es útil entender la distinción: **Knowledge Bases** está optimizado para recuperar y responder a partir de documentos. **Bedrock Agents** añade razonamiento en múltiples pasos y uso de herramientas — el agente puede llamar APIs externas, ejecutar consultas de base de datos, y tomar acciones, no solo buscar en documentos. Los Agents son más potentes pero también más complejos de construir, probar, y validar. Para la mayoría de casos de uso de búsqueda sobre documentos internos, Knowledge Bases es la solución correcta.
 
-**Nota de compliance:** el vector store (OpenSearch Serverless o Aurora pgvector) almacena fragmentos de texto extraídos de tus documentos. Este recurso debe estar en la región de AWS correcta (UE para Novartis Switzerland) y debe tener grupos de seguridad de VPC configurados apropiadamente. Para contenido de documentos que incluya PII o datos regulados, habilita cifrado en reposo y logging de auditoría en el vector store antes de cargar cualquier documento.
+**Nota de compliance:** el vector store (OpenSearch Serverless o Aurora pgvector) almacena fragmentos de texto extraídos de tus documentos. Este recurso debe estar en la región de AWS correcta (la configurada por DD&IT para tu cuenta) y debe tener grupos de seguridad de VPC configurados apropiadamente. Para contenido de documentos que incluya PII o datos regulados, habilita cifrado en reposo y logging de auditoría en el vector store antes de cargar cualquier documento.
 
 ---
 

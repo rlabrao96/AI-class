@@ -1,6 +1,6 @@
 # Copilot en Microsoft 365
 
-Microsoft 365 Copilot es el asistente de inteligencia artificial integrado en las herramientas que ya usas cada día: Outlook, Teams, Word, Excel, PowerPoint y SharePoint. En este módulo entenderás cómo funciona por dentro, cómo escribir prompts que aprovechen sus capacidades únicas de acceso a tu contexto organizacional, y cómo aplicarlo de forma concreta en las tareas más frecuentes de tu rol. Para los profesionales de Novartis Switzerland, donde Copilot ya está habilitado por DD&IT, este conocimiento marca la diferencia entre usarlo como un buscador glorificado y convertirlo en un multiplicador real de productividad.
+Microsoft 365 Copilot es el asistente de inteligencia artificial integrado en las herramientas que ya usas cada día: Outlook, Teams, Word, Excel, PowerPoint y SharePoint. En este módulo entenderás cómo funciona por dentro, cómo escribir prompts que aprovechen sus capacidades únicas de acceso a tu contexto organizacional, y cómo aplicarlo de forma concreta en las tareas más frecuentes de tu rol. Para los profesionales de Novartis, donde Copilot ya está habilitado por DD&IT, este conocimiento marca la diferencia entre usarlo como un buscador glorificado y convertirlo en un multiplicador real de productividad.
 
 ---
 
@@ -28,9 +28,9 @@ Uno de los aspectos más críticos para entender Copilot correctamente es su mod
 
 El flujo completo cuando haces una consulta a Copilot sigue estos pasos: primero, tu prompt es analizado para identificar qué tipo de información se necesita; segundo, Microsoft Graph recupera el contenido relevante de tu tenant (emails, archivos, reuniones) respetando tus permisos; tercero, ese contenido se combina con tu prompt y se envía al LLM como contexto enriquecido; finalmente, el LLM genera una respuesta fundamentada en ese contexto real, no en suposiciones genéricas.
 
-### Compliance y privacidad para Novartis Switzerland
+### Compliance y privacidad para Novartis
 
-Para los profesionales de Novartis, hay un punto de cumplimiento fundamental: **todos los datos permanecen dentro de tu tenant**. Microsoft no usa el contenido de tu organización para entrenar sus modelos. Además, Novartis Switzerland está cubierta por el **EU Data Boundary** de Microsoft, lo que significa que los datos procesados por Copilot no salen de la región europea. Las respuestas de Copilot se generan con el contexto de tu tenant y no se comparten con otros tenants ni usuarios externos.
+Para los profesionales de Novartis, hay un punto de cumplimiento fundamental: **todos los datos permanecen dentro de tu tenant**. Microsoft no usa el contenido de tu organización para entrenar sus modelos. Los datos procesados por Copilot no salen de la región de datos configurada para tu tenant. Las respuestas de Copilot se generan con el contexto de tu tenant y no se comparten con otros tenants ni usuarios externos.
 
 La implicación práctica de toda esta arquitectura es importante: la calidad de las respuestas de Copilot depende directamente de la calidad y organización de los datos en tu entorno. Si tus documentos están bien nombrados, organizados en SharePoint con estructura clara, y los permisos están bien gestionados, Copilot podrá encontrar y usar esa información de forma mucho más efectiva.
 
@@ -246,6 +246,6 @@ La promesa de los Copilot Agents es significativa: en lugar de que el conocimien
 <ResourceCard
   title="Microsoft 365 Copilot — Seguridad y compliance"
   url="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy"
-  description="Documentación de Microsoft sobre cómo Copilot maneja datos, privacidad, límites del tenant, y cumplimiento regulatorio (incluyendo EU Data Boundary)."
+  description="Documentación de Microsoft sobre cómo Copilot maneja datos, privacidad, límites del tenant, y cumplimiento regulatorio."
   type="doc"
 />
