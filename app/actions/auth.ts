@@ -16,11 +16,11 @@ export async function login(prevState: State, formData: FormData): Promise<State
     return { error: 'Contraseña incorrecta. Inténtalo de nuevo.' }
   }
 
-  cookies().set('auth_token', process.env.SITE_PASSWORD!, {
+  cookies().set('auth_token', String(Date.now()), {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60, // 1 hour
     path: '/',
   })
 
