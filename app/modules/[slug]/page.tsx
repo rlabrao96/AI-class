@@ -8,9 +8,10 @@ import Link from 'next/link'
 const moduleMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
   'ai-fundamentals': () => import('@/content/ai-fundamentals.mdx'),
   'prompting-fundamentals': () => import('@/content/prompting-fundamentals.mdx'),
+  'reliable-ai-systems': () => import('@/content/reliable-ai-systems.mdx'),
   'vibe-coding': () => import('@/content/vibe-coding.mdx'),
-  'legal-ai-risks': () => import('@/content/legal-ai-risks.mdx'),
   'agents-and-skills': () => import('@/content/agents-and-skills.mdx'),
+  'legal-ai-risks': () => import('@/content/legal-ai-risks.mdx'),
 }
 
 export function generateStaticParams() {

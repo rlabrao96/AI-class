@@ -37,8 +37,20 @@ export const modules: Module[] = [
     ],
   },
   {
-    slug: 'vibe-coding',
+    slug: 'reliable-ai-systems',
     number: 3,
+    title: 'Sistemas de IA Confiables',
+    estimatedTime: '40 min',
+    toc: [
+      { id: 'por-qué-los-llms-solos-fallan-en-producción', label: 'Por qué los LLMs solos fallan' },
+      { id: 'llm-modulo-orquestación-con-critics', label: 'LLM-Modulo: orquestación con critics' },
+      { id: 'schema-guided-reasoning-hacer-el-output-verificable', label: 'Schema-Guided Reasoning' },
+      { id: 'evaluar-si-tu-sistema-funciona', label: 'Evaluar si tu sistema funciona' },
+    ],
+  },
+  {
+    slug: 'vibe-coding',
+    number: 4,
     title: 'Vibe-coding: Automatiza Sin Código',
     estimatedTime: '45 min',
     toc: [
@@ -50,7 +62,7 @@ export const modules: Module[] = [
   },
   {
     slug: 'agents-and-skills',
-    number: 4,
+    number: 5,
     title: 'Agentes de IA, Skills y Extensibilidad',
     estimatedTime: '40 min',
     toc: [
@@ -63,7 +75,7 @@ export const modules: Module[] = [
   },
   {
     slug: 'legal-ai-risks',
-    number: 5,
+    number: 6,
     title: 'Riesgos Legales y Gobernanza de la IA',
     estimatedTime: '25 min',
     toc: [
