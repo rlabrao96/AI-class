@@ -1,3 +1,254 @@
 # Vibe-coding
 
-Contenido próximamente.
+Hay una barrera que durante décadas separó a quienes podían construir herramientas digitales de quienes solo podían usarlas: saber programar. El vibe-coding es el nombre que se le ha dado a una nueva práctica que erosiona esa barrera — no eliminando la complejidad técnica, sino desplazando quién necesita entenderla. La idea central es simple: describes lo que quieres en lenguaje natural, la IA genera el código o la automatización, y tú iteras hasta que funciona. Sin cursos de programación. Sin entender cada línea. Sin depender de un desarrollador para tareas pequeñas.
+
+Este módulo es para cualquier profesional — con o sin background técnico — que quiera empezar a construir sus propias herramientas, automatizar procesos repetitivos y entender el nuevo flujo de trabajo que está redefiniendo cómo se produce software en equipos de todo tipo.
+
+---
+
+## Qué es el vibe-coding {#que-es-el-vibe-coding}
+
+El término "vibe-coding" lo popularizó Andrej Karpathy a principios de 2025 para describir algo que muchos ya estaban haciendo sin nombre: escribirle a una IA lo que necesitas que haga un programa, dejar que ella genere el código, probarlo, y repetir el ciclo hasta obtener lo que querías. La palabra "vibe" captura algo real: el proceso se siente más parecido a describir una intención que a construir un sistema.
+
+Pero hay una distinción importante que hacer desde el inicio. El vibe-coding no es "hacer que la IA escriba código por ti mientras tú te desconectas". Es un flujo de trabajo activo donde **el valor que aportas como humano es la claridad de tu descripción y tu capacidad de evaluar si el resultado funciona**. El código generado puede tener errores. Puede hacer algo parecido a lo que pediste pero no exactamente. Puede romperse con datos que no anticipaste. Tu rol es detectar eso y corregir el rumbo — no escribir la solución tú mismo.
+
+Ese cambio de perspectiva es el núcleo del concepto: ya no necesitas saber *cómo* construir algo para poder construirlo. Necesitas saber *qué* quieres construir y ser capaz de reconocer cuándo ya está bien hecho.
+
+### Tres ejemplos concretos para anclar la idea
+
+**Un script que limpia fechas en un CSV.** Tienes un archivo con miles de filas exportado de tres sistemas distintos. La columna de fechas tiene formatos mezclados: `15/03/2024`, `March 2024`, `2024-03-15`. Ninguna función estándar de Excel los procesa igual. En lugar de pasar horas arreglando celdas a mano o aprender Python, le describes el problema a la IA: *"Tengo un CSV con una columna de fechas en tres formatos distintos. Necesito un script que los normalice todos a YYYY-MM-DD."* La IA genera el script. Tú lo corres, ves qué pasa, y si algo falla, pegas el error de vuelta.
+
+**Una fórmula de Excel que categoriza gastos.** Tienes una hoja de gastos con descripciones de texto libre. Quieres que una nueva columna clasifique cada gasto automáticamente. Describes la lógica en castellano: *"Si la descripción contiene 'taxi', 'Uber' o 'traslado', categoriza como Transporte. Si contiene 'almuerzo', 'cena' o 'restaurante', categoriza como Alimentación."* La IA te devuelve la fórmula anidada exacta para Excel o Google Sheets. Tú la pegas, verificas los primeros 20 resultados y ajustas si algo no cuadra.
+
+**Una plantilla de email con variables.** Necesitas enviar 80 emails de seguimiento personalizados. En lugar de escribirlos uno por uno, describes la estructura y las variables: *"Crea una plantilla de email de seguimiento post-reunión con variables para [nombre], [empresa], [tema discutido] y [próximo paso acordado]. Tono profesional pero directo."* La IA genera la plantilla. Luego le pides que genere cinco variantes para que no suenen idénticas.
+
+Lo que estos tres ejemplos tienen en común: el trabajo intelectual que aportas no es técnico. Es la capacidad de describir el problema con suficiente precisión y de evaluar si el resultado es correcto. Esa es la habilidad central del vibe-coding.
+
+### La analogía del Dark Souls
+
+En el mundo de los videojuegos, existe un concepto llamado "git gud" — mejorar de verdad, aprender los patrones del juego en lugar de presionar botones al azar. El vibe-coding funciona igual. La tentación es ser impreciso en la descripción ("hazme algo que procese mis datos") y esperar magia. Pero las mecánicas del proceso penalizan la vaguedad: si no describes bien el contexto, la IA genera algo genérico que no encaja con tu caso específico. La habilidad no es técnica — es la de articular bien los problemas.
+
+---
+
+## El loop de iteración {#el-loop-de-iteracion}
+
+El vibe-coding no es un acto de una sola interacción. Es un ciclo. Entender ese ciclo es lo que separa a alguien que obtiene resultados de alguien que se frustra y abandona. El flujo tiene cuatro pasos que se repiten hasta llegar al resultado esperado.
+
+### Paso 1: Describe lo que quieres con contexto específico
+
+La primera descripción es la más importante. No porque deba ser perfecta — no lo será — sino porque define el punto de partida. Una buena descripción inicial incluye tres elementos:
+
+- **Contexto**: qué tipo de datos o situación tienes ("mi CSV tiene 3 columnas: nombre, fecha, monto")
+- **Output esperado**: qué quieres que produzca ("un archivo limpio donde todas las fechas están en formato YYYY-MM-DD")
+- **Restricciones o condiciones especiales**: qué casos borde debes manejar ("algunas celdas de fecha están vacías, esas deben quedarse vacías")
+
+Una descripción completa elimina suposiciones. Cuantas menos suposiciones hace la IA, más cerca está el primer resultado de lo que necesitas.
+
+### Paso 2: Corre o revisa el output
+
+Si es un script, córrelo con un subconjunto pequeño de tus datos reales. Si es una fórmula, aplícala a 10 filas y verifica los resultados. Si es un borrador de texto, léelo en voz alta e identifica qué suena raro. En todos los casos, tu tarea es la misma: **comparar lo que obtuviste con lo que necesitabas**. No necesitas entender el código para saber si el resultado es correcto.
+
+### Paso 3: Describe el error o el desajuste
+
+Aquí está el error más frecuente de quienes están empezando: parafrasear el problema con sus propias palabras en lugar de usar la información exacta del fallo. Tres reglas para describir errores de manera efectiva:
+
+- **Copia el mensaje de error completo**, no lo resumas. Si el script dice `KeyError: 'fecha_transaccion'`, pega eso exactamente, no escribas "hay un error con las fechas".
+- **Describe qué esperabas versus qué obtuviste**: "esperaba que las fechas del formato 'March 2024' se convirtieran a '2024-03-01', pero el script las está dejando igual sin mostrar error".
+- **Incluye contexto adicional si cambió algo**: "probé con mi archivo completo, que tiene 12,000 filas, y el error aparece solo en las filas después de la 3,000".
+
+### Paso 4: Repite hasta que funcione
+
+No existe un número de iteraciones "correcto". Algunos problemas se resuelven en el primer intento. Otros requieren cinco o seis ciclos. Lo que importa es que cada iteración debe acercarte al resultado: si el error cambió, estás progresando; si obtienes el mismo error después de tres intentos, probablemente el problema está en cómo estás describiendo el contexto, no en la solución.
+
+### Un diálogo de iteración real
+
+El siguiente es un ejemplo del tipo de conversación que produce resultados:
+
+---
+
+**Usuario:** Tengo un CSV con una columna llamada "fecha" que tiene fechas en tres formatos distintos: DD/MM/YYYY, Month YYYY y YYYY-MM-DD. Necesito un script en Python que normalice todo a YYYY-MM-DD. Las celdas vacías deben quedar vacías.
+
+**IA:** *(genera script de Python usando pandas y dateutil)*
+
+**Usuario:** Corrí el script y obtuve este error:
+`ParserError: Unknown string format: '15/3/24'`
+El archivo tiene algunas fechas en formato corto DD/M/YY, no DD/MM/YYYY como yo decía. Hay unas 200 filas así.
+
+**IA:** *(actualiza el script para manejar también el formato corto DD/M/YY)*
+
+**Usuario:** Ahora funciona para casi todo. Pero las fechas que dicen "Q1 2024" o "Q2 2024" las está convirtiendo como inválidas y pone NaT. ¿Podemos hacer que "Q1 2024" se convierta a 2024-01-01, "Q2 2024" a 2024-04-01, y así?
+
+**IA:** *(agrega lógica específica para formatos trimestrales)*
+
+---
+
+En tres intercambios, el script pasó de manejar tres formatos a manejar cinco. Nada de esto requirió que el usuario entendiera Python. Requirió que el usuario supiera qué querían, reconociera qué estaba fallando, y describiera el fallo con precisión.
+
+### La regla de oro
+
+No necesitas entender el código para dirigirlo. Necesitas entender el **objetivo** y si el output lo alcanza. Esa distinción es lo que hace accesible el vibe-coding a profesionales sin background técnico — y lo que lo hace poderoso incluso para quienes sí lo tienen.
+
+---
+
+## Casos de uso prácticos {#casos-de-uso-practicos}
+
+A continuación, cinco casos de uso que cualquier profesional puede probar hoy, sin instalaciones complicadas ni conocimiento técnico previo. Para los dos primeros, puedes trabajar directamente en la interfaz de chat de Claude, ChatGPT o similar. Para los que requieren ejecutar código, puedes pedirle a la IA que lo adapte para Google Colab, que tiene entorno de ejecución gratuito en el navegador.
+
+---
+
+### 1. Limpieza de datos en Excel o CSV
+
+**El problema:** Tienes datos exportados de múltiples sistemas que no comparten el mismo formato. Fechas en tres estilos, nombres con mayúsculas inconsistentes, montos con y sin símbolo de moneda.
+
+**El prompt:**
+
+> Tengo un CSV con las siguientes columnas: nombre (texto libre con capitalización inconsistente), fecha (en tres formatos: DD/MM/YY, Month YYYY, y YYYY-MM-DD), y monto (algunos tienen el símbolo $ adelante, otros no). Necesito un script de Python que: 1) normalice los nombres a Title Case, 2) convierta todas las fechas a YYYY-MM-DD, 3) limpie los montos para que sean números sin símbolo. El archivo de entrada se llama datos.csv y el de salida debe llamarse datos_limpios.csv.
+
+**Por qué funciona:** El prompt especifica cada columna, su problema concreto y el resultado esperado. La IA no tiene que adivinar nada — puede generar un script que resuelva exactamente eso.
+
+---
+
+### 2. Fórmulas complejas en Excel o Google Sheets
+
+**El problema:** Necesitas una fórmula que aplique lógica de negocio que sabes en castellano pero no sabes cómo expresar en sintaxis de Excel.
+
+**El prompt:**
+
+> Necesito una fórmula para Google Sheets. La lógica es: si la celda en columna B es mayor a 1000 Y la celda en columna C está vacía, muestra "URGENTE". Si la celda en columna B es mayor a 1000 Y la celda en columna C tiene algún valor, muestra "EN PROCESO". En todos los demás casos, muestra "NORMAL". La fórmula va en la columna D, empezando en D2.
+
+**Por qué funciona:** Describes la lógica como la pensarías verbalmente. La IA traduce esa lógica a la sintaxis correcta de `IF` anidados o `IFS`, con la referencia de celda exacta que pediste.
+
+---
+
+### 3. Automatizar borradores de emails repetitivos
+
+**El problema:** Envías variantes del mismo tipo de email decenas de veces por semana. Cada uno tiene pequeñas diferencias pero la estructura es idéntica.
+
+**El prompt:**
+
+> Crea una plantilla de email para comunicar a un cliente que su solicitud fue aprobada con condiciones. Variables a personalizar: [NOMBRE_CLIENTE], [TIPO_SOLICITUD], [CONDICIÓN_PRINCIPAL], [FECHA_LÍMITE], [NOMBRE_EJECUTIVO]. El tono debe ser profesional pero cálido. El email no debe superar 150 palabras. Luego genera tres variantes del cuerpo principal para que no todos los emails suenen idénticos.
+
+**Por qué funciona:** Al definir variables con corchetes y pedir variantes, obtienes un sistema de plantillas listo para usar — no solo un email.
+
+---
+
+### 4. Resumir documentos extensos
+
+**El problema:** Tienes 50 páginas de actas de reunión, reportes de auditoría o transcripciones que necesitas procesar rápidamente.
+
+**El prompt:**
+
+> Tengo las actas de las últimas 12 reuniones de comité de dirección. Las voy a pegar a continuación. Dame: 1) los 10 temas más frecuentes que aparecen en múltiples reuniones, 2) los 5 puntos de acción que llevan más semanas sin resolverse, 3) una lista de las decisiones tomadas que involucran presupuesto. Formato: una sección para cada uno de los tres puntos, con bullets concisos.
+
+**Por qué funciona:** En lugar de pedir "un resumen", defines tres preguntas específicas con formato de output. La IA puede responder cada una de forma precisa en lugar de generar un resumen genérico.
+
+---
+
+### 5. Convertir texto de PDF a tabla estructurada
+
+**El problema:** Tienes información atrapada en PDFs — cotizaciones, contratos, reportes — que necesitas analizar como datos estructurados.
+
+**El prompt:**
+
+> Voy a pegar el texto de una cotización de proveedor. Extrae la siguiente información y organízala como tabla con estas columnas: Código de producto, Descripción, Cantidad, Precio unitario, Precio total. Si algún campo no está disponible, deja la celda vacía. Al final agrega una fila con el total general. Aquí está el texto: [pegar texto del PDF]
+
+**Por qué funciona:** El texto de un PDF se puede pegar directamente en el chat. Al especificar las columnas exactas, obtienes una tabla que puedes copiar directamente a Excel o Google Sheets.
+
+---
+
+### El patrón que une todos estos casos
+
+Nótese que en todos los ejemplos anteriores, el prompt tiene la misma estructura: contexto del problema, descripción del input, descripción exacta del output esperado, y especificación del formato. Eso es lo que hace que el vibe-coding funcione — no es la herramienta, es la claridad de la descripción.
+
+---
+
+## Cómo ir más lejos {#como-ir-mas-lejos}
+
+Una vez que el loop de iteración se vuelve natural — describir, probar, corregir, repetir — el mismo principio escala a herramientas más potentes. El "vibe" no cambia. Lo que cambia es el alcance de lo que puedes construir.
+
+### Claude Code: la IA que trabaja directamente en tu computadora
+
+Claude Code es una herramienta de Anthropic que corre en tu terminal (la línea de comandos de tu computadora) y opera con acceso directo a tus archivos locales. En lugar de copiar y pegar código manualmente, Claude Code puede leer tus archivos, escribir nuevos archivos, ejecutar código y corregir errores de forma autónoma — todo a partir de tus instrucciones en lenguaje natural.
+
+El flujo es el mismo que el vibe-coding básico, pero con una diferencia clave: no tienes que ser el intermediario entre la IA y tu computadora. Le dices "analiza todos los archivos CSV en esta carpeta y genera un reporte consolidado", y Claude Code encuentra los archivos, escribe el script, lo ejecuta y te muestra el resultado. Es el siguiente escalón natural después de dominar el loop básico.
+
+### Conectar herramientas con AI agents: Zapier, Make, n8n
+
+Herramientas como Zapier AI, Make (antes Integromat) y n8n permiten conectar aplicaciones entre sí usando IA como capa de lógica — sin código. El patrón típico es: un trigger (llegó un email, se creó una fila en una hoja de cálculo, se subió un archivo) activa un flujo donde la IA procesa el contenido y toma decisiones, y luego ejecuta acciones en otras aplicaciones (enviar un mensaje en Slack, crear una tarea en Notion, actualizar un CRM).
+
+Por ejemplo: cada vez que llega un email de un cliente con una queja, la IA clasifica la urgencia, extrae los datos clave, y crea automáticamente un ticket en el sistema de soporte con la categoría correcta asignada. Todo sin intervención manual, todo sin código.
+
+La ventaja de estas herramientas es la velocidad de prototipado: en horas puedes tener un flujo funcionando que antes habría requerido días de desarrollo. La limitación es la misma que señala la literatura de negocio y flujos de trabajo con IA: a medida que la lógica se vuelve más compleja, la falta de transparencia y control puede ser un problema. Son ideales para flujos internos, pruebas de concepto y tareas de bajo riesgo.
+
+### El loop se extiende: de prompts a sistemas
+
+La habilidad que estás desarrollando en este módulo — describir un problema con claridad, evaluar si el output es correcto, iterar hasta que funcione — es exactamente la misma que usan equipos de producto para construir sistemas de automatización más complejos. La diferencia es de escala, no de naturaleza.
+
+En equipos que combinan expertos de negocio con ingenieros, el experto de dominio describe la lógica de negocio ("si la solicitud supera los $50,000 Y el proveedor tiene menos de un año en nuestra base, necesita doble aprobación"), y el equipo técnico la implementa de forma que sea verificable y auditable. El experto de dominio no escribe código — pero define exactamente qué debe hacer el sistema y evalúa si los resultados son correctos. Eso es vibe-coding a escala organizacional.
+
+### Una nota honesta sobre los límites
+
+El vibe-coding no reemplaza a los desarrolladores para sistemas complejos. Un sistema de pagos, una plataforma con miles de usuarios, una integración que debe cumplir requisitos de seguridad regulados — esos proyectos necesitan ingeniería real, con tests, revisión de código, manejo de errores robusto y arquitectura pensada.
+
+Lo que el vibe-coding sí desbloquea es una categoría enorme de automatizaciones "pequeñas" que antes estaban bloqueadas por la barrera técnica: el script que nadie iba a escribir porque "no vale la pena pedírselo al equipo de IT", la fórmula que llevas meses haciendo a mano, el reporte que sigues generando manualmente cada lunes. Esa categoría de trabajo — repetitiva, de bajo riesgo, sin valor de negocio en sí misma pero consumidora de tiempo — es exactamente donde el vibe-coding tiene su mayor impacto.
+
+---
+
+<Quiz
+  moduleSlug="vibe-coding"
+  questions={[
+    {
+      question: "¿Cuál es la habilidad core del vibe-coding?",
+      options: [
+        "Escribir código sintácticamente correcto",
+        "Describir claramente lo que quieres e iterar",
+        "Conocer múltiples lenguajes de programación",
+        "Entender modelos de machine learning"
+      ],
+      correct: 1
+    },
+    {
+      question: "Cuando el código generado por IA falla, ¿qué debes hacer?",
+      options: [
+        "Empezar desde cero",
+        "Copiar el mensaje de error y describir qué pasó de vuelta a la IA",
+        "Rendirse y hacerlo manualmente",
+        "Llamar a un desarrollador"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuál de estos es un buen caso de uso para vibe-coding?",
+      options: [
+        "Entrenar un nuevo modelo de IA",
+        "Limpiar un CSV con formato inconsistente",
+        "Diseñar la arquitectura de una red neuronal",
+        "Reemplazar a tu equipo de datos completo"
+      ],
+      correct: 1
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="Canal YouTube de Jack — Vibe-coding en práctica"
+  url="https://www.youtube.com/@Itssssss_Jack"
+  description="Videos prácticos sobre cómo construir herramientas y automatizaciones con IA sin escribir código. Contenido actualizado y muy accionable."
+  type="video"
+/>
+
+<ResourceCard
+  title="Simon Willison's Blog"
+  url="https://simonwillison.net"
+  description="Blog técnico de referencia sobre IA práctica, LLMs y herramientas. Perspectiva de un desarrollador experimentado sobre cómo usar IA en el trabajo real."
+  type="article"
+/>
+
+<ResourceCard
+  title="Claude Code — Documentación oficial"
+  url="https://docs.anthropic.com/en/docs/claude-code/overview"
+  description="Documentación de Claude Code: la herramienta de Anthropic para programar con IA directamente en tu terminal. El siguiente paso después del vibe-coding básico."
+  type="doc"
+/>
