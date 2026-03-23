@@ -1,0 +1,313 @@
+# Amazon Bedrock: IA en AWS
+
+Amazon Bedrock es el servicio gestionado de AWS para construir aplicaciones de IA generativa usando modelos de lenguaje de múltiples proveedores, sin necesidad de gestionar infraestructura. Este módulo cubre cómo usarlo en la práctica — desde la consola web hasta la API con Python — y cómo funciona el stack completo: llamadas a modelos, RAG con Knowledge Bases, y controles de seguridad con Guardrails. Novartis tiene Bedrock habilitado en AWS junto con Azure AI Foundry como parte de una estrategia multi-cloud deliberada: diferentes herramientas para diferentes casos de uso.
+
+---
+
+## Qué es Amazon Bedrock y por qué usarlo
+
+Amazon Bedrock es el servicio de AWS para acceder y usar modelos fundacionales (foundation models) de múltiples proveedores a través de una API unificada. La propuesta central es simple: no gestionas servidores GPU, no configuras clústeres, no despliegas instancias. Llamas a una API, pagas por token consumido, y cuando no hay actividad no pagas nada. El modelo serverless aplicado a IA generativa.
+
+### Un catálogo de modelos, no un modelo único
+
+La diferencia más visible entre Bedrock y otros servicios de IA en la nube es la amplitud del catálogo. En Bedrock puedes usar:
+
+- **Anthropic Claude** (Claude 3.5 Sonnet, Claude 3 Haiku, Claude 3 Opus): ampliamente considerados los mejores modelos para razonamiento complejo, análisis de documentos largos, y generación de texto estructurado. Soportan hasta 200.000 tokens de contexto, lo que equivale a varios cientos de páginas de texto.
+- **Meta Llama 3**: modelos de código abierto (open weights) útiles cuando necesitas personalización profunda o fine-tuning sobre datos propios. Llama también es una buena opción para generación de código.
+- **Amazon Titan**: los modelos propios de AWS. Más simples que Claude para tareas de razonamiento, pero muy eficientes para embeddings (la representación vectorial de texto que RAG necesita).
+- **Mistral**: modelos rápidos y eficientes en costo, especialmente buenos para tareas de clasificación y resumen a escala donde velocidad y precio importan más que capacidad de razonamiento profundo.
+- **Cohere y AI21 Labs**: opciones adicionales con fortalezas específicas en búsqueda semántica y generación de texto en múltiples idiomas.
+
+Esta diversidad de modelos es el diferenciador clave de Bedrock frente a Azure AI Foundry. Foundry es muy fuerte en el ecosistema Microsoft-OpenAI: GPT-4o, GPT-4 Turbo, integración con Microsoft 365. Bedrock, en cambio, da acceso a Claude (que muchos equipos consideran superior para análisis de documentos complejos), Llama (que es fundamental si quieres hacer fine-tuning), y varios otros modelos con características únicas.
+
+### Por qué Novartis usa los dos
+
+La estrategia multi-cloud de Novartis no es redundancia por redundancia — es elegir la mejor herramienta para cada tipo de problema:
+
+- **Razonamiento complejo y documentos muy largos** → Claude en Bedrock. Un contrato de 150 páginas, un dossier regulatorio, una revisión de literatura científica extensa: Claude maneja estos contextos con consistencia superior.
+- **Integración con el ecosistema Microsoft** → Azure AI Foundry con GPT-4o. Todo lo que vive en SharePoint, Teams, el stack de Copilot, o requiere autenticación con Azure AD fluye más naturalmente por el ecosistema de Microsoft.
+- **Fine-tuning y experimentación con modelos abiertos** → Amazon + Llama o modelos personalizados. AWS ofrece la infraestructura de entrenamiento y Bedrock la API unificada.
+- **Velocidad y costo a escala** → Mistral en Bedrock o modelos equivalentes en Azure.
+
+Tener ambas plataformas disponibles significa que el equipo puede seleccionar el modelo más adecuado para cada caso de uso, en lugar de adaptar el caso de uso al modelo disponible.
+
+### Bedrock Studio: la interfaz web
+
+Bedrock Studio es la interfaz de usuario web de Bedrock — equivalente a lo que Claude.ai o ChatGPT son para el usuario final, pero ejecutado dentro de tu cuenta de AWS. Puedes seleccionar cualquier modelo disponible en el catálogo, ajustar parámetros como temperatura y longitud de respuesta, probar system prompts, y comparar respuestas entre modelos diferentes. Es el punto de entrada recomendado antes de escribir código.
+
+### Bedrock vs. API directa de Anthropic
+
+Una pregunta frecuente: si Novartis ya puede usar Claude, ¿por qué hacerlo a través de Bedrock en lugar de directamente con la API de Anthropic? La respuesta es de compliance y arquitectura de datos.
+
+Cuando llamas a Claude a través de la API directa de Anthropic, los datos salen de la infraestructura de Novartis y viajan a los servidores de Anthropic. Cuando llamas a Claude a través de Bedrock, la llamada permanece dentro de tu VPC de AWS. Anthropic no ve los datos — AWS sí, pero dentro de los términos de tu contrato empresarial con AWS. Los datos no se usan para entrenar los modelos fundacionales por defecto.
+
+**Nota de compliance:** Bedrock está disponible en múltiples regiones de AWS. Para Novartis Switzerland, los despliegues deben usar regiones dentro de la UE — preferentemente `eu-central-1` (Frankfurt) o `eu-west-1` (Irlanda) — para mantener residencia de datos en la UE. Antes de usar Bedrock para casos de uso con datos sensibles, verifica con IT el estado del model invocation logging en tu cuenta: los logs de invocación pueden contener prompts y respuestas, y necesitan el mismo nivel de protección que los datos que procesan.
+
+---
+
+## Llamar modelos: consola y API
+
+Hay dos formas de usar Bedrock: a través de la consola web (Bedrock Studio) o programáticamente a través de la API con boto3, el SDK de Python de AWS. Ambas rutas acceden a los mismos modelos y tienen las mismas garantías de seguridad.
+
+### Bedrock Studio: explorar sin código
+
+Bedrock Studio es el entorno ideal para experimentar antes de comprometerse con un modelo o una arquitectura. El flujo es directo:
+
+1. Abre Bedrock Studio en la consola de AWS
+2. Selecciona un modelo del catálogo (Claude 3.5 Sonnet es un buen punto de partida para la mayoría de tareas)
+3. Configura el system prompt — las instrucciones que el modelo siempre seguirá en esa sesión
+4. Escribe tu prompt y observa la respuesta
+5. Ajusta parámetros y repite
+
+Bedrock Studio también permite comparación lado a lado: puedes enviar el mismo prompt a Claude y a Llama simultáneamente y comparar las respuestas. Esto es muy útil en las primeras fases de un proyecto para decidir qué modelo usar antes de escribir código de producción.
+
+### Qué modelo usar para qué tarea
+
+La elección del modelo tiene un impacto directo en calidad, velocidad y costo. Estas son las directrices prácticas:
+
+**Claude 3.5 Sonnet (Anthropic):** el modelo de propósito general más potente disponible en Bedrock. Úsalo para análisis de documentos complejos, razonamiento en múltiples pasos, generación de texto estructurado, y cualquier tarea donde la calidad del resultado importa más que la velocidad. Contexto de hasta 200.000 tokens — puede procesar documentos muy extensos en una sola llamada.
+
+**Claude 3 Haiku (Anthropic):** la versión rápida y barata de Claude. Útil cuando necesitas alta velocidad y bajo costo — por ejemplo, clasificar miles de documentos o generar resúmenes cortos a escala. Mismas garantías de compliance que Sonnet, pero con menor capacidad de razonamiento complejo.
+
+**Llama 3 (Meta):** la mejor opción cuando necesitas fine-tuning sobre datos propios o cuando las restricciones de licencia de modelos comerciales son relevantes. También funciona bien para generación de código. Requiere despliegue personalizado en Bedrock para fine-tuning.
+
+**Amazon Titan:** eficiente para embeddings — la representación vectorial de texto que alimenta los sistemas de búsqueda semántica y RAG. Para generación de texto en tareas de razonamiento, Claude es superior.
+
+**Mistral:** muy eficiente en costo y velocidad para tareas de clasificación, resumen, y extracción de entidades a gran escala. Cuando el volumen es alto y la tarea es más rutinaria, Mistral puede ofrecer mejor costo-beneficio.
+
+### Parámetros clave que controlan el comportamiento del modelo
+
+**Temperature (0 a 1):** controla qué tan "creativo" o predecible es el modelo. Temperature 0 produce la respuesta más probable y consistente — ideal para extracción de datos, clasificación, o cualquier tarea donde quieres resultados reproducibles. Temperature 0.7-1.0 introduce variabilidad — útil para brainstorming o generación de contenido creativo donde la diversidad de ideas importa.
+
+**Max tokens:** limita la longitud máxima de la respuesta. Importante para control de costos: si tu tarea solo necesita una clasificación de una palabra, no tiene sentido pagar por un límite de 4.000 tokens. Configúralo acorde a la tarea.
+
+**Top-p (nucleus sampling):** controla la diversidad del vocabulario sin ser tan directo como temperature. Un valor de 0.9 significa que el modelo solo considera los tokens que cubren el 90% de la probabilidad acumulada. En la práctica, la mayoría de usuarios ajusta temperature y deja top-p en su valor por defecto.
+
+**System prompt:** instrucciones que el modelo siempre sigue, independientemente de lo que el usuario escriba. Es el mecanismo principal para dar contexto, rol, y restricciones consistentes a través de todas las interacciones. Un system prompt bien diseñado es más fiable que intentar incluir instrucciones en cada prompt de usuario.
+
+### La API con Python y boto3
+
+Cuando necesitas integrar Bedrock en una aplicación o script, usas boto3 — el SDK de Python de AWS. Un punto importante: no usas el SDK de Anthropic directamente. La interfaz pasa por boto3 independientemente del modelo que llames.
+
+```python
+import boto3
+import json
+
+bedrock = boto3.client('bedrock-runtime', region_name='eu-central-1')
+
+response = bedrock.invoke_model(
+    modelId='anthropic.claude-3-5-sonnet-20241022-v2:0',
+    body=json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 1024,
+        "messages": [
+            {"role": "user", "content": "Summarize this document in 3 bullets: ..."}
+        ]
+    })
+)
+result = json.loads(response['body'].read())
+print(result['content'][0]['text'])
+```
+
+Algunos aspectos clave de este código: el `region_name` debe apuntar a una región de la UE para Novartis Switzerland. El `modelId` usa el identificador completo de Bedrock (no solo el nombre del modelo). El `body` sigue el formato específico del proveedor del modelo — para Claude de Anthropic, el formato de mensajes es el mismo que la API directa de Anthropic, pero envuelto en la estructura de boto3.
+
+**Nota de compliance:** todas las llamadas a la API de Bedrock desde dentro de la red de Novartis deben enrutar a través de VPC endpoints, no por internet público. Esto es normalmente pre-configurado por IT cuando se aprovisiona acceso a Bedrock para tu cuenta. Antes de construir aplicaciones de producción, verifica con IT que el VPC endpoint de Bedrock está configurado correctamente para tu entorno.
+
+---
+
+## RAG con Bedrock Knowledge Bases
+
+Bedrock Knowledge Bases es el servicio gestionado de RAG (Retrieval-Augmented Generation) de AWS. En términos de función, hace lo mismo que la combinación de Azure AI Search + Azure AI Foundry en el ecosistema de Microsoft: conectar un LLM a una base de documentos privada para que responda preguntas basadas en ese contenido, con citas de fuente. La diferencia es que Knowledge Bases lo gestiona todo dentro de Bedrock, sin necesitar configurar servicios adicionales.
+
+### Cómo funciona internamente
+
+Cuando conectas una fuente de datos a Knowledge Bases, el servicio ejecuta automáticamente un pipeline de cuatro pasos:
+
+1. **Chunking:** divide tus documentos en fragmentos de tamaño manejable. El tamaño y estrategia de chunking afecta significativamente la calidad del retrieval — Knowledge Bases ofrece chunking fijo, semántico, y por jerarquía de secciones.
+2. **Embeddings:** convierte cada chunk en un vector numérico usando Amazon Titan Embeddings o Cohere Embed. Este vector captura el significado semántico del texto de forma que la búsqueda por similitud es posible.
+3. **Almacenamiento vectorial:** guarda esos vectores en un vector store gestionado — Amazon OpenSearch Serverless o Aurora pgvector, ambos dentro de tu AWS account.
+4. **Sincronización:** cuando los documentos fuente cambian, Knowledge Bases actualiza el índice automáticamente — en schedule periódico o bajo demanda.
+
+El resultado es un índice de búsqueda semántica sobre tu contenido, mantenido automáticamente, que el LLM puede consultar para responder preguntas.
+
+### El retrieve-and-generate API
+
+La API más potente de Knowledge Bases es `retrieve_and_generate`: envías una pregunta, y Bedrock maneja todo el ciclo RAG internamente:
+
+1. Convierte la pregunta en un vector de búsqueda
+2. Recupera los chunks más relevantes de tu Knowledge Base
+3. Construye un prompt para el LLM con esos chunks como contexto
+4. Llama al modelo (Claude, Titan, o el que hayas configurado)
+5. Devuelve la respuesta junto con las citas de fuente: qué documento, qué sección, qué página
+
+Esas citas de fuente son fundamentales para la confiabilidad del sistema. En lugar de que el usuario tenga que confiar ciegamente en la respuesta del modelo, puede verificar directamente el documento original.
+
+### Fuentes de datos disponibles
+
+Knowledge Bases se conecta directamente a:
+
+- **Amazon S3:** el conector más común para grandes volúmenes de documentos. PDFs, Word, PowerPoint, HTML, texto plano — todos soportados. Ideal para bibliotecas de documentos estáticas o que se actualizan por batch.
+- **SharePoint:** conexión directa a sitios y bibliotecas de SharePoint, usando las mismas credenciales del directorio corporativo. Mismo tipo de conector que Azure AI Search ofrece en el ecosistema de Microsoft.
+- **Confluence:** útil para indexar wikis internas, bases de conocimiento de equipo, y documentación técnica interna.
+- **Salesforce:** conectar Knowledge Bases a registros, artículos, y datos de Salesforce.
+
+### Caso de uso práctico en Novartis
+
+Un asistente de Información Médica que responde preguntas de profesionales de la salud (HCPs) basado en el etiquetado aprobado de productos. El flujo sería:
+
+- Los PDFs de los Summary of Product Characteristics (SmPCs) actualizados se suben a S3 cada vez que hay una nueva versión aprobada
+- Knowledge Bases indexa automáticamente cada nuevo PDF al detectar el cambio en S3
+- El asistente responde preguntas sobre dosificación, contraindicaciones, e interacciones citando el SmPC correspondiente
+- Las citas de fuente en cada respuesta permiten al HCP verificar directamente el documento aprobado
+
+Este tipo de sistema tiene ventajas significativas sobre simplemente dar acceso directo al LLM: las respuestas están ancladas en documentos regulatorios aprobados, las citas de fuente son verificables, y el índice se mantiene actualizado sin intervención manual.
+
+### Bedrock Agents vs. Knowledge Bases
+
+Es útil entender la distinción: **Knowledge Bases** está optimizado para recuperar y responder a partir de documentos. **Bedrock Agents** añade razonamiento en múltiples pasos y uso de herramientas — el agente puede llamar APIs externas, ejecutar consultas de base de datos, y tomar acciones, no solo buscar en documentos. Los Agents son más potentes pero también más complejos de construir, probar, y validar. Para la mayoría de casos de uso de búsqueda sobre documentos internos, Knowledge Bases es la solución correcta.
+
+**Nota de compliance:** el vector store (OpenSearch Serverless o Aurora pgvector) almacena fragmentos de texto extraídos de tus documentos. Este recurso debe estar en la región de AWS correcta (UE para Novartis Switzerland) y debe tener grupos de seguridad de VPC configurados apropiadamente. Para contenido de documentos que incluya PII o datos regulados, habilita cifrado en reposo y logging de auditoría en el vector store antes de cargar cualquier documento.
+
+---
+
+## Guardrails y uso responsable en Bedrock
+
+Bedrock Guardrails es la capa nativa de moderación de contenido y seguridad de Bedrock. La idea es configurar los controles una vez y aplicarlos a todas las llamadas al modelo en tu aplicación — sin cambiar el código de la aplicación. Es una capa de seguridad independiente del modelo que uses.
+
+### Qué puede hacer Guardrails
+
+**Topic denial (denegación de temas):** defines una lista de temas que el modelo nunca debe abordar, y Bedrock bloquea cualquier respuesta que intente entrar en ese territorio. Ejemplos relevantes para Novartis: "no discutas productos de competidores", "no des consejo de inversión", "no proporciones diagnósticos médicos". El topic denial se configura con ejemplos en lenguaje natural, no con reglas rígidas de texto.
+
+**Content filters (filtros de contenido):** filtra categorías de contenido dañino — discurso de odio, violencia, autolesiones, contenido sexual. Cada categoría tiene niveles de sensibilidad configurables (bajo, medio, alto) para el input del usuario y para el output del modelo independientemente. Puedes ser más permisivo con el input del usuario (que puede incluir citas de terceros o texto que necesitas analizar) y más estricto con el output del modelo.
+
+**PII detection (detección de información personal identificable):** detecta y puede redactar o bloquear PII en inputs o outputs. Los tipos de PII detectados incluyen nombres, emails, números de teléfono, números de la seguridad social, números de historia clínica, números de tarjeta de crédito, y más. Puedes configurar qué tipos de PII redactar (reemplazar con `[NOMBRE]`, `[EMAIL]`, etc.) y cuáles bloquear completamente.
+
+**Word filters (filtros de palabras):** bloquea términos o frases específicos. Útil para términos regulatorios que no deberían aparecer fuera de contexto apropiado, o para vocabulario que viola políticas corporativas específicas.
+
+**Grounding check (verificación de anclaje):** disponible específicamente cuando usas Knowledge Bases. Valida que la respuesta del modelo está anclada en el contexto recuperado — es decir, que el modelo no está "inventando" información más allá de lo que los documentos dicen. Si la respuesta no está suficientemente anclada, Guardrails puede bloquearla o etiquetarla.
+
+### Cómo configurar Guardrails
+
+La configuración se hace en la consola de Bedrock, no en el código de tu aplicación:
+
+1. Crea un Guardrail en la consola de Bedrock
+2. Configura cada categoría de filtro con sus umbrales
+3. Obtienes un `guardrail_id`
+4. Ese ID se pasa en tus llamadas a la API — el mismo Guardrail puede aplicarse a múltiples aplicaciones y modelos
+
+El hecho de que la configuración viva en Bedrock y no en el código de la aplicación tiene una ventaja importante: puedes actualizar las políticas de seguridad sin desplegar código nuevo. Si necesitas añadir un nuevo término prohibido o ajustar un umbral, lo haces en la consola de Bedrock y el cambio se aplica inmediatamente a todas las aplicaciones que usan ese Guardrail.
+
+### Reporting y monitorización
+
+Bedrock envía automáticamente métricas de Guardrails a Amazon CloudWatch. Puedes ver:
+- Cuántas requests fueron bloqueadas y por qué categoría
+- Qué tipos de PII se detectaron más frecuentemente
+- Tendencias de violaciones de topic denial a lo largo del tiempo
+
+Este historial de violaciones es valioso no solo para operaciones — también para iterar sobre la configuración del Guardrail. Si ves muchos falsos positivos en una categoría, puedes reducir la sensibilidad. Si ves que ciertos inputs evaden el topic denial, puedes añadir más ejemplos.
+
+### Guardrails en el contexto regulatorio de pharma
+
+En el contexto de una empresa farmacéutica como Novartis, Guardrails tiene tres roles de compliance especialmente relevantes:
+
+**Redacción de PII:** usuarios internos pueden pegar texto que contiene identificadores de pacientes sin darse cuenta — un informe de caso adverso, un email de un HCP con datos del paciente incluidos. Si PII detection está activado, esos identificadores se redactan antes de que lleguen al modelo. Sin este control, datos de pacientes podrían aparecer en los logs de invocación de Bedrock.
+
+**Topic denial para límites regulatorios:** un asistente interno de medical affairs puede estar autorizado a hablar sobre mecanismos de acción y datos clínicos, pero no para hacer afirmaciones comparativas sobre competidores o hacer declaraciones no aprobadas sobre eficacia. Topic denial codifica esos límites de forma sistemática.
+
+**Blocking off-topic en asistentes especializados:** un asistente de envíos regulatorios debería permanecer enfocado en temas regulatorios. Topic denial evita que derive hacia responder preguntas generales de recursos humanos o legales para las que no tiene el contexto apropiado.
+
+### Limitaciones importantes
+
+Guardrails es un filtro probabilístico, no un bloque determinista. Esto significa que con suficiente ingeniería de prompts (jailbreaking), un usuario determinado puede eludir los topic denial. No debe ser el único mecanismo de seguridad en aplicaciones de alto riesgo.
+
+La recomendación correcta es tratarlo como defensa en profundidad: Guardrails detecta el 95%+ de los casos problemáticos de forma automática y consistente, pero sigue siendo necesario el diseño cuidadoso del system prompt, la formación de usuarios, y la revisión humana de outputs en casos de uso de alto riesgo.
+
+**Nota de compliance:** Guardrails está fuertemente recomendado para cualquier despliegue de Bedrock que procese input de usuarios — internos o externos. Antes de desplegar una aplicación de Bedrock sin PII detection habilitado, confirma con IT y el DPO que el caso de uso específico no lo requiere. Para casos de uso regulatorios o clínicos, la configuración de Guardrails debe documentarse e incluirse en el paquete de validación del sistema.
+
+---
+
+<Quiz
+  moduleSlug="aws-bedrock"
+  questions={[
+    {
+      question: "¿Por qué Novartis usa tanto Azure AI Foundry como Amazon Bedrock?",
+      options: [
+        "Porque son el mismo servicio con distintos nombres",
+        "Porque diferentes casos de uso se benefician de diferentes modelos y ecosistemas — multi-cloud permite elegir la mejor herramienta",
+        "Porque uno es para desarrollo y el otro para producción",
+        "Por error — deberían usar solo uno de los dos"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué modelo de Bedrock es generalmente mejor para tareas de razonamiento complejo y documentos muy largos?",
+      options: [
+        "Amazon Titan",
+        "Meta Llama 3",
+        "Anthropic Claude",
+        "Mistral"
+      ],
+      correct: 2
+    },
+    {
+      question: "¿Qué hace automáticamente Bedrock Knowledge Bases cuando lo conectas a una fuente de datos?",
+      options: [
+        "Nada automáticamente, debes configurar cada paso manualmente",
+        "Chunking de documentos, generación de embeddings, almacenamiento vectorial, y sincronización cuando los documentos cambian",
+        "Solo descarga los documentos, el chunking y embeddings son manuales",
+        "Envía los documentos a OpenAI para indexación"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué puede hacer Bedrock Guardrails que NO puede hacer un simple system prompt?",
+      options: [
+        "Nada, un system prompt bien escrito tiene las mismas capacidades",
+        "Detección y redacción automática de PII, filtros de contenido configurables, y logging de violaciones — aplicado de forma consistente a todas las llamadas",
+        "Mejorar la calidad de las respuestas del modelo",
+        "Reducir el costo por token"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Con qué SDK de Python debes llamar a modelos de Bedrock (Claude, Llama, etc.)?",
+      options: [
+        "El SDK oficial de Anthropic (anthropic Python package)",
+        "OpenAI Python SDK con base_url de AWS",
+        "boto3, el SDK de AWS para Python",
+        "Cualquiera de los anteriores funciona igual"
+      ],
+      correct: 2
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="Amazon Bedrock — Documentación oficial"
+  url="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+  description="Visión general de Amazon Bedrock: modelos disponibles, Knowledge Bases, Agents, Guardrails, y guía de inicio."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Bedrock Knowledge Bases — Guía de inicio"
+  url="https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"
+  description="Cómo crear y configurar una Knowledge Base en Bedrock: conectar fuentes de datos, configurar embeddings, y usar el retrieve-and-generate API."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Amazon Bedrock Guardrails"
+  url="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"
+  description="Documentación de Guardrails: cómo configurar filtros de contenido, detección de PII, topic denial, y grounding checks para aplicaciones de Bedrock."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Anthropic Claude en Amazon Bedrock"
+  url="https://docs.anthropic.com/en/api/claude-on-amazon-bedrock"
+  description="Guía de Anthropic sobre cómo usar Claude a través de Amazon Bedrock: diferencias con la API directa, boto3 vs SDK, y mejores prácticas."
+  type="doc"
+/>
