@@ -1,0 +1,254 @@
+# Microsoft Fabric: Datos con IA
+
+Microsoft Fabric representa el paso de Microsoft hacia una plataforma de analytics unificada, donde los datos, los pipelines, el análisis y la inteligencia artificial conviven en un solo entorno. En este módulo aprenderás qué es Fabric, cómo conectar y transformar datos con Data Factory, cómo usar Copilot para analizar datos en lenguaje natural, y qué controles de governance y seguridad necesitas conocer antes de desplegar Fabric en un contexto regulado como Novartis.
+
+---
+
+## Qué es Microsoft Fabric y por qué importa
+
+Antes de Fabric, construir un pipeline analítico moderno en Azure significaba ensamblar varios servicios separados: Azure Data Factory para mover datos, Azure Synapse Analytics para el warehouse, Power BI para visualización, Azure Machine Learning para los modelos. Cada servicio tenía su propia interfaz de administración, su propio esquema de permisos, su propia facturación y su propia capa de seguridad. El resultado práctico era que los equipos de datos pasaban una parte desproporcionada del tiempo gestionando integraciones entre servicios en lugar de generar valor con los datos.
+
+Microsoft Fabric resuelve esto reuniendo todos esos workloads en una sola plataforma SaaS: **Data Engineering** (procesamiento de datos a escala con Spark), **Data Warehouse** (SQL analítico sobre datos estructurados), **Data Science** (notebooks con Python/R/Scala), **Real-Time Analytics** (análisis de streams en tiempo real), y **Power BI** (visualización y reporting) conviven en una misma experiencia, con una sola identidad de acceso y un modelo de facturación unificado por capacidad (las unidades se llaman Fabric Capacity Units, o CUs).
+
+### OneLake: el concepto central
+
+El elemento que hace posible esta unificación es **OneLake**. Piénsalo como OneDrive, pero para datos analíticos: una única capa de almacenamiento lógica que todos los workloads de Fabric leen y escriben. No importa si estás trabajando en un Notebook de PySpark, consultando un Data Warehouse SQL, o construyendo un report de Power BI — todos acceden a los mismos datos en OneLake, sin necesidad de copiarlos ni de construir pipelines de sincronización entre servicios.
+
+Esto elimina una de las causas más comunes de inconsistencia en los datos: las múltiples copias. En el mundo pre-Fabric, era habitual tener la misma tabla de ventas en tres lugares distintos — una copia en el warehouse, otra en un dataset de Power BI, otra en un bucket de Data Lake — y que cada copia estuviera en un estado diferente dependiendo de cuándo se ejecutó el último pipeline de sincronización. Con OneLake, hay una sola copia, y todos los servicios la leen directamente.
+
+OneLake usa el formato **Delta Lake** para almacenar tablas, lo que proporciona capacidades de ACID transactions, versioning de datos (puedes consultar el estado de una tabla en un punto anterior en el tiempo) y operaciones de actualización/borrado eficientes. Esto lo hace adecuado no solo para datos históricos estáticos sino también para datos que cambian con frecuencia.
+
+### Workspaces: la unidad organizativa de Fabric
+
+Dentro de Fabric, los **workspaces** son los contenedores organizativos principales, equivalentes a un SharePoint site o a un Team en Teams. Un workspace agrupa pipelines, lakehouses, warehouses, notebooks, datasets y reports relacionados. Los permisos se asignan a nivel de workspace (con cuatro roles: Viewer, Contributor, Member, Admin), aunque también es posible compartir ítems individuales.
+
+Una organización típica crea workspaces separados por dominio de negocio (Finance Analytics, Commercial Analytics, Supply Chain) o por entorno (Development, UAT, Production). El aislamiento entre workspaces garantiza que el equipo de finance no pueda acceder accidentalmente a los datasets de supply chain sin permiso explícito.
+
+### Relevancia para Novartis
+
+Las organizaciones farmacéuticas manejan volúmenes y variedad de datos que hacen de Fabric una plataforma especialmente relevante: datos clínicos de ensayos, datos de farmacovigilancia, datos de supply chain global, datos comerciales por mercado, datos financieros por entidad. Hoy muchos de estos datos viven en silos separados — SAP para finanzas y supply chain, sistemas de CRM para datos comerciales, plataformas específicas para datos clínicos — con poco o ningún análisis transversal. Fabric puede unificar estos datos en una plataforma gobernada para análisis integrado.
+
+Novartis Switzerland tiene Fabric habilitado a través de DD&IT, lo que significa que el entorno ya está disponible para comenzar a trabajar.
+
+> **Nota de compliance:** Fabric corre dentro del tenant de Microsoft 365 de Novartis, con los mismos controles de residencia de datos y compliance que aplican al resto de M365. Para Novartis Switzerland, los datos permanecen en la región EU. Sin embargo, **los datos regulados — datos de ensayos clínicos, datos GxP, datos de farmacovigilancia — requieren controles de governance adicionales antes de conectarse a Fabric**. Antes de crear pipelines que muevan este tipo de datos, consulta con IT/compliance para confirmar que el workspace y la configuración cumplen con los requerimientos regulatorios aplicables.
+
+---
+
+## Conectar tus datos: pipelines con Data Factory
+
+Una vez que tienes Fabric, el primer desafío práctico suele ser el mismo: los datos que necesitas analizar están en otro sistema. Están en SAP, en Salesforce, en una base de datos SQL, en archivos CSV guardados en SharePoint, o en un API REST de un proveedor. **Data Factory en Fabric** es la herramienta para construir los puentes que llevan esos datos hasta OneLake.
+
+### Qué es Data Factory en Fabric
+
+Data Factory es un servicio de integración de datos visual: sin necesidad de escribir código, puedes construir pipelines que extraen datos de una fuente, aplican transformaciones, y cargan el resultado en un destino. El canvas de construcción funciona con drag-and-drop — arrastras actividades, las conectas con flechas, y defines los parámetros de cada una mediante formularios.
+
+La biblioteca de conectores incluye más de 100 fuentes de datos predefinidas: SharePoint, Azure SQL Database, Azure Data Lake, SAP HANA, SAP BW, Salesforce, REST APIs genéricas, SFTP, archivos CSV/Excel/JSON/Parquet, y muchas más. Si el sistema origen tiene una API o un conector JDBC/ODBC, Data Factory puede conectarse a él.
+
+### La anatomía de un pipeline
+
+Un pipeline en Data Factory sigue siempre la misma estructura lógica:
+
+**Origen (Source):** dónde viven los datos hoy. Puede ser una tabla de SAP, una lista de SharePoint, un archivo CSV guardado en OneDrive, o una consulta SQL a una base de datos Azure. Aquí defines las credenciales de conexión (que se almacenan cifradas como "Linked Services") y qué datos extraer (tabla completa, consulta filtrada, o incremento desde la última extracción).
+
+**Transformación (Transform):** qué modificaciones aplicar a los datos en tránsito. Data Factory permite transformaciones básicas en el pipeline mismo (renombrar columnas, filtrar filas, hacer joins entre tablas), pero para transformaciones más complejas existen los **Dataflows Gen2**, que veremos en un momento.
+
+**Destino (Destination):** dónde deben llegar los datos procesados. En el contexto de Fabric, el destino habitual es un **Lakehouse** en OneLake (donde los datos se almacenan como tablas Delta) o un **Data Warehouse** (para datos que serán consultados principalmente con SQL). También puedes cargar directamente en un dataset de Power BI.
+
+### Dataflows Gen2: para analistas sin perfil de ingeniería
+
+Si los pipelines son la opción "production-grade" con toda la potencia y complejidad que conlleva, **Dataflows Gen2** son la opción accesible para analistas de negocio. La interfaz es idéntica a **Power Query**, la misma herramienta de "Obtener y transformar datos" que existe en Excel desde hace años. Si alguna vez has usado Get & Transform en Excel para limpiar una tabla, ya sabes usar Dataflows.
+
+Con Dataflows puedes: conectarte a una fuente, ver los datos en una grilla interactiva, aplicar transformaciones con clics (eliminar columnas, dividir texto, cambiar tipos de dato, filtrar valores, hacer merges entre tablas) y cargar el resultado en OneLake. Todo sin escribir una sola línea de código.
+
+**¿Cuándo usar pipelines y cuándo usar Dataflows?** Los pipelines son la elección correcta para movimientos de datos en producción, programados, de alto volumen, o que forman parte de un flujo crítico de negocio. Los Dataflows son más adecuados para exploración ad-hoc, preparación de datos para análisis puntuales, o transformaciones simples donde la prioridad es la agilidad sobre la robustez.
+
+### Ejemplo práctico: datos de ventas desde SAP a Power BI
+
+Imagina este escenario: el equipo comercial de Novartis Switzerland quiere un dashboard semanal de ventas por producto y región, con datos que vienen del sistema SAP. El flujo completo con Data Factory:
+
+1. El pipeline se conecta a la tabla de ventas en SAP HANA mediante el conector nativo de SAP HANA en Data Factory.
+2. Una actividad de transformación limpia los datos: elimina registros con campos obligatorios vacíos, estandariza los códigos de región (SAP usa códigos internos que el equipo comercial no reconoce — se mapean a nombres legibles), y elimina duplicados.
+3. El resultado se carga en un Lakehouse de OneLake como tabla Delta.
+4. Un dataset de Power BI conectado a ese Lakehouse alimenta el dashboard de ventas.
+5. El pipeline está programado para ejecutarse todos los lunes a las 6:00 AM, garantizando que al comenzar la semana los datos estén actualizados.
+
+Todo el flujo se configura visualmente, sin código, y el equipo de IT puede auditarlo completamente a través del historial de ejecuciones del pipeline.
+
+> **Nota de compliance:** Cuando construyas pipelines, documenta qué datos estás moviendo, desde qué sistema origen, hacia qué destino, y quién tiene acceso al workspace destino. Fabric tiene una vista de **Data Lineage** integrada en cada workspace — úsala. Esta trazabilidad es esencial en caso de una auditoría o un incidente de seguridad, y también facilita el análisis de impacto cuando necesitas hacer cambios en la fuente de datos.
+
+---
+
+## Analizar con lenguaje natural: Copilot en Fabric
+
+Una de las capacidades más relevantes de Fabric para usuarios de negocio es **Copilot**: la posibilidad de interactuar con tus datos usando lenguaje natural, sin necesidad de saber DAX, SQL o Python. Copilot en Fabric no es un único botón — está integrado de forma diferente en cada workload, adaptado a lo que tiene sentido en ese contexto.
+
+### Copilot en Power BI
+
+Es la implementación más accesible y la que más impacto tiene para analistas de negocio no técnicos. Con Copilot en Power BI puedes:
+
+**Generar reports desde una descripción:** escribes en lenguaje natural qué quieres ver y Copilot genera un borrador del report, sugiriendo los visuales más adecuados y eligiendo los campos del modelo de datos que corresponden a tu descripción.
+
+*Ejemplo:* "Crea un line chart que muestre el revenue mensual por región para los últimos 12 meses, con una línea de tendencia." Copilot interpreta el prompt, identifica los campos de fecha, revenue y región en el modelo de datos, y genera el visual con la configuración correcta. Desde ahí puedes ajustar colores, etiquetas y formato como lo harías normalmente.
+
+**Generar medidas DAX:** DAX (Data Analysis Expressions) es el lenguaje de fórmulas de Power BI, similar a las fórmulas de Excel pero más potente y con una curva de aprendizaje pronunciada. Copilot puede escribir medidas DAX a partir de una descripción en lenguaje natural.
+
+*Ejemplo:* "Agrega una medida que calcule el promedio móvil de 3 meses de las unidades vendidas." Copilot escribe el DAX correspondiente — que en este caso involucra funciones de inteligencia de tiempo como `DATESINPERIOD` y `CALCULATE` — y lo agrega al modelo.
+
+**Resumir un report:** Copilot puede leer un report existente y generar un resumen textual de las tendencias principales. Útil para preparar una narrativa antes de una presentación.
+
+### Copilot en Notebooks
+
+Para analistas con perfil técnico que trabajan en Python o PySpark, **Copilot en Notebooks** funciona como un asistente de código integrado. En lugar de tener que aprender las APIs específicas de Fabric o Spark, puedes describir lo que quieres hacer en lenguaje natural y Copilot genera el código.
+
+*Ejemplo:* "Carga la tabla de ventas desde el Lakehouse y muéstrame los 10 productos con mayor revenue en el último trimestre." Copilot genera el código PySpark o pandas correspondiente, incluyendo la conexión al Lakehouse y el filtro de fechas, listos para ejecutar en la celda del notebook.
+
+Esto es especialmente valioso para analistas que conocen Python en general pero no están familiarizados con las APIs específicas de Microsoft Fabric o Apache Spark, cuya sintaxis puede ser diferente a lo que están acostumbrados.
+
+### Copilot en Data Warehouse
+
+Para quienes trabajan con el workload de Data Warehouse en Fabric, Copilot puede traducir preguntas en lenguaje natural a consultas SQL sobre las tablas del warehouse.
+
+*Ejemplo:* "Muéstrame el conteo de clientes distintos que compraron tanto el producto A como el producto B en el tercer trimestre." Copilot analiza el schema del warehouse, identifica las tablas y campos relevantes, y escribe la consulta SQL con los JOINs y filtros necesarios.
+
+### Limitaciones que debes conocer
+
+Copilot en Fabric funciona mejor cuando el modelo de datos está bien diseñado: tablas con nombres descriptivos, columnas con nombres claros que reflejen su contenido, y relaciones bien definidas entre tablas. Si tu modelo de datos usa nombres crípticos heredados de un sistema legacy — columnas como `COL_A1`, `ZTAB_003`, o abreviaturas sin contexto — Copilot tendrá dificultades para interpretar correctamente qué datos hay y cómo relacionarlos. Antes de esperar resultados de calidad de Copilot, vale la pena invertir tiempo en renombrar y documentar el modelo.
+
+Otra limitación práctica: Copilot en Fabric requiere capacidad **F64 o superior**. Las capacidades más pequeñas (F2, F4, F8) no incluyen Copilot. Verifica con IT qué capacidad tiene asignado tu workspace antes de depender de esta funcionalidad.
+
+El modelo mental correcto para Copilot en Fabric es el de un **acelerador**, no un sustituto del entendimiento de los datos. Copilot reduce significativamente el tiempo para llegar a un primer borrador — de una medida DAX, de una consulta SQL, de un report — pero el código o el visual generado siempre debe revisarse antes de usarse en producción. Un error de interpretación en una medida DAX puede llevar a números incorrectos en un dashboard que se presenta a dirección.
+
+> **Nota de compliance:** Copilot en Fabric no usa tus datos para entrenar los modelos de Microsoft. Sin embargo, los prompts que envías — incluyendo nombres de columnas y valores de datos que aparecen en el contexto — son procesados por los servicios de IA de Microsoft. Evita incluir en tus prompts valores de datos confidenciales reales: registros de pacientes, valores de acuerdos comerciales en negociación, o cualquier dato que esté clasificado como Highly Confidential. Describe el tipo de dato que quieres analizar, no el dato en sí.
+
+---
+
+## Governance y seguridad en Fabric
+
+La promesa de OneLake — todos los datos en un solo lugar — tiene una contrapartida directa: cuando los datos están unificados, la superficie de exposición también se unifica. Una mala configuración de permisos en OneLake puede dar acceso inadvertido a datos que deberían estar estrictamente controlados. Governance en Fabric no es opcional; es parte de la arquitectura.
+
+### Microsoft Purview: el centro de governance
+
+Fabric se integra de forma nativa con **Microsoft Purview**, la plataforma de governance de datos de Microsoft. Esta integración proporciona tres capacidades fundamentales:
+
+**Etiquetas de sensibilidad (Sensitivity Labels):** las mismas etiquetas que ya existen en Microsoft 365 — Public, Internal, Confidential, Highly Confidential — se pueden aplicar a ítems de Fabric: reports, datasets, lakehouses, warehouses. Un dataset marcado como "Highly Confidential" lleva esa etiqueta a los reports de Power BI que se construyen sobre él, y las políticas de DLP (Data Loss Prevention) de Purview pueden bloquear automáticamente intentos de exportar o compartir ese contenido fuera de canales autorizados.
+
+**Purview Data Map:** escanea automáticamente los ítems de Fabric en busca de tipos de datos sensibles predefinidos — números de identificación, datos de salud, información financiera — y cataloga lo que encuentra. Esto proporciona visibilidad sobre qué datos sensibles existen en la plataforma, incluso los que el equipo de datos no sabía que estaban ahí.
+
+**Data Loss Prevention (DLP):** las políticas de DLP de Purview aplicadas a Fabric pueden detectar cuando un dataset o report contiene información sensible y aplicar controles automáticos: bloquear el descarga, restringir el acceso, o generar una alerta para el equipo de seguridad.
+
+### Row-Level Security (RLS) en Power BI
+
+En cualquier organización con datos que abarcan múltiples regiones, unidades de negocio o mercados, surge la necesidad de que diferentes usuarios vean subconjuntos diferentes de los mismos datos en el mismo report. **Row-Level Security** resuelve esto.
+
+RLS permite definir reglas que determinan qué filas de datos puede ver cada usuario, basándose en su identidad de Azure AD. La regla típica usa la función `USERPRINCIPALNAME()` de DAX para comparar el email del usuario con un campo en la tabla de datos que define a qué segmento pertenece.
+
+*Ejemplo:* Un report de performance comercial cubre todas las regiones de Europa. El director de Suiza solo debe ver datos de Suiza; el director de Alemania solo los de Alemania. Con RLS, ambos acceden al mismo report, pero el filtro se aplica automáticamente según quién está autenticado. No hay necesidad de mantener versiones separadas del report para cada región.
+
+RLS se define en el modelo semántico (el dataset de Power BI) y se aplica automáticamente a todos los reports que lo usan. Si cambias la regla en el modelo, se aplica en todos los reports simultáneamente.
+
+### Roles de workspace y principio de mínimo privilegio
+
+Los cuatro roles de workspace en Fabric tienen permisos claramente diferenciados:
+
+- **Viewer:** puede leer reports y dashboards. No puede ver los datos subyacentes ni editar nada.
+- **Contributor:** puede crear y editar contenido (reports, notebooks, pipelines). No puede gestionar miembros del workspace.
+- **Member:** todo lo de Contributor, más puede gestionar contenido y configurar ciertas opciones del workspace.
+- **Admin:** control total, incluyendo agregar o eliminar miembros y eliminar el workspace.
+
+La práctica correcta es aplicar el principio de **mínimo privilegio**: asignar el rol más restrictivo que permita a cada usuario hacer su trabajo. La mayoría de los usuarios de negocio que solo consumen reports necesitan el rol Viewer, no Contributor o Admin.
+
+### Data Lineage y Endorsement: calidad y trazabilidad
+
+Fabric incluye una vista de **Data Lineage** integrada en cada workspace que visualiza el grafo completo de dependencias: qué fuentes alimentan qué pipelines, qué pipelines cargan qué tablas, qué tablas alimentan qué datasets, qué datasets usan qué reports. Antes de modificar un pipeline o una tabla de origen, la vista de lineage responde la pregunta crítica: "¿qué se rompe si toco esto?"
+
+El sistema de **Endorsement** permite marcar datasets y otros ítems como "Promoted" (el propietario recomienda su uso) o "Certified" (un equipo central ha validado formalmente la calidad y la definición de los datos). En organizaciones grandes, donde pueden coexistir múltiples versiones de tablas similares, el endorsement ayuda a los usuarios a identificar cuál es la fuente oficial — previniendo que cada equipo use su propia versión de la "tabla de ventas" con métricas ligeramente diferentes.
+
+> **Nota de compliance:** Antes de desplegar cualquier workspace de Fabric para un caso de uso regulado — farmacovigilancia, operaciones clínicas, manufactura GxP — el workspace debe pasar por revisión y aprobación de IT/compliance. Fabric puede soportar casos de uso GxP, pero requiere configuración específica: habilitación de audit trails, documentación de validación (IQ/OQ/PQ), y controles de change management alineados con la regulación aplicable (21 CFR Part 11, Annex 11, o las guías de GxP de Novartis). No asumas que un workspace estándar de Fabric es automáticamente GxP-compliant — no lo es sin la configuración y documentación adecuadas.
+
+---
+
+<Quiz
+  moduleSlug="microsoft-fabric"
+  questions={[
+    {
+      question: "¿Qué es OneLake en Microsoft Fabric?",
+      options: [
+        "Un tipo de base de datos relacional de Microsoft",
+        "La capa de almacenamiento unificada de Fabric donde todos los workloads leen los mismos datos",
+        "Una herramienta de visualización de datos",
+        "El nombre del portal de administración de Fabric"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuál es la diferencia entre Data Factory Pipelines y Dataflows Gen2?",
+      options: [
+        "Pipelines son solo para datos en la nube; Dataflows para datos on-premise",
+        "Pipelines son para flujos de producción programados y complejos; Dataflows para transformaciones más simples con interfaz Power Query",
+        "Dataflows son más potentes que los pipelines",
+        "No hay diferencia, son el mismo producto con nombres distintos"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuándo NO deberías usar Copilot en Fabric sin revisión?",
+      options: [
+        "Nunca, el código generado por Copilot es siempre correcto",
+        "Solo cuando el dataset tiene menos de 1000 filas",
+        "Siempre debes revisar el código generado antes de ejecutarlo en datos de producción",
+        "Solo en fines de semana"
+      ],
+      correct: 2
+    },
+    {
+      question: "¿Qué hace Row-Level Security (RLS) en Power BI?",
+      options: [
+        "Encripta las filas de datos en tránsito",
+        "Controla qué filas de datos puede ver cada usuario en un report, según su identidad",
+        "Limita la cantidad de filas que se pueden importar",
+        "Comprime los datos para mejorar el rendimiento"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué debes hacer antes de desplegar un workspace de Fabric para un caso de uso regulado (GxP)?",
+      options: [
+        "Nada especial, Fabric es automáticamente GxP-compliant",
+        "Obtener revisión y aprobación de IT/compliance, con configuración específica y documentación de validación",
+        "Contratar a Microsoft directamente para la implementación",
+        "Esperar a que Fabric tenga certificación GxP oficial"
+      ],
+      correct: 1
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="Microsoft Fabric — Documentación oficial"
+  url="https://learn.microsoft.com/en-us/fabric/get-started/microsoft-fabric-overview"
+  description="Visión general oficial de Microsoft Fabric: arquitectura, workloads disponibles, OneLake, y guía de inicio para organizaciones."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Copilot en Microsoft Fabric"
+  url="https://learn.microsoft.com/en-us/fabric/get-started/copilot-fabric-overview"
+  description="Documentación sobre las capacidades de Copilot en todos los workloads de Fabric: Power BI, Notebooks, Data Warehouse, Data Factory."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Microsoft Purview en Fabric — Governance"
+  url="https://learn.microsoft.com/en-us/fabric/governance/microsoft-purview-fabric"
+  description="Cómo usar Microsoft Purview con Fabric para data cataloging, sensitivity labels, lineage, y controles de compliance."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Data lineage en Microsoft Fabric"
+  url="https://learn.microsoft.com/en-us/fabric/governance/lineage"
+  description="Cómo visualizar y navegar el linaje de datos en Fabric: qué fuentes alimentan qué datasets y qué reports dependen de cada dataset."
+  type="doc"
+/>
