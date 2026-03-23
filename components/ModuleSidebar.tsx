@@ -21,7 +21,18 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
   const currentModule = modules.find((m) => m.slug === currentSlug)
 
   const sidebarContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full pb-16">
+      <div className="mb-4">
+        <Link
+          href="/glossary"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#71717a] hover:text-[#18181b] hover:bg-[#f4f4f5] transition-colors"
+        >
+          <BookOpen size={14} className="flex-shrink-0" />
+          Glosario de términos
+        </Link>
+      </div>
+
       <div className="mb-6">
         <p className="text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-3">
           Módulos
@@ -77,16 +88,6 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
         </div>
       )}
 
-      <div className="mt-auto pt-6 border-t border-[#e4e4e7]">
-        <Link
-          href="/glossary"
-          onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#71717a] hover:text-[#18181b] hover:bg-[#f4f4f5] transition-colors"
-        >
-          <BookOpen size={14} className="flex-shrink-0" />
-          Glosario de términos
-        </Link>
-      </div>
     </div>
   )
 
