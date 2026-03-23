@@ -1,9 +1,11 @@
 import createMDX from '@next/mdx'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
 const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
   },
 })
