@@ -25,7 +25,7 @@ export default function HomePage() {
             Capacitación en IA
           </h1>
           <p className="text-[#71717a]">
-            Tres módulos para entender, usar y aprovechar la IA en tu trabajo.
+            Cuatro módulos para entender, usar y aprovechar la IA en tu trabajo de forma responsable.
           </p>
         </div>
 
@@ -48,6 +48,26 @@ export default function HomePage() {
             />
           </div>
         </div>
+
+        {/* Certificate banner */}
+        {completedCount === modules.length && (
+          <div className="mb-8 p-5 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-green-800">
+                ¡Completaste todos los módulos!
+              </p>
+              <p className="text-xs text-green-700 mt-0.5">
+                Ya puedes obtener tu certificado de finalización.
+              </p>
+            </div>
+            <Link
+              href="/certificate"
+              className="flex-shrink-0 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors no-underline"
+            >
+              Ver certificado →
+            </Link>
+          </div>
+        )}
 
         {/* Module list */}
         <div className="space-y-3">
