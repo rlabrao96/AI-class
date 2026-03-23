@@ -1,3 +1,231 @@
 # Prompting Fundamentals
 
-Contenido próximamente.
+Escribir un buen prompt no es un arte misterioso — es una habilidad técnica que se puede aprender, practicar y mejorar sistemáticamente. La diferencia entre un resultado mediocre y uno excelente rara vez está en el modelo: casi siempre está en la calidad de la instrucción que le damos. En este módulo aprenderás los cuatro elementos que componen un prompt efectivo, por qué la especificidad supera a la brevedad, cómo enseñarle al modelo con ejemplos, y cuándo pedirle que "piense en voz alta" antes de responder.
+
+---
+
+## Estructura del prompt {#estructura-del-prompt}
+
+Un prompt bien construido no es simplemente una pregunta. Es una instrucción completa que le da al modelo todo lo que necesita para producir exactamente lo que tú quieres. Los mejores prompts comparten cuatro elementos clave: **Rol, Contexto, Tarea y Formato**. No todos los prompts necesitan los cuatro en todo momento, pero conocer cada uno te permite diagnosticar por qué un resultado no fue el esperado y saber exactamente qué ajustar.
+
+### Rol: "Eres un experto en..."
+
+El rol le da al modelo una perspectiva desde la cual operar. Cuando le dices "Eres un analista financiero senior", el modelo no solo cambia el vocabulario que usa — ajusta su nivel de asunciones, la profundidad técnica de sus respuestas y el tipo de matices que incluye. Piénsalo como elegir qué colega le pides consejo: no le preguntas lo mismo al área legal que al área de marketing, aunque la pregunta de fondo sea la misma.
+
+### Contexto: la información de fondo
+
+El modelo solo sabe lo que está en su entrenamiento y lo que tú le proporcionas en el prompt. Si le pides un análisis sin darle el documento, si le pides un email sin explicarle la relación con el cliente, o si le pides un resumen sin decirle para quién es, el modelo tiene que adivinar — y cuando adivina, generaliza. El contexto elimina esa ambigüedad. No significa escribir párrafos enteros de antecedentes; significa incluir la información mínima que cambia el resultado.
+
+### Tarea: exactamente qué quieres
+
+La tarea es el núcleo del prompt. El error más común aquí es ser demasiado general: "analiza esto", "ayúdame con esto", "dame algo sobre este tema". Cuanto más específica es la tarea, más enfocada es la respuesta. Define el verbo de acción (resume, clasifica, redacta, compara, extrae), el objeto (este contrato, este email, este conjunto de datos) y, si aplica, los criterios de éxito.
+
+### Formato: cómo quieres el resultado
+
+Sin instrucciones de formato, el modelo elige por ti — y su elección puede no coincidir con tu necesidad. ¿Quieres una lista con viñetas o prosa continua? ¿Un párrafo o cinco? ¿Tono formal o conversacional? ¿En español o en inglés? ¿Con encabezados o sin ellos? Especificar el formato no es un detalle menor: es lo que convierte una respuesta correcta en una respuesta utilizable.
+
+### Ejemplo comparativo
+
+Veamos la diferencia en la práctica:
+
+**Prompt débil:**
+> Resume este documento.
+
+**Prompt fuerte:**
+> Eres un analista de comunicaciones. Resume el siguiente informe en 3 puntos clave, cada uno de máximo 2 oraciones, enfocados en implicaciones para el negocio. Tono formal.
+
+El segundo prompt tiene los cuatro elementos: el rol (analista de comunicaciones) orienta la perspectiva; el contexto está implícito en el documento que se adjunta; la tarea es precisa (3 puntos clave, máximo 2 oraciones, enfocados en implicaciones de negocio); y el formato está definido (tono formal, estructura de lista). El modelo no tiene que adivinar nada — puede enfocar toda su capacidad en hacer exactamente lo que necesitas.
+
+Cuando un resultado no te satisface, antes de reescribir el prompt completo, pregúntate cuál de los cuatro elementos estaba ausente o era vago. Esa diagnosis te ahorra mucho tiempo.
+
+---
+
+## Especificidad > brevedad {#especificidad-beats-brevedad}
+
+Hay un mito extendido sobre los modelos de lenguaje: que los prompts cortos son mejores porque "el modelo ya entiende". La realidad es la opuesta. Los prompts vagos producen respuestas genéricas, y los prompts específicos producen respuestas útiles. Las restricciones no limitan la creatividad del modelo — la enfocan.
+
+Piénsalo así: si le pides a un diseñador gráfico "hazme algo bonito", recibirás algo que a él le parezca bonito. Si le dices "hazme un banner de 1200x628 píxeles para LinkedIn, fondo azul marino, texto blanco, con el logo en la esquina superior izquierda y el mensaje 'Evento 15 de abril'", recibirás exactamente lo que necesitas. Las instrucciones adicionales no complican el trabajo — lo aclaran.
+
+### Comparaciones concretas
+
+**Caso 1 — Email de seguimiento**
+
+Vago:
+> Escribe un email.
+
+Específico:
+> Escribe un email de seguimiento de 150 palabras a un cliente que no respondió en 2 semanas. Tono profesional pero cercano. No mencionar explícitamente la falta de respuesta ni presionar por una decisión. El objetivo es reabrir el canal de comunicación y ofrecer una llamada breve.
+
+El segundo prompt genera un email que puedes enviar directamente. El primero genera un borrador que todavía necesita varias rondas de ajuste.
+
+**Caso 2 — Análisis de texto**
+
+Vago:
+> Analiza esto.
+
+Específico:
+> Identifica los 3 principales riesgos de negocio en este texto y clasifícalos por impacto potencial (alto / medio / bajo). Para cada riesgo incluye: una descripción de una oración, el nivel de impacto y la evidencia textual que lo sustenta.
+
+La segunda versión produce un output estructurado que puedes llevar directamente a una reunión. La primera produce... algo. Quizás útil, quizás no.
+
+### El hábito práctico más valioso
+
+Cuando el primer resultado no es lo que esperabas, el instinto natural es pedir de nuevo con otras palabras. Pero antes de hacer eso, hazte esta pregunta: **¿qué restricción podría agregar que acote el espacio de respuestas posibles?**
+
+Las restricciones más útiles suelen ser:
+- **Longitud**: "no más de 100 palabras", "exactamente 3 puntos"
+- **Audiencia**: "para alguien sin conocimientos técnicos", "para el comité directivo"
+- **Alcance**: "solo basándote en este texto, sin información externa"
+- **Estructura**: "en forma de tabla", "con encabezados para cada sección"
+- **Tono**: "directo y sin rodeos", "empático y sin lenguaje técnico"
+
+Agregar una o dos restricciones bien elegidas transforma un prompt mediocre en uno efectivo, sin necesidad de reescribirlo desde cero.
+
+---
+
+## Few-shot prompting {#few-shot-prompting}
+
+Hay tareas donde describir lo que quieres con palabras es más difícil que simplemente mostrarlo. Para esos casos existe el **few-shot prompting**: incluir 2 o 3 ejemplos dentro del prompt para que el modelo aprenda el patrón exacto de formato, tono o estructura que buscas, antes de aplicarlo a tu caso real.
+
+El nombre viene del campo del aprendizaje automático: "few-shot" significa "aprender de pocos ejemplos". En la práctica, funciona así: en lugar de solo describir lo que quieres, muestras al modelo entradas y salidas de referencia, y luego le das la entrada real. El modelo infiere el patrón a partir de los ejemplos — no solo de la instrucción.
+
+### Por qué funciona
+
+Cuando describes un formato con palabras ("quiero que la respuesta tenga este estilo..."), el modelo interpreta esa descripción. Cuando muestras ejemplos reales, el modelo puede leer el patrón directamente. Para tareas donde el estilo importa tanto como el contenido, los ejemplos son más precisos que cualquier descripción verbal.
+
+### Ejemplo concreto: resúmenes de reunión
+
+Imagina que tu equipo tiene un formato específico para resumir reuniones — y quieres que el modelo lo replique de forma consistente para todas las reuniones del trimestre:
+
+```
+Tarea: Resume la siguiente transcripción de reunión usando el formato de los ejemplos.
+
+Ejemplo 1:
+Transcripción: [Reunión del 3 de marzo sobre presupuesto Q2...]
+Resumen:
+**Decisiones tomadas:** Se aprobó aumento del 15% en presupuesto de marketing.
+**Próximos pasos:** Ana envía propuesta formal antes del viernes.
+**Pendientes sin resolver:** Definir criterios de medición de ROI.
+
+Ejemplo 2:
+Transcripción: [Reunión del 7 de marzo sobre lanzamiento de producto...]
+Resumen:
+**Decisiones tomadas:** Fecha de lanzamiento confirmada para el 20 de abril.
+**Próximos pasos:** Carlos coordina con el equipo de ventas esta semana.
+**Pendientes sin resolver:** Aprobación final del precio por parte de dirección.
+
+Ahora resume esta transcripción usando el mismo formato:
+[Transcripción de tu reunión aquí]
+```
+
+Con dos ejemplos, el modelo no tiene que adivinar qué significa "mismo formato". Lo ve, lo entiende y lo replica — incluso en transcripciones de reuniones con contenidos completamente distintos.
+
+### Cuándo usar few-shot prompting
+
+**Funciona especialmente bien para:**
+- Tareas de formato específico (reportes, resúmenes, fichas estandarizadas)
+- Clasificación con categorías propias de tu organización
+- Escritura en la voz o estilo editorial de tu empresa
+- Extracción de datos estructurados desde texto libre (facturas, contratos, formularios)
+
+**Es innecesario para:**
+- Preguntas factuales simples ("¿cuál es la capital de Francia?")
+- Tareas creativas donde quieres diversidad, no uniformidad
+- Prompts donde la instrucción en palabras ya es completamente clara
+
+La regla práctica: si puedes describir el resultado deseado con palabras y eso es suficiente, no necesitas ejemplos. Si el formato o el estilo es difícil de articular verbalmente, incluye dos o tres ejemplos — verás la diferencia inmediatamente.
+
+---
+
+## Chain of thought {#chain-of-thought}
+
+Los modelos de lenguaje tienen una tendencia natural a "saltar" a una respuesta. Para preguntas simples, eso es una ventaja — es rápido y eficiente. Pero para problemas complejos, saltar a una conclusión sin razonar el camino aumenta significativamente la probabilidad de error. El **chain of thought** (cadena de pensamiento) es la técnica que corrige esto: le pides al modelo que trabaje el problema paso a paso antes de dar una respuesta final.
+
+La instrucción puede ser tan simple como:
+
+> "Piensa paso a paso antes de responder."
+
+> "Razona en voz alta y luego dame tu conclusión."
+
+> "Antes de responder, analiza los pros y contras de cada opción."
+
+Cuando el modelo sigue este proceso, su razonamiento intermedio se vuelve visible — y eso mejora tanto la calidad del resultado como tu capacidad de detectar dónde algo salió mal.
+
+### Por qué mejora la precisión
+
+Cuando el modelo escribe su razonamiento en pasos, cada paso actúa como un punto de control. Un error lógico en el paso 2 se vuelve visible antes de que contamine la conclusión. Sin chain of thought, ese mismo error queda oculto dentro de una respuesta que suena confiada pero es incorrecta.
+
+La investigación en este campo es clara: para problemas de múltiples pasos, pedir razonamiento explícito mejora la precisión de forma sustancial. No porque el modelo "piense más" en sentido humano, sino porque el proceso secuencial de generar texto lo fuerza a ser consistente paso a paso.
+
+### Cuándo usarlo
+
+**Tiene mayor impacto en:**
+- Análisis complejos con múltiples variables o factores
+- Razonamiento lógico y deducciones encadenadas
+- Problemas con cálculos o estimaciones
+- Decisiones de negocio con trade-offs que necesitan ser sopesados explícitamente
+
+**Es innecesario para:**
+- Búsquedas de información directa ("¿qué dice la cláusula 3.2?")
+- Traducciones o reformulaciones de texto
+- Tareas donde quieres una respuesta concisa sin justificación
+
+### El trade-off: output más largo, razonamiento mejor
+
+Chain of thought produce respuestas más largas. Si necesitas el razonamiento visible para auditarlo o explicarlo, eso es una ventaja. Si solo necesitas la conclusión, puedes pedir lo mejor de los dos mundos:
+
+> "Piensa paso a paso, pero al final dame solo tu conclusión en 2 oraciones."
+
+Esto aprovecha el razonamiento mejorado sin obligarte a leer un análisis extenso cuando no lo necesitas. Como toda técnica de prompting, no es una regla universal — es una herramienta que usas cuando el problema lo justifica.
+
+---
+
+<Quiz
+  moduleSlug="prompting-fundamentals"
+  questions={[
+    {
+      question: "¿Qué significa el few-shot prompting?",
+      options: [
+        "Usar un modelo de IA pequeño",
+        "Dar ejemplos dentro del prompt",
+        "Hacer preguntas cortas",
+        "Limitar la longitud de la respuesta"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuál prompt es más probable que obtenga un mejor resultado?",
+      options: [
+        "Escribe un resumen",
+        "Escribe un resumen ejecutivo de 3 oraciones de este texto, enfocado en impacto de negocio, en tono formal",
+        "Resúmeme esto por favor",
+        "¿Puedes ayudarme con un resumen?"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuándo es más útil el chain of thought?",
+      options: [
+        "Para tareas de escritura creativa",
+        "Para preguntas factuales simples",
+        "Para problemas de razonamiento complejo o múltiples pasos",
+        "Para generar imágenes"
+      ],
+      correct: 2
+    }
+  ]}
+/>
+
+<ResourceCard
+  title="Anthropic Prompt Engineering Guide"
+  url="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+  description="Guía oficial de Anthropic sobre técnicas de prompting: estructura, ejemplos, y patrones avanzados."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Prompt Engineering Interactive Tutorial"
+  url="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+  description="Tutorial interactivo para practicar técnicas de prompting directamente con ejemplos reales."
+  type="doc"
+/>
