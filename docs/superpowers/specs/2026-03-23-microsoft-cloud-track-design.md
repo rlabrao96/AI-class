@@ -39,7 +39,7 @@ localStorage keys per track:
 - Track 1 (existing): `progress_[slug]`, `quiz_[slug]_completed` — no change
 - Track 2 (new): same keys, same format — no schema change needed since slugs are unique
 
-Helper functions in `lib/progress.ts`: add `getTrackProgress(track: Track)` that returns completion count for that track's modules only.
+Helper functions in `lib/progress.ts`: add `getTrackProgress(track: Track): number` that returns the integer count of completed modules in that track (e.g., 2 out of 3). The homepage divides this by `track.modules.length` to derive the progress bar width percentage.
 
 ### Homepage (`/`)
 
@@ -52,16 +52,24 @@ The existing "Seis módulos para entender..." tagline becomes the track 1 descri
 
 ### Module page & sidebar
 
-The module page looks up the current module's `track` field and:
-- Passes the track slug to `ModuleSidebar`
-- `ModuleSidebar` filters to show only modules of that track
-- "Siguiente" button only advances within the track
-- "MÓDULO X" badge uses within-track number
-- Celebration banner links to `/certificate/[track-slug]`
+The module page looks up the current module's `track` field and passes `trackSlug` to both `ModuleSidebar` and `MarkCompleteButton`.
+
+**`ModuleSidebar` new prop interface:** `{ currentSlug: string; trackSlug: string }`. `currentSlug` is retained (needed for active highlight, TOC section, and progress re-read effect). `trackSlug` is used to filter `modules` to only that track's modules for the nav list.
+
+**`MarkCompleteButton` new prop interface:** `{ slug: string; trackSlug: string }`. The component must compute `nextModule` by filtering `modules` to the current track first, then finding the next entry — not from the global `modules` array. Without this, the last module of track 1 would always find track 2's first module as "next" and the celebration banner would never appear. Celebration banner links to `/certificate/[trackSlug]`.
+
+**"MÓDULO X" badge:** `mod.number` already holds the within-track number (new modules have `number: 1`, `2`, `3`). The existing `mod.number` render requires no code change.
 
 ### Certificate page
 
 Generalize `app/certificate/page.tsx` → `app/certificate/[trackSlug]/page.tsx`. Reads `trackSlug` param, loads the matching track from `lib/modules.ts`, checks all modules in that track are complete, renders certificate for that track.
+
+Must include `generateStaticParams` returning both track slugs to satisfy Next.js static generation:
+```ts
+export function generateStaticParams() {
+  return tracks.map((t) => ({ trackSlug: t.slug }))
+}
+```
 
 The certificate shows:
 - Track title
@@ -217,14 +225,14 @@ The certificate shows:
 
 | File | Action | Notes |
 |------|--------|-------|
-| `lib/modules.ts` | Modify | Add `Track` interface, `track` field to `Module`, add `tracks` array, add 3 new module entries |
-| `lib/progress.ts` | Modify | Add `getTrackProgress(track)` helper |
+| `lib/modules.ts` | Modify | Add `Track` interface, `track: string` field to `Module`, add `tracks` array, add 3 new module entries with `track: 'microsoft-cloud'`. Add `track: 'fundamentos'` to all 6 existing modules. |
+| `lib/progress.ts` | Modify | Add `getTrackProgress(track: Track): number` helper returning count of completed modules in that track |
 | `app/page.tsx` | Modify | Two-section layout with track headers, per-track progress bars, per-track certificate banners |
-| `app/modules/[slug]/page.tsx` | Modify | Pass track to sidebar, use within-track module number |
-| `components/ModuleSidebar.tsx` | Modify | Accept `trackSlug` prop, filter modules by track |
-| `components/MarkCompleteButton.tsx` | Modify | Link celebration banner to `/certificate/[trackSlug]` |
-| `app/certificate/[trackSlug]/page.tsx` | Create | Parameterized certificate page per track |
-| `app/certificate/page.tsx` | Modify | Redirect to `/certificate/fundamentos` |
+| `app/modules/[slug]/page.tsx` | Modify | (1) Add 3 new entries to `moduleMap` static import map (`copilot-m365`, `microsoft-fabric`, `aws-bedrock`). (2) Pass `trackSlug={mod.track}` to `ModuleSidebar`. (3) Pass `trackSlug={mod.track}` to `MarkCompleteButton`. |
+| `components/ModuleSidebar.tsx` | Modify | New prop interface: `{ currentSlug: string; trackSlug: string }`. Filter module nav list to `modules.filter(m => m.track === trackSlug)`. |
+| `components/MarkCompleteButton.tsx` | Modify | New prop interface: `{ slug: string; trackSlug: string }`. Compute `nextModule` from `modules.filter(m => m.track === trackSlug)` not global array. Celebration banner links to `/certificate/${trackSlug}`. |
+| `app/certificate/[trackSlug]/page.tsx` | Create | Parameterized certificate page. Must include `generateStaticParams` returning `tracks.map(t => ({ trackSlug: t.slug }))`. |
+| `app/certificate/page.tsx` | Modify | Server-side redirect to `/certificate/fundamentos` using Next.js `redirect()` from `next/navigation`. Remove `'use client'` directive. Replace entire file body with `export default function CertificatePage() { redirect('/certificate/fundamentos') }`. |
 | `content/copilot-m365.mdx` | Create | Module 1 of track 2 |
 | `content/microsoft-fabric.mdx` | Create | Module 2 of track 2 |
 | `content/aws-bedrock.mdx` | Create | Module 3 of track 2 |
