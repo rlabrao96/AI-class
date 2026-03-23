@@ -1,0 +1,203 @@
+# Riesgos Legales y Gobernanza de la IA
+
+El uso de IA en el entorno empresarial no es solo una decisión técnica: tiene implicaciones legales, éticas y reputacionales reales. A medida que la IA se integra en procesos de negocio, los riesgos se vuelven más concretos — y también las responsabilidades. En este módulo aprenderás cuáles son los riesgos que más afectan a las organizaciones, qué dice el marco regulatorio vigente, y qué significa adoptar IA de forma responsable en la práctica.
+
+---
+
+## Los riesgos reales del uso de IA en la empresa
+
+Antes de hablar de regulaciones o frameworks, hay que entender los riesgos concretos. La investigación académica y los casos empresariales recientes identifican cinco categorías principales que toda organización debe tener presentes.
+
+### Precisión y alucinaciones
+
+Los modelos de lenguaje predicen texto probable, no verdad factual. Esto tiene consecuencias prácticas: el modelo puede presentar información incorrecta con total confianza. Un caso documentado de alto perfil: en 2023, dos abogados en Nueva York presentaron un escrito citando jurisprudencia generada por ChatGPT — casos que no existían. El juez lo descubrió. Ambos fueron sancionados.
+
+En contextos donde la precisión es crítica (farmacéutica, regulatorio, clínico, legal, financiero), el riesgo de alucinaciones no es teórico. La mitigación no es evitar la IA — es agregar verificación humana obligatoria antes de cualquier output de IA que vaya a ser usado para tomar decisiones.
+
+### Sesgo algorítmico
+
+Los modelos aprenden de datos históricos. Si esos datos reflejan patrones discriminatorios — y casi siempre lo hacen en alguna medida — el modelo los replica y amplifica. Casos documentados incluyen sistemas de contratación que penalizaban CVs de mujeres, algoritmos de crédito con disparidades raciales, y sistemas de salud que asignaban menos recursos a pacientes negros porque los datos históricos de gasto así lo indicaban.
+
+El sesgo no es un defecto técnico que "se soluciona" — es un riesgo sistémico que requiere auditoría continua, diversidad en equipos que diseñan y despliegan sistemas, y mecanismos de reporte cuando se detectan problemas.
+
+### Privacidad y confidencialidad de datos
+
+Este riesgo es el más inmediato para empleados: **lo que escribes en un prompt es tratado como datos**. En herramientas de consumo (ChatGPT gratuito, Claude.ai, Gemini), los inputs pueden ser usados para entrenamiento, accedidos por operadores, o almacenados indefinidamente. En una empresa farmacéutica, esto incluye datos de pacientes, estrategia de producto, resultados de ensayos clínicos, información financiera no pública.
+
+La distinción crítica:
+- **Apps de consumo**: sin protecciones contractuales de datos empresariales
+- **Licencias enterprise** (Claude for Enterprise, ChatGPT Enterprise, Azure OpenAI): incluyen acuerdos de confidencialidad, los datos no se usan para entrenamiento
+
+**Regla práctica**: Si la información no la publicarías en LinkedIn ni la enviarías por email a alguien externo, no la pongas en una herramienta de IA que no tenga licencia enterprise verificada.
+
+### Transparencia y explicabilidad
+
+Muchos sistemas de IA son cajas negras: toman decisiones pero no pueden explicar por qué. Esto es problemático cuando las decisiones afectan a personas. El Reglamento General de Protección de Datos (GDPR) ya establece el derecho a no ser objeto de decisiones automatizadas significativas sin explicación. La EU AI Act añade requisitos adicionales de explicabilidad para sistemas de alto riesgo.
+
+### Responsabilidad y supervisión humana
+
+El "automation bias" — la tendencia humana a confiar excesivamente en los sistemas automatizados — es uno de los riesgos más subestimados. Cuando un sistema de IA hace una recomendación, los operadores humanos tienden a aprobarla sin revisarla críticamente, incluso cuando tienen la autoridad para hacerlo. Esto no anula la responsabilidad legal: las organizaciones siguen siendo responsables de las decisiones que toman sus sistemas, incluyendo las automatizadas.
+
+---
+
+## Privacidad y propiedad intelectual
+
+Dos áreas legales están siendo definidas en tiempo real por los tribunales y legisladores: privacidad de datos y propiedad intelectual. Lo que resulte de estos procesos afectará directamente cómo las empresas pueden usar IA.
+
+### El problema de privacidad: qué entra en los modelos
+
+Cuando los proveedores de IA entrenan sus modelos, utilizan grandes volúmenes de datos de internet. Cuando los usuarios interactúan con herramientas de IA, esos inputs pueden convertirse en datos de entrenamiento para versiones futuras. El caso de LinkedIn en 2024 ilustra la sensibilidad del tema: la plataforma activó por defecto el uso de datos de usuarios para entrenamiento de IA sin consentimiento explícito previo, generando una reacción regulatoria inmediata en Europa.
+
+**GDPR y herramientas de IA**: La Agencia Italiana de Protección de Datos bloqueó temporalmente ChatGPT en 2023 alegando violaciones del GDPR. Posteriormente OpenAI fue multada €15 millones. El principio aplicado: recopilar y procesar datos personales para entrenar modelos sin base legal adecuada es una infracción.
+
+**En la práctica para empresas**: Antes de usar cualquier herramienta de IA con datos de clientes, pacientes, o empleados, hay que verificar: (1) ¿hay un DPA (Data Processing Agreement) firmado? (2) ¿está en la lista de herramientas aprobadas por IT/Legal? Si la respuesta a alguna es no, no se usa.
+
+### Propiedad intelectual: el output de IA, ¿de quién es?
+
+Los casos más relevantes en curso:
+
+**NYT v. OpenAI (2023)**: El New York Times demandó a OpenAI argumentando que el entrenamiento del modelo con artículos del Times constituye infracción de copyright. La demanda alega que el modelo puede reproducir verbatim párrafos extensos de artículos protegidos. El caso aún está en litigio, pero el argumento central es: el output de IA que reproduce contenido protegido puede generar responsabilidad para el usuario que lo distribuye.
+
+**Thomson-Reuters v. Ross Intelligence (2025)**: Un tribunal federal rechazó la defensa de "fair use" para el entrenamiento de modelos de IA con contenido protegido. Primera decisión judicial importante que limita qué datos pueden usarse para entrenar sin licencia.
+
+**Bartz v. Anthropic (2025)**: Caso de músicos y autores demandando por uso de letras y textos sin licencia. Resultó en un acuerdo por $1.5 mil millones. Señal de que el riesgo de demandas por copyright en IA es real y puede ser cuantitativamente significativo.
+
+**Copyright Office de EE.UU.**: Su reporte de 2025 concluyó que los outputs de IA no pueden ser protegidos por copyright cuando el proceso de generación no involucra suficiente autoría humana. Implicación: si produces contenido completamente con IA, no puedes afirmar derechos de autor sobre él.
+
+**Implicación práctica**: El contenido generado con IA puede contener material de terceros sin que el usuario lo sepa. Para contenido que va a publicarse, debe haber revisión humana y, cuando es relevante, verificación de originalidad.
+
+---
+
+## El panorama regulatorio
+
+El marco regulatorio de la IA está fragmentado globalmente, pero hay patrones claros que afectan a las empresas que operan internacionalmente.
+
+### Estados Unidos: sin ley federal, pero con acción regulatoria
+
+EE.UU. no tiene legislación federal integral sobre IA. El enfoque ha sido sectorial (FDA para dispositivos médicos con IA, FTC para prácticas engañosas, etc.) más el NIST AI Risk Management Framework, un estándar voluntario publicado en 2023 que se ha convertido en referencia de facto.
+
+En enero de 2025, la administración Trump firmó una Executive Order sobre IA con una característica notable: preemption explícita de leyes estatales de IA. Esto significa que el gobierno federal está reservándose la autoridad regulatoria sobre IA, potencialmente bloqueando regulaciones estatales más estrictas. El foco del EO es competitividad y liderazgo tecnológico, con énfasis en reducir obstáculos regulatorios.
+
+### Unión Europea: el marco más comprehensivo del mundo
+
+**GDPR (ya vigente)**: Aplica plenamente a sistemas de IA que procesan datos personales. Incluye derecho a no ser sujeto de decisiones automatizadas significativas, derecho de explicación, y base legal para procesamiento.
+
+**EU AI Act (vigencia gradual 2024-2027)**: Primera ley integral de IA en el mundo. Clasifica sistemas por nivel de riesgo:
+- **Riesgo inaceptable**: prohibidos (manipulación subliminal, scoring social masivo)
+- **Alto riesgo**: permitidos con requisitos estrictos (sistemas en salud, contratación, crédito, infraestructura crítica) — requieren evaluación de conformidad, documentación técnica, supervisión humana
+- **Riesgo limitado**: obligaciones de transparencia (los chatbots deben identificarse como IA)
+- **Riesgo mínimo**: sin requisitos adicionales
+
+**Brussels Effect**: La regulación europea tiene alcance extraterritorial. Cualquier empresa que procese datos de ciudadanos europeos o venda en Europa debe cumplir. Para una empresa farmacéutica global como Novartis, esto significa que el AI Act es prácticamente una realidad operativa, aunque su sede esté fuera de la UE.
+
+### China: múltiples regulaciones específicas
+
+China ha tomado un enfoque diferente: regulaciones específicas por tipo de tecnología. Regulaciones de recomendación algorítmica (2022), deepfakes (2022), y modelos fundacionales generativos (2023). El énfasis está en control estatal del contenido y la información, con requisitos de licenciamiento y aprobación gubernamental.
+
+### Reino Unido: soft law por ahora
+
+El UK ha optado temporalmente por no legislar directamente, delegando a reguladores sectoriales la aplicación de principios de IA dentro de sus dominios. Abierto a revisión si el enfoque resulta insuficiente.
+
+---
+
+## Gobernanza práctica: qué hace una organización responsable
+
+Entender los riesgos y el marco regulatorio es necesario pero no suficiente. Lo que determina si una organización usa IA responsablemente es la implementación concreta de mecanismos de gobernanza.
+
+### El NIST AI Risk Management Framework
+
+El NIST AI RMF es el estándar de referencia más adoptado para gestión de riesgos de IA. Tiene cuatro funciones core:
+
+**GOVERN (Gobernar)**: Establecer la cultura, políticas y procesos organizacionales para gestión de riesgos de IA. Incluye: asignación de roles y responsabilidades, definición de qué aplicaciones de IA requieren aprobación formal, mecanismos de reporte, y formación de empleados.
+
+**MAP (Mapear)**: Identificar y categorizar los riesgos específicos de cada sistema de IA antes de desplegarlo. Preguntas clave: ¿qué decisiones toma este sistema? ¿Quiénes pueden ser afectados negativamente? ¿Qué datos procesa? ¿Cuál es el impacto si el sistema falla o es incorrecto?
+
+**MEASURE (Medir)**: Evaluar la probabilidad e impacto de los riesgos identificados. Incluye pruebas de sesgo, evaluación de precisión en poblaciones relevantes, y red teaming (equipos internos que intentan activamente hacer fallar o mal usar el sistema).
+
+**MANAGE (Gestionar)**: Implementar controles para los riesgos priorizados. Incluye definir cuándo se requiere supervisión humana, qué outputs nunca pueden ser tomados sin revisión, y procesos de respuesta a incidentes.
+
+### Las líneas rojas concretas
+
+La investigación sobre gobernanza de IA muestra que los "principios de alto nivel" son insuficientes sin mecanismos de aplicación concretos. Un framework práctico para cada caso de uso crítico incluye:
+
+- **Trigger**: ¿En qué condición específica se activa el control?
+- **Hard Limit**: ¿Qué está estrictamente prohibido hacer sin aprobación humana?
+- **Enforcement Mechanism**: ¿Cómo se verifica el cumplimiento?
+- **Override Protocol**: ¿Bajo qué condiciones y con qué autorización se puede hacer una excepción?
+
+Ejemplo: Un sistema de IA que hace recomendaciones médicas. Trigger: cualquier recomendación de tratamiento. Hard Limit: ninguna recomendación puede implementarse sin revisión de un médico certificado. Enforcement: log obligatorio de revisión. Override: solo con firma de dos especialistas y documentación de urgencia.
+
+### Qué significa esto para ti como empleado
+
+No necesitas ser experto en regulación para contribuir a la gobernanza responsable de IA. Las acciones concretas más importantes:
+
+1. **Solo usar herramientas aprobadas**: Antes de usar cualquier herramienta de IA para trabajo, verificar que está en la lista de herramientas aprobadas por IT/Legal. Si no está, no la uses aunque parezca conveniente.
+
+2. **No ingresar datos sensibles en herramientas no aprobadas**: Datos de pacientes, resultados de estudios, estrategia de producto, información financiera no pública — si no sabes si la herramienta tiene protección contractual, no pongas esos datos.
+
+3. **Verificar los outputs que importan**: Un email de seguimiento generado por IA tiene bajo riesgo si lo lees antes de enviarlo. Un análisis de datos clínicos, una interpretación regulatoria, o una recomendación de negocio tienen riesgo alto si van directo a decisión sin revisión.
+
+4. **Reportar cuando algo sale mal**: Si un sistema de IA produce un output sesgado, incorrecto, o potencialmente dañino, reportarlo. La información de incidentes es lo que permite a las organizaciones mejorar sus controles.
+
+5. **Mantener el juicio humano en el centro**: La IA es una herramienta poderosa de apoyo. La responsabilidad de las decisiones que tomas en tu trabajo sigue siendo tuya.
+
+---
+
+<Quiz
+  moduleSlug="legal-ai-risks"
+  questions={[
+    {
+      question: "¿Cuál es la diferencia práctica más importante entre una herramienta de IA de consumo y una licencia enterprise?",
+      options: [
+        "La velocidad de respuesta",
+        "Las licencias enterprise incluyen acuerdos contractuales que protegen la confidencialidad de los datos",
+        "Los modelos enterprise son más inteligentes",
+        "Solo el precio"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Qué implica el 'Brussels Effect' para una empresa farmacéutica global?",
+      options: [
+        "Solo aplica si tienen oficinas en Bruselas",
+        "No es relevante fuera de Europa",
+        "La regulación europea aplica a cualquier empresa que opere o venda en Europa, independiente de dónde tenga su sede",
+        "Solo aplica al uso de datos de empleados europeos"
+      ],
+      correct: 2
+    },
+    {
+      question: "Según los principios de gobernanza de IA, ¿qué deben incluir los controles concretos para casos de uso críticos?",
+      options: [
+        "Solo una lista de principios éticos generales",
+        "Trigger, Hard Limit, Enforcement Mechanism y Override Protocol",
+        "Aprobación del CEO para cada uso",
+        "Un comité de revisión mensual"
+      ],
+      correct: 1
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="NIST AI Risk Management Framework"
+  url="https://www.nist.gov/system/files/documents/2023/01/26/AI%20RMF%201.0.pdf"
+  description="El framework de referencia para gestión de riesgos de IA. Incluye las cuatro funciones core: Govern, Map, Measure, Manage."
+  type="doc"
+/>
+
+<ResourceCard
+  title="EU AI Act — Texto oficial"
+  url="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689"
+  description="El primer marco legal integral de IA del mundo. Clasifica sistemas por nivel de riesgo y establece requisitos de cumplimiento."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Anthropic — Responsible Scaling Policy"
+  url="https://www.anthropic.com/news/anthropics-responsible-scaling-policy"
+  description="Cómo Anthropic evalúa y gestiona los riesgos de sus modelos antes de cada lanzamiento. Ejemplo de gobernanza de IA en práctica."
+  type="article"
+/>
