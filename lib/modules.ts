@@ -49,20 +49,8 @@ export const modules: Module[] = [
     ],
   },
   {
-    slug: 'legal-ai-risks',
-    number: 4,
-    title: 'Riesgos Legales y Gobernanza de la IA',
-    estimatedTime: '25 min',
-    toc: [
-      { id: 'los-riesgos-reales-del-uso-de-ia-en-la-empresa', label: 'Los riesgos reales del uso de IA' },
-      { id: 'privacidad-y-propiedad-intelectual', label: 'Privacidad y propiedad intelectual' },
-      { id: 'el-panorama-regulatorio', label: 'El panorama regulatorio' },
-      { id: 'gobernanza-práctica-qué-hace-una-organización-responsable', label: 'Gobernanza práctica' },
-    ],
-  },
-  {
     slug: 'agents-and-skills',
-    number: 5,
+    number: 4,
     title: 'Agentes de IA, Skills y Extensibilidad',
     estimatedTime: '40 min',
     toc: [
@@ -71,6 +59,18 @@ export const modules: Module[] = [
       { id: 'caso-de-estudio-superpowers', label: 'Caso de estudio: superpowers' },
       { id: 'construir-un-agente-con-tool-use-ejemplo-hands-on', label: 'Agente hands-on con tool use' },
       { id: 'conectar-agentes-con-flujos-de-trabajo-n8n-como-capa-de-orquestación', label: 'Orquestación con n8n' },
+    ],
+  },
+  {
+    slug: 'legal-ai-risks',
+    number: 5,
+    title: 'Riesgos Legales y Gobernanza de la IA',
+    estimatedTime: '25 min',
+    toc: [
+      { id: 'los-riesgos-reales-del-uso-de-ia-en-la-empresa', label: 'Los riesgos reales del uso de IA' },
+      { id: 'privacidad-y-propiedad-intelectual', label: 'Privacidad y propiedad intelectual' },
+      { id: 'el-panorama-regulatorio', label: 'El panorama regulatorio' },
+      { id: 'gobernanza-práctica-qué-hace-una-organización-responsable', label: 'Gobernanza práctica' },
     ],
   },
 ]
