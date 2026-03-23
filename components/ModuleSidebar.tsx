@@ -8,9 +8,10 @@ import { getAllModulesProgress, ModuleStatus } from '@/lib/progress'
 
 interface ModuleSidebarProps {
   currentSlug: string
+  trackSlug: string
 }
 
-export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
+export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
   const [progress, setProgress] = useState<Record<string, ModuleStatus>>({})
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -38,7 +39,7 @@ export function ModuleSidebar({ currentSlug }: ModuleSidebarProps) {
           Módulos
         </p>
         <nav className="space-y-1">
-          {modules.map((mod) => {
+          {modules.filter((mod) => mod.track === trackSlug).map((mod) => {
             const status = progress[mod.slug] ?? 'not-started'
             const isCurrent = mod.slug === currentSlug
             return (
