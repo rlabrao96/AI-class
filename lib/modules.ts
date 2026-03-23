@@ -18,9 +18,9 @@ export const modules: Module[] = [
     title: 'Fundamentos de IA',
     estimatedTime: '45 min',
     toc: [
-      { id: 'como-funcionan-los-llms', label: 'Cómo funcionan los LLMs' },
+      { id: 'cómo-funcionan-los-llms', label: 'Cómo funcionan los LLMs' },
       { id: 'el-ecosistema-de-herramientas', label: 'El ecosistema de herramientas' },
-      { id: 'limites-reales', label: 'Límites reales' },
+      { id: 'límites-reales', label: 'Límites reales' },
       { id: 'el-mindset-correcto', label: 'El mindset correcto' },
     ],
   },
@@ -31,7 +31,7 @@ export const modules: Module[] = [
     estimatedTime: '45 min',
     toc: [
       { id: 'estructura-del-prompt', label: 'Estructura del prompt' },
-      { id: 'especificidad-beats-brevedad', label: 'Especificidad > brevedad' },
+      { id: 'especificidad--brevedad', label: 'Especificidad > brevedad' },
       { id: 'few-shot-prompting', label: 'Few-shot prompting' },
       { id: 'chain-of-thought', label: 'Chain of thought' },
     ],
@@ -42,10 +42,10 @@ export const modules: Module[] = [
     title: 'Vibe-coding: Automatiza Sin Código',
     estimatedTime: '45 min',
     toc: [
-      { id: 'que-es-el-vibe-coding', label: 'Qué es el vibe-coding' },
-      { id: 'el-loop-de-iteracion', label: 'El loop de iteración' },
-      { id: 'casos-de-uso-practicos', label: 'Casos de uso prácticos' },
-      { id: 'como-ir-mas-lejos', label: 'Cómo ir más lejos' },
+      { id: 'qué-es-el-vibe-coding', label: 'Qué es el vibe-coding' },
+      { id: 'el-loop-de-iteración', label: 'El loop de iteración' },
+      { id: 'casos-de-uso-prácticos', label: 'Casos de uso prácticos' },
+      { id: 'cómo-ir-más-lejos', label: 'Cómo ir más lejos' },
     ],
   },
 ]
