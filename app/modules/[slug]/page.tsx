@@ -12,6 +12,10 @@ const moduleMap: Record<string, () => Promise<{ default: React.ComponentType }>>
   'vibe-coding': () => import('@/content/vibe-coding.mdx'),
   'agents-and-skills': () => import('@/content/agents-and-skills.mdx'),
   'legal-ai-risks': () => import('@/content/legal-ai-risks.mdx'),
+  'copilot-m365': () => import('@/content/copilot-m365.mdx'),
+  'microsoft-fabric': () => import('@/content/microsoft-fabric.mdx'),
+  'azure-ai-foundry': () => import('@/content/azure-ai-foundry.mdx'),
+  'aws-bedrock': () => import('@/content/aws-bedrock.mdx'),
 }
 
 export function generateStaticParams() {
@@ -30,7 +34,7 @@ export default async function ModulePage({
 
   return (
     <div className="flex min-h-screen bg-white">
-      <ModuleSidebar currentSlug={params.slug} />
+      <ModuleSidebar currentSlug={params.slug} trackSlug={mod.track} />
 
       <main className="flex-1 min-w-0 pb-24">
         <div className="max-w-[720px] mx-auto px-6 py-10">
@@ -57,7 +61,7 @@ export default async function ModulePage({
         </div>
       </main>
 
-      <MarkCompleteButton slug={params.slug} />
+      <MarkCompleteButton slug={params.slug} trackSlug={mod.track} />
     </div>
   )
 }
