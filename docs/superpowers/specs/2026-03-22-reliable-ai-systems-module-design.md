@@ -50,6 +50,33 @@ No requiere escribir código — los ejemplos son conceptuales con diagramas y p
 **Tiempo estimado:** 40 min
 **Idioma:** Español
 
+### Estructura del archivo MDX
+
+El archivo sigue el patrón de todos los módulos existentes:
+```
+# [Título del módulo]          ← H1, texto del título
+
+[Párrafo de introducción]      ← 3-4 oraciones. Qué cubre el módulo, por qué importa,
+                                  a quién está dirigido. Tono técnico pero accesible.
+
+---
+
+## [Sección 1]                 ← H2
+...
+
+---
+
+## [Sección 4]                 ← H2
+
+---
+
+<Quiz ... />
+
+## Recursos
+
+<ResourceCard ... />
+```
+
 ### Secciones (H2)
 
 #### 1. Por qué los LLMs solos fallan en producción
@@ -127,8 +154,10 @@ No requiere escribir código — los ejemplos son conceptuales con diagramas y p
 
 **ID de anchor:** `evaluar-si-tu-sistema-funciona`
 
-**Contenido (~350 palabras):**
-- Tres niveles de evaluación, de más a menos confiable:
+**Framing de la sección:** Esta sección reencuadra los verifiers de la Sección 1 en un contexto de *monitoreo continuo* — no repite las definiciones, sino que responde: "¿cómo sabes que tu diseño está funcionando en producción?"
+
+**Contenido (~450 palabras):**
+- Tres niveles de evaluación continua, de más a menos confiable:
   1. **Hard verifiers en producción**: si diseñaste bien el schema, muchos checks corren automáticamente en cada request. Unit tests sobre los outputs estructurados.
   2. **Soft verifiers sobre muestra**: revisión humana periódica sobre N% de los casos. Cómo elegir qué revisar: casos borderline (cerca del threshold), casos con feedback negativo del usuario, sample aleatorio.
   3. **LLM-as-judge**: usar un segundo LLM para evaluar outputs del primero. Útil cuando el output es semántico y no hay ground truth fácil. Limitaciones: sesgo a favor de respuestas largas y del mismo proveedor, posible contaminación de datos.
@@ -151,25 +180,42 @@ No requiere escribir código — los ejemplos son conceptuales con diagramas y p
 4. Qué hace el meta-controller en el loop de LLM-Modulo
 5. Cuándo es válido usar LLM-as-judge y cuál es su principal limitación
 
-### ResourceCards (4)
+### ResourceCards (5)
 1. **LLM-Modulo Framework** (paper) — `doc` — referencia académica del framework
 2. **Anthropic — Structured Outputs** — `doc` — cómo implementar outputs estructurados en la API de Claude
-3. **HELM: Holistic Evaluation of Language Models** — `doc` — framework de evaluación de Stanford
-4. **Epic Sepsis Model Rollback** — `article` — caso real de falla de modelo en producción (STAT News)
+3. **Anthropic — Build reliable, interpretable AI workflows with SGR** — `article` — blog post de Anthropic sobre Schema-Guided Reasoning como patrón de diseño para sistemas confiables (ancla la Sección 3)
+4. **HELM: Holistic Evaluation of Language Models** — `doc` — framework de evaluación de Stanford
+5. **Epic Sepsis Model Rollback** — `article` — caso real de falla de modelo en producción (STAT News)
 
 ---
 
 ## Cambios en archivos existentes
 
 ### `lib/modules.ts`
-- Agregar entrada para `reliable-ai-systems` con número 3
-- Renumerar `vibe-coding` → 4, `agents-and-skills` → 5, `legal-ai-risks` → 6
+- Agregar entrada para `reliable-ai-systems` con número 3, incluyendo el array `toc` con los anchor IDs exactos de cada H2 (generados por rehype-slug):
+  ```ts
+  {
+    slug: 'reliable-ai-systems',
+    number: 3,
+    title: 'Sistemas de IA Confiables',
+    estimatedTime: '40 min',
+    toc: [
+      { id: 'por-qué-los-llms-solos-fallan-en-producción', label: 'Por qué los LLMs solos fallan' },
+      { id: 'llm-modulo-orquestación-con-critics', label: 'LLM-Modulo: orquestación con critics' },
+      { id: 'schema-guided-reasoning-hacer-el-output-verificable', label: 'Schema-Guided Reasoning' },
+      { id: 'evaluar-si-tu-sistema-funciona', label: 'Evaluar si tu sistema funciona' },
+    ],
+  }
+  ```
+- Renumerar módulos existentes: `vibe-coding` → 4, `agents-and-skills` → 5, `legal-ai-risks` → 6
+- Insertar la nueva entrada ENTRE `prompting-fundamentals` (2) y `vibe-coding` (ahora 4)
 
 ### `app/modules/[slug]/page.tsx`
 - Agregar `'reliable-ai-systems': () => import('@/content/reliable-ai-systems.mdx')` al moduleMap
 
 ### `app/page.tsx`
-- Actualizar tagline: "Seis módulos para..."
+- Actualizar tagline de línea 28: cambiar "Cinco módulos" por "Seis módulos":
+  `"Seis módulos para entender, usar y aprovechar la IA en tu trabajo de forma responsable."`
 
 ### `app/certificate/page.tsx`
 - Sin cambios — itera sobre `modules` dinámicamente, se actualiza solo
