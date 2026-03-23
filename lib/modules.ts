@@ -60,6 +60,19 @@ export const modules: Module[] = [
       { id: 'gobernanza-práctica-qué-hace-una-organización-responsable', label: 'Gobernanza práctica' },
     ],
   },
+  {
+    slug: 'agents-and-skills',
+    number: 5,
+    title: 'Agentes de IA, Skills y Extensibilidad',
+    estimatedTime: '40 min',
+    toc: [
+      { id: 'qué-es-un-agente-de-ia', label: 'Qué es un agente de IA' },
+      { id: 'skills-y-plugins-extender-el-modelo-sin-fine-tuning', label: 'Skills y plugins' },
+      { id: 'caso-de-estudio-superpowers', label: 'Caso de estudio: superpowers' },
+      { id: 'construir-un-agente-con-tool-use-ejemplo-hands-on', label: 'Agente hands-on con tool use' },
+      { id: 'conectar-agentes-con-flujos-de-trabajo-n8n-como-capa-de-orquestación', label: 'Orquestación con n8n' },
+    ],
+  },
 ]
 
 export function getModule(slug: string): Module | undefined {

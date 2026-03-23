@@ -25,7 +25,7 @@ export default function HomePage() {
             Capacitación en IA
           </h1>
           <p className="text-[#71717a]">
-            Cuatro módulos para entender, usar y aprovechar la IA en tu trabajo de forma responsable.
+            Cinco módulos para entender, usar y aprovechar la IA en tu trabajo de forma responsable.
           </p>
         </div>
 

@@ -1,0 +1,475 @@
+# Agentes de IA, Skills y Extensibilidad
+
+Los modelos de lenguaje por sí solos responden preguntas. Los **agentes** hacen cosas: ejecutan código, navegan interfaces, llaman APIs, leen archivos, encadenan decisiones. La diferencia no está en el modelo — está en la arquitectura que lo rodea. En este módulo aprenderás qué es un agente de IA, cómo se extiende un modelo con herramientas y skills, y cómo implementar un sistema de skills real con superpowers — un framework open-source que funciona con Claude, GPT-4, y cualquier modelo que soporte tool use.
+
+Este módulo asume que sabes usar la terminal, tienes Python o Node.js instalado, y no te da miedo leer un README.
+
+---
+
+## Qué es un agente de IA
+
+Un **modelo de lenguaje** toma texto y produce texto. Un **agente** es un modelo que además puede:
+
+1. **Usar herramientas** — ejecutar funciones definidas externamente (buscar en la web, leer un archivo, llamar una API, correr código)
+2. **Tomar decisiones en loops** — evaluar el resultado de cada acción y decidir qué hacer después
+3. **Operar con contexto persistente** — acceder a memoria, archivos, o estado que persiste entre llamadas
+
+La arquitectura básica de cualquier agente es:
+
+```
+Prompt del usuario
+       ↓
+    Modelo LLM
+       ↓
+¿Necesito usar una herramienta?
+    ↙         ↘
+   Sí          No
+   ↓            ↓
+Ejecutar      Respuesta
+herramienta   final
+   ↓
+Resultado → vuelve al modelo
+```
+
+El modelo decide cuándo usar cada herramienta basándose en su descripción. No es que el modelo "aprende" nuevas capacidades — aprende a delegar en funciones que ya existen.
+
+### El concepto de tool use
+
+La mayoría de los modelos modernos (Claude, GPT-4o, Gemini) soportan **tool use** (también llamado function calling): el usuario define un conjunto de funciones con su nombre, descripción y parámetros, y el modelo puede invocarlas cuando lo considera necesario.
+
+Ejemplo conceptual en Python con el SDK de Anthropic:
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+tools = [
+    {
+        "name": "get_weather",
+        "description": "Obtiene el clima actual de una ciudad",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string", "description": "Nombre de la ciudad"}
+            },
+            "required": ["city"]
+        }
+    }
+]
+
+response = client.messages.create(
+    model="claude-opus-4-6",
+    max_tokens=1024,
+    tools=tools,
+    messages=[{"role": "user", "content": "¿Cómo está el clima en Zurich?"}]
+)
+
+# Si el modelo quiere usar la herramienta, response.stop_reason == "tool_use"
+# y response.content contiene un bloque con el tool name e inputs
+```
+
+La clave: el modelo no ejecuta la función — solo dice "quiero llamar `get_weather` con `city="Zurich"`". Tu código ejecuta la función real y devuelve el resultado al modelo para que lo incorpore en la respuesta final.
+
+Este mecanismo es **agnóstico de modelo**: OpenAI, Anthropic, Google y la mayoría de los proveedores implementan la misma idea con APIs similares. Lo que cambia es el formato de la llamada, no el concepto.
+
+---
+
+## Skills y plugins: extender el modelo sin fine-tuning
+
+Si tool use es cómo el modelo llama funciones, los **skills** son una capa de abstracción superior: **comportamientos y conocimiento reutilizables que se inyectan al modelo via contexto** — en el system prompt, en el contexto inicial, o como archivos que el modelo puede leer.
+
+La distinción importante:
+
+| Nivel | Qué es | Cómo funciona |
+|-------|--------|---------------|
+| **Tool** | Una función ejecutable | El modelo la llama, tu código la ejecuta |
+| **Skill** | Un comportamiento o workflow definido en texto | Se inyecta en el contexto del modelo |
+| **Plugin** | Combinación de tools + skills + configuración | Encapsula capacidad completa y reutilizable |
+
+Los skills no requieren cambiar el modelo ni hacer fine-tuning. Funcionan porque los LLMs siguen instrucciones en contexto con alta fidelidad. Si el sistema prompt dice "cuando el usuario pida un commit, sigue exactamente estos pasos: 1) verifica cambios con git status, 2) genera un mensaje semántico, 3) confirma con el usuario antes de ejecutar" — el modelo seguirá ese workflow consistentemente.
+
+### Por qué esto importa
+
+Los modelos "base" son generalistas. Los skills te permiten darles personalidad, workflows específicos, y conocimiento del dominio sin necesidad de re-entrenar nada. Una empresa farmacéutica puede tener un skill de "revisión de documentos regulatorios" que inyecta los criterios del ICH, las categorías de hallazgos frecuentes, y el formato de reporte esperado — y ese skill funciona igual en Claude, GPT-4, o Gemini.
+
+---
+
+## Caso de estudio: superpowers
+
+[**superpowers**](https://github.com/obra/superpowers) es un sistema open-source de skills para Claude Code (aunque los conceptos aplican a cualquier agente). Es un caso de estudio ideal porque:
+
+1. Está en producción, es público, y tiene skills reales que puedes examinar
+2. Muestra cómo estructurar skills como archivos Markdown
+3. Demuestra cómo inyectar skills en el contexto de un agente de forma modular
+4. El sistema de skills es completamente agnóstico — los archivos `.md` se pueden usar con cualquier modelo
+
+### Instalación
+
+```bash
+# Requiere Claude Code instalado
+# Instalar superpowers como plugin de Claude Code
+
+# Opción 1: via npx
+npx @andresmoschini/superpowers@latest install
+
+# Opción 2: clonar e instalar manualmente
+git clone https://github.com/obra/superpowers
+cd superpowers
+npm install
+npm run install-plugin
+```
+
+Después de instalar, al abrir Claude Code en cualquier proyecto verás que los skills están disponibles como comandos de slash (`/brainstorm`, `/commit`, `/tdd`, etc.).
+
+### Anatomía de un skill
+
+Cada skill es un archivo Markdown con frontmatter YAML. Ejemplo del skill `commit`:
+
+```markdown
+---
+name: commit
+description: Creates semantic git commits following conventional commits spec
+triggers:
+  - commit
+  - git commit
+---
+
+# Commit Skill
+
+When the user asks to commit, follow these steps exactly:
+
+1. Run `git status` to see what changed
+2. Run `git diff --staged` to review staged changes
+3. Generate a commit message following conventional commits:
+   - feat: new feature
+   - fix: bug fix
+   - docs: documentation
+   - refactor: code restructure without behavior change
+4. Show the proposed message to the user and ask for confirmation
+5. Only execute `git commit` after explicit approval
+```
+
+El modelo lee este archivo en el contexto de la sesión y sigue el workflow cuando detecta que el usuario quiere hacer un commit. No hay código ejecutable en el skill — solo instrucciones que el modelo sigue.
+
+### Crear tu propio skill
+
+Puedes crear skills para tus propios workflows. Ejemplo para un equipo de análisis de datos:
+
+```markdown
+---
+name: analyze-dataset
+description: Analyzes a CSV or DataFrame and produces a structured report
+triggers:
+  - analyze dataset
+  - analyze data
+  - data analysis
+---
+
+# Dataset Analysis Skill
+
+When asked to analyze a dataset, follow this process:
+
+## Step 1: Understand the data
+- Read the file or DataFrame
+- Report: number of rows, columns, data types
+- Identify: missing values per column (%), duplicate rows
+
+## Step 2: Statistical summary
+For numeric columns: mean, median, std, min, max, p25, p75
+For categorical columns: top 5 values with counts and percentages
+
+## Step 3: Quality flags
+Flag any column where:
+- Missing values > 10%
+- Single value represents > 90% of rows (low variance)
+- Data type seems wrong (e.g., numeric stored as string)
+
+## Step 4: Output format
+Produce a Markdown table for each section.
+End with a "Recommended next steps" section of 3-5 bullet points.
+```
+
+Guarda este archivo como `~/.claude/plugins/skills/analyze-dataset.md` y Claude Code lo cargará automáticamente en todas tus sesiones.
+
+### El directorio de skills
+
+La estructura de superpowers en producción:
+
+```
+superpowers/
+├── skills/
+│   ├── brainstorming.md       ← workflow de ideación
+│   ├── commit.md              ← semantic commits
+│   ├── tdd.md                 ← test-driven development
+│   ├── debugging.md           ← debugging sistemático
+│   ├── code-review.md         ← revisión de código
+│   └── writing-plans.md       ← planificación de tareas
+├── references/
+│   └── codex-tools.md         ← mapeo de herramientas cross-modelo
+└── plugin.json                ← metadata del plugin
+```
+
+Cada skill es independiente. Puedes tomar solo los que necesitas, modificarlos para tu contexto, o crear los tuyos desde cero.
+
+---
+
+## Construir un agente con tool use: ejemplo hands-on
+
+Para consolidar los conceptos, construyamos un agente simple que puede leer archivos locales y responder preguntas sobre su contenido. Funciona con el SDK de Anthropic pero la lógica es portable a OpenAI o Vertex AI (Gemini).
+
+### Setup
+
+```bash
+pip install anthropic
+export ANTHROPIC_API_KEY="tu_api_key"
+```
+
+### El agente
+
+```python
+import anthropic
+import os
+import json
+
+client = anthropic.Anthropic()
+
+# Definición de herramientas
+tools = [
+    {
+        "name": "read_file",
+        "description": "Lee el contenido de un archivo local. Usa esta herramienta cuando el usuario mencione un archivo específico o cuando necesites información que podría estar en un archivo.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Ruta absoluta o relativa al archivo"
+                }
+            },
+            "required": ["path"]
+        }
+    },
+    {
+        "name": "list_files",
+        "description": "Lista los archivos en un directorio",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "directory": {
+                    "type": "string",
+                    "description": "Ruta al directorio. Usa '.' para el directorio actual."
+                }
+            },
+            "required": ["directory"]
+        }
+    }
+]
+
+# Implementación de herramientas
+def execute_tool(tool_name: str, tool_input: dict) -> str:
+    if tool_name == "read_file":
+        try:
+            with open(tool_input["path"], "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            return f"Error: archivo no encontrado en {tool_input['path']}"
+        except Exception as e:
+            return f"Error leyendo archivo: {str(e)}"
+
+    elif tool_name == "list_files":
+        try:
+            files = os.listdir(tool_input["directory"])
+            return "\n".join(files)
+        except Exception as e:
+            return f"Error listando directorio: {str(e)}"
+
+    return f"Herramienta desconocida: {tool_name}"
+
+# Loop del agente
+def run_agent(user_message: str):
+    messages = [{"role": "user", "content": user_message}]
+
+    while True:
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=4096,
+            tools=tools,
+            messages=messages
+        )
+
+        # Si el modelo terminó, devolver la respuesta
+        if response.stop_reason == "end_turn":
+            for block in response.content:
+                if hasattr(block, "text"):
+                    return block.text
+
+        # Si el modelo quiere usar herramientas, ejecutarlas
+        elif response.stop_reason == "tool_use":
+            # Agregar respuesta del modelo al historial
+            messages.append({"role": "assistant", "content": response.content})
+
+            # Ejecutar cada herramienta solicitada
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    print(f"  → Usando herramienta: {block.name}({block.input})")
+                    result = execute_tool(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
+
+            # Agregar resultados al historial y continuar
+            messages.append({"role": "user", "content": tool_results})
+
+        else:
+            break
+
+    return "El agente terminó sin respuesta final."
+
+# Uso
+if __name__ == "__main__":
+    respuesta = run_agent("Lista los archivos en el directorio actual y dime cuál parece ser el más importante")
+    print(respuesta)
+```
+
+### Qué está pasando aquí
+
+1. El modelo recibe el mensaje del usuario y decide si necesita herramientas
+2. Si `stop_reason == "tool_use"`, el modelo devuelve una lista de tool calls en lugar de texto
+3. Tu código ejecuta las funciones reales (`read_file`, `list_files`)
+4. Los resultados vuelven al modelo como mensajes de tipo `tool_result`
+5. El modelo genera su respuesta final incorporando lo que encontró
+
+Este loop es el núcleo de **cualquier agente**, sin importar el modelo o la tarea. Claude Code, los agentes de n8n, los Copilot Agents de Microsoft — todos funcionan sobre este mismo patrón.
+
+---
+
+## Conectar agentes con flujos de trabajo: n8n como capa de orquestación
+
+Para audiencias no técnicas o flujos de producción sin mantenimiento de código, **n8n** (y herramientas similares como Make o Zapier AI) actúan como capa de orquestación: conectan el agente con triggers del mundo real sin escribir un loop manualmente.
+
+El patrón típico en n8n:
+
+```
+Trigger (email / webhook / cron / archivo nuevo)
+       ↓
+   Preprocesamiento
+   (extraer texto, formatear datos)
+       ↓
+   Llamada al LLM
+   (con o sin tools, según el nodo)
+       ↓
+   Decisión / clasificación
+       ↓
+   Acción final
+   (crear ticket / enviar mensaje / actualizar CRM)
+```
+
+La diferencia con el agente Python de arriba: en n8n el loop está visualizado como un grafo, cada nodo es una función, y el modelo opera en uno de esos nodos. Más accesible para configurar; menos flexible para lógica compleja.
+
+Cuándo usar cada enfoque:
+
+| Escenario | Herramienta recomendada |
+|-----------|------------------------|
+| Prototipo rápido, flujo simple, sin código | n8n / Make / Zapier AI |
+| Necesitas control total del loop y manejo de errores | Python SDK (Anthropic / OpenAI) |
+| Integración en IDE o terminal | Claude Code + superpowers |
+| Flujo de producción complejo con tests | Python SDK + orquestador propio |
+
+---
+
+<Quiz
+  moduleSlug="agents-and-skills"
+  questions={[
+    {
+      question: "¿Cuál es la diferencia fundamental entre un modelo LLM y un agente?",
+      options: [
+        "El agente es un modelo más grande y potente",
+        "El agente puede usar herramientas, tomar decisiones en loops y operar con estado persistente",
+        "El agente no requiere API key para funcionar",
+        "El agente solo funciona con Claude, no con otros modelos"
+      ],
+      correct: 1
+    },
+    {
+      question: "En tool use, ¿quién ejecuta realmente la función cuando el modelo la solicita?",
+      options: [
+        "El modelo la ejecuta internamente",
+        "El servidor de Anthropic/OpenAI la ejecuta automáticamente",
+        "Tu código ejecuta la función y devuelve el resultado al modelo",
+        "La función se ejecuta en el browser del usuario"
+      ],
+      correct: 2
+    },
+    {
+      question: "¿Qué es un 'skill' en el contexto de extensibilidad de modelos?",
+      options: [
+        "Un modelo especializado entrenado con fine-tuning",
+        "Un plugin de pago que se compra al proveedor del modelo",
+        "Un comportamiento o workflow definido en texto que se inyecta al modelo via contexto",
+        "Una función Python que el modelo puede ejecutar"
+      ],
+      correct: 2
+    },
+    {
+      question: "¿Por qué el sistema de skills de superpowers es agnóstico de modelo?",
+      options: [
+        "Porque usa una API universal que todos los modelos soportan",
+        "Porque los skills son archivos Markdown con instrucciones en lenguaje natural — cualquier modelo que siga instrucciones puede usarlos",
+        "Porque superpowers convierte automáticamente el skill al formato de cada modelo",
+        "Porque solo funciona con modelos open-source"
+      ],
+      correct: 1
+    },
+    {
+      question: "¿Cuándo es preferible usar n8n sobre un agente en Python para un flujo con LLMs?",
+      options: [
+        "Cuando necesitas control total del loop de tool use y manejo de errores complejo",
+        "Cuando el flujo es simple, el trigger viene de una app externa, y no quieres mantener código",
+        "Cuando el presupuesto de API es muy limitado",
+        "Cuando el modelo es Gemini y no Claude"
+      ],
+      correct: 1
+    }
+  ]}
+/>
+
+## Recursos
+
+<ResourceCard
+  title="superpowers — Sistema de Skills para Claude Code"
+  url="https://github.com/obra/superpowers"
+  description="Framework open-source de skills para agentes de IA. Arquitectura de referencia para construir comportamientos reutilizables que funcionan con cualquier modelo que soporte tool use."
+  type="doc"
+/>
+
+<ResourceCard
+  title="Anthropic — Tool Use Documentation"
+  url="https://docs.anthropic.com/en/docs/build-with-claude/tool-use"
+  description="Documentación oficial de tool use en Claude. Incluye ejemplos de implementación, manejo de errores, y patrones para agentes multi-step."
+  type="doc"
+/>
+
+<ResourceCard
+  title="n8n — Build Your First AI Agent (2026)"
+  url="https://www.youtube.com/playlist?list=PLlET0GsrLUL5HKJk1rb7t32sAs_iAlpZe"
+  description="Tutorial oficial de n8n para construir agentes con IA sin código. Muestra cómo conectar LLMs con triggers del mundo real (email, webhooks, bases de datos) en flujos de producción."
+  type="video"
+/>
+
+<ResourceCard
+  title="Peter Yang — Connect Claude Code to Google, Slack & Reddit"
+  url="https://www.youtube.com/@PeterYangYT/videos"
+  description="Tutorial práctico que muestra cómo conectar Claude Code con herramientas externas usando MCPs (Model Context Protocol) en menos de una hora. Caso de uso directo de extensibilidad de agentes."
+  type="video"
+/>
+
+<ResourceCard
+  title="Anthropic — Model Context Protocol (MCP)"
+  url="https://docs.anthropic.com/en/docs/claude-code/mcp"
+  description="Protocolo open-source de Anthropic para conectar modelos de IA con fuentes de datos y herramientas externas de forma estándar. El sucesor natural de tool use manual para casos de uso de producción."
+  type="doc"
+/>

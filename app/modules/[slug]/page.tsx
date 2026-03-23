@@ -10,6 +10,7 @@ const moduleMap: Record<string, () => Promise<{ default: React.ComponentType }>>
   'prompting-fundamentals': () => import('@/content/prompting-fundamentals.mdx'),
   'vibe-coding': () => import('@/content/vibe-coding.mdx'),
   'legal-ai-risks': () => import('@/content/legal-ai-risks.mdx'),
+  'agents-and-skills': () => import('@/content/agents-and-skills.mdx'),
 }
 
 export function generateStaticParams() {
