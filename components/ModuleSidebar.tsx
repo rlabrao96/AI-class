@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Menu, X, BookOpen } from 'lucide-react'
 import { modules } from '@/lib/modules'
 import { getAllModulesProgress, ModuleStatus } from '@/lib/progress'
+import { NovartisLogo } from '@/components/NovartisLogo'
 
 interface ModuleSidebarProps {
   currentSlug: string
@@ -23,11 +24,18 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full pb-16">
+      {/* Logo */}
+      <div className="mb-6 pb-4 border-b border-novartis-blue/10">
+        <Link href="/" onClick={() => setMobileOpen(false)}>
+          <NovartisLogo width={130} />
+        </Link>
+      </div>
+
       <div className="mb-4">
         <Link
           href="/glossary"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#71717a] hover:text-[#18181b] hover:bg-[#f4f4f5] transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-novartis-blue hover:bg-novartis-blue-light transition-colors"
         >
           <BookOpen size={14} className="flex-shrink-0" />
           Glosario de términos
@@ -35,7 +43,7 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
       </div>
 
       <div className="mb-6">
-        <p className="text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-3">
+        <p className="text-xs font-semibold text-novartis-blue uppercase tracking-wider mb-3">
           Módulos
         </p>
         <nav className="space-y-1">
@@ -47,17 +55,17 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
                 key={mod.slug}
                 href={`/modules/${mod.slug}`}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   isCurrent
-                    ? 'bg-[#f4f4f5] text-[#18181b] font-medium'
-                    : 'text-[#71717a] hover:text-[#18181b] hover:bg-[#f4f4f5]'
+                    ? 'bg-novartis-blue-light text-novartis-blue font-medium'
+                    : 'text-gray-500 hover:text-novartis-blue-dark hover:bg-novartis-blue-light/50'
                 }`}
               >
                 <span
                   className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
                     status === 'completed'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-[#e4e4e7] text-[#71717a]'
+                      ? 'bg-novartis-blue text-white'
+                      : 'bg-novartis-blue-light text-novartis-blue'
                   }`}
                 >
                   {status === 'completed' ? '✓' : mod.number}
@@ -71,7 +79,7 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
 
       {currentModule && currentModule.toc.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-3">
+          <p className="text-xs font-semibold text-novartis-blue uppercase tracking-wider mb-3">
             En este módulo
           </p>
           <nav className="space-y-1">
@@ -80,7 +88,7 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={() => setMobileOpen(false)}
-                className="block px-3 py-1.5 text-sm text-[#71717a] hover:text-[#18181b] transition-colors"
+                className="block px-3 py-1.5 text-sm text-gray-500 hover:text-novartis-blue transition-colors"
               >
                 {item.label}
               </a>
@@ -96,24 +104,24 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
     <>
       {/* Mobile toggle */}
       <button
-        className="md:hidden fixed top-4 left-4 z-30 bg-white border border-[#e4e4e7] rounded-md p-2"
+        className="md:hidden fixed top-4 left-4 z-30 bg-white border border-novartis-blue/20 rounded-lg p-2 shadow-sm"
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label="Toggle sidebar"
       >
-        {mobileOpen ? <X size={16} /> : <Menu size={16} />}
+        {mobileOpen ? <X size={16} className="text-novartis-blue" /> : <Menu size={16} className="text-novartis-blue" />}
       </button>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/20 z-20"
+          className="md:hidden fixed inset-0 bg-novartis-blue-dark/20 backdrop-blur-sm z-20"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile drawer */}
       <div
-        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white border-r border-[#e4e4e7] p-6 z-20 transition-transform ${
+        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white border-r border-novartis-blue/10 p-6 z-20 transition-transform shadow-xl ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -121,7 +129,7 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:block w-64 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-[#e4e4e7] px-6 py-8">
+      <aside className="hidden md:block w-64 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-novartis-blue/10 px-6 py-6 bg-white">
         {sidebarContent}
       </aside>
     </>

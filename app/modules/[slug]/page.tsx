@@ -40,22 +40,22 @@ export default async function ModulePage({
         <div className="max-w-[720px] mx-auto px-6 py-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-[#18181b] text-white text-sm font-medium rounded-lg hover:bg-[#27272a] transition-colors"
+            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-novartis-blue text-white text-sm font-semibold rounded-lg hover:bg-novartis-blue-dark transition-colors"
           >
             ← Volver al menú principal
           </Link>
 
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-semibold text-[#3b82f6] uppercase tracking-wider">
+            <span className="text-xs font-semibold text-novartis-orange uppercase tracking-wider">
               Módulo {mod.number}
             </span>
-            <span className="text-xs text-[#a1a1aa]">·</span>
-            <span className="text-xs text-[#71717a]">{mod.estimatedTime}</span>
+            <span className="text-xs text-gray-300">·</span>
+            <span className="text-xs text-gray-500">{mod.estimatedTime}</span>
           </div>
 
-          <h1 className="text-3xl font-bold text-[#18181b] mb-8">{mod.title}</h1>
+          <h1 className="text-3xl font-bold text-novartis-blue-dark mb-8">{mod.title}</h1>
 
-          <article className="prose prose-zinc max-w-none prose-headings:scroll-mt-6">
+          <article className="prose prose-zinc prose-novartis max-w-none prose-headings:scroll-mt-6">
             <ModuleContent />
           </article>
         </div>

@@ -193,30 +193,30 @@ const categoryLabels: Record<Term['category'], string> = {
 }
 
 const categoryColors: Record<Term['category'], string> = {
-  fundamentos: 'bg-blue-50 text-blue-700 border-blue-200',
+  fundamentos: 'bg-novartis-blue-light text-novartis-blue border-novartis-blue/20',
   sistemas: 'bg-purple-50 text-purple-700 border-purple-200',
-  herramientas: 'bg-orange-50 text-orange-700 border-orange-200',
-  legal: 'bg-red-50 text-red-700 border-red-200',
+  herramientas: 'bg-novartis-orange-light text-novartis-orange border-novartis-orange/20',
+  legal: 'bg-red-50 text-novartis-red border-novartis-red/20',
 }
 
 const categories: Term['category'][] = ['fundamentos', 'sistemas', 'herramientas', 'legal']
 
 export default function GlossaryPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-novartis-blue-light via-white to-white">
       <div className="max-w-2xl mx-auto px-6 py-16">
         <div className="mb-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-[#18181b] text-white text-sm font-medium rounded-lg hover:bg-[#27272a] transition-colors"
+            className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-novartis-blue text-white text-sm font-semibold rounded-lg hover:bg-novartis-blue-dark transition-colors"
           >
             ← Volver al menú principal
           </Link>
         </div>
 
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-[#18181b] mb-2">Glosario</h1>
-          <p className="text-[#71717a]">
+          <h1 className="text-3xl font-bold text-novartis-blue-dark mb-2">Glosario</h1>
+          <p className="text-gray-500">
             Términos y acrónimos clave del curso, organizados por tema.
           </p>
         </div>
@@ -226,14 +226,14 @@ export default function GlossaryPage() {
             const terms = glossary.filter((t) => t.category === category)
             return (
               <section key={category}>
-                <h2 className="text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-4">
+                <h2 className="text-xs font-semibold text-novartis-blue uppercase tracking-wider mb-4">
                   {categoryLabels[category]}
                 </h2>
                 <div className="space-y-4">
                   {terms.map((t) => (
                     <div
                       key={t.term}
-                      className="p-4 border border-[#e4e4e7] rounded-lg bg-[#fafafa]"
+                      className="p-4 border border-novartis-blue/10 rounded-xl bg-white shadow-sm"
                     >
                       <div className="flex items-start gap-3 mb-1.5">
                         {t.acronym && (
@@ -243,11 +243,11 @@ export default function GlossaryPage() {
                             {t.acronym}
                           </span>
                         )}
-                        <p className="text-sm font-semibold text-[#18181b]">
+                        <p className="text-sm font-semibold text-novartis-blue-dark">
                           {t.acronym ? t.term : t.term}
                         </p>
                       </div>
-                      <p className="text-sm text-[#52525b] leading-relaxed">
+                      <p className="text-sm text-gray-600 leading-relaxed">
                         {t.definition}
                       </p>
                     </div>

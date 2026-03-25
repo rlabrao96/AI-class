@@ -28,24 +28,24 @@ export function MarkCompleteButton({ slug: currentSlug, trackSlug }: MarkComplet
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e4e4e7] px-4 py-3 flex items-center justify-between gap-4 z-10">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-novartis-blue/10 px-4 py-3 flex items-center justify-between gap-4 z-10">
       {completed ? (
         <>
-          <span className="flex items-center gap-2 text-green-600 font-medium text-sm">
-            <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-xs">✓</span>
+          <span className="flex items-center gap-2 text-novartis-blue font-medium text-sm">
+            <span className="w-5 h-5 rounded-full bg-novartis-blue-light flex items-center justify-center text-xs text-novartis-blue">✓</span>
             Módulo completado
           </span>
           {nextModule ? (
             <button
               onClick={() => router.push(`/modules/${nextModule.slug}`)}
-              className="bg-[#18181b] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#27272a] transition-colors"
+              className="bg-novartis-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-novartis-blue-dark transition-colors"
             >
               Siguiente: {nextModule.title} →
             </button>
           ) : (
             <button
               onClick={() => router.push(`/certificate/${trackSlug}`)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              className="bg-novartis-orange text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors"
             >
               Ver certificado →
             </button>
@@ -54,7 +54,7 @@ export function MarkCompleteButton({ slug: currentSlug, trackSlug }: MarkComplet
       ) : (
         <button
           onClick={handleComplete}
-          className="ml-auto bg-[#18181b] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#27272a] transition-colors"
+          className="ml-auto bg-novartis-blue text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-novartis-blue-dark transition-colors"
         >
           Marcar como completado ✓
         </button>

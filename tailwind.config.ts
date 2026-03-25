@@ -8,7 +8,20 @@ const config: Config = {
     './content/**/*.{mdx,md}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        novartis: {
+          blue: '#0460A9',
+          'blue-dark': '#003D6B',
+          'blue-light': '#E8F1FA',
+          'blue-mid': '#0978D4',
+          orange: '#EC6608',
+          'orange-light': '#FFF3E8',
+          red: '#E03C31',
+          yellow: '#F0AB00',
+        },
+      },
+    },
   },
   plugins: [require('@tailwindcss/typography')],
 }

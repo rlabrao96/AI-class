@@ -29,25 +29,25 @@ export function ResourceCard({ title, url, description, type }: ResourceCardProp
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-start gap-4 p-4 border border-[#e4e4e7] rounded-lg bg-[#fafafa] hover:shadow-md transition-shadow no-underline group"
+      className="flex items-start gap-4 p-4 border border-novartis-blue/10 rounded-xl bg-white hover:shadow-md hover:border-novartis-blue/25 transition-all no-underline group"
     >
       <div className="flex-shrink-0 mt-0.5">
         <Icon
           size={20}
-          className="text-[#71717a] group-hover:text-[#18181b] transition-colors"
+          className="text-novartis-blue/50 group-hover:text-novartis-blue transition-colors"
           aria-hidden="true"
         />
       </div>
       <div className="min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-medium text-[#71717a] uppercase tracking-wide">
+          <span className="text-xs font-medium text-novartis-blue uppercase tracking-wide">
             {typeLabels[type]}
           </span>
         </div>
-        <h4 className="text-sm font-semibold text-[#18181b] mb-1 group-hover:underline">
+        <h4 className="text-sm font-semibold text-novartis-blue-dark mb-1 group-hover:underline">
           {title}
         </h4>
-        <p className="text-sm text-[#71717a] line-clamp-2">{description}</p>
+        <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
       </div>
     </a>
   )

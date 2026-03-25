@@ -1,3 +1,54 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  ::selection {
+    background-color: #0460A9;
+    color: white;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #E8F1FA;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0460A9;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #003D6B;
+  }
+}
+
+@layer components {
+  .novartis-btn-primary {
+    @apply bg-novartis-blue text-white font-medium rounded-lg hover:bg-novartis-blue-dark transition-colors;
+  }
+  .novartis-btn-secondary {
+    @apply bg-novartis-blue-light text-novartis-blue font-medium rounded-lg hover:bg-blue-100 transition-colors;
+  }
+}
+
+/* Prose overrides for Novartis brand */
+.prose-novartis {
+  --tw-prose-headings: #003D6B;
+  --tw-prose-links: #0460A9;
+  --tw-prose-bold: #003D6B;
+  --tw-prose-counters: #0460A9;
+  --tw-prose-bullets: #0460A9;
+  --tw-prose-quotes: #003D6B;
+  --tw-prose-quote-borders: #EC6608;
+  --tw-prose-code: #003D6B;
+  --tw-prose-hr: #E8F1FA;
+}
+
+/* Print styles for certificate */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
