@@ -61,6 +61,8 @@ Un enfoque práctico: cuando generes contenido que será visto por muchas person
 Otra técnica útil: genera el mismo contenido con diferentes prompts y compara los resultados. Si le pides al modelo que escriba una descripción de puesto tres veces con instrucciones ligeramente diferentes, puedes detectar patrones de sesgo que se repiten y corregirlos conscientemente.
 </Accordion>
 
+<ModuleImage src="/media/ai-fundamentals/diagrams/bias-data.png" alt="Sesgo en datos de entrenamiento" caption="Datos sesgados producen resultados sesgados: el modelo hereda y amplifica los patrones desbalanceados de su entrenamiento." />
+
 ### Corte de datos de entrenamiento: el modelo vive en el pasado
 
 Cada modelo tiene una **fecha de corte de entrenamiento** — un punto después del cual no tiene información. Es como hablar con alguien que estuvo en una isla desierta sin conexión a internet durante los últimos meses (o años, dependiendo del modelo).
@@ -100,6 +102,8 @@ Con los LLMs, esto funciona de manera similar. Supongamos que una empresa tiene 
 **Lo que esto significa para ti como profesional**: Si tu organización está construyendo o implementando sistemas de IA que procesan datos externos (correos, documentos de clientes, contenido web), la inyección de prompts es un riesgo de seguridad que el equipo técnico debe considerar desde el diseño. No es un problema teórico — es un vector de ataque real que se ha demostrado en múltiples contextos.
 
 Como usuario individual, la inyección de prompts te afecta de forma más sutil. Si le pides a un modelo que resuma una página web, y esa página tiene instrucciones ocultas, el resumen que obtienes puede estar manipulado sin que lo notes. La regla práctica: cuando uses IA para procesar contenido de fuentes que no controlas, mantén un nivel extra de escepticismo sobre el resultado.
+
+<ModuleImage src="/media/ai-fundamentals/diagrams/prompt-injection.png" alt="Inyección de prompts" caption="La inyección de prompts ocurre cuando instrucciones maliciosas se esconden dentro de documentos que el modelo procesa." />
 
 ### Privacidad: lo que no debes subir a una herramienta pública
 
