@@ -1,0 +1,148 @@
+{
+  "name": "Modelos de Lenguaje Extensos (LLM)",
+  "children": [
+    {
+      "name": "Conceptos Fundamentales",
+      "children": [
+        {
+          "name": "Archivos: Parámetros y Código"
+        },
+        {
+          "name": "Arquitectura Transformer"
+        },
+        {
+          "name": "Predicción de la siguiente palabra"
+        },
+        {
+          "name": "Compresión pérdida del internet"
+        }
+      ]
+    },
+    {
+      "name": "Proceso de Entrenamiento",
+      "children": [
+        {
+          "name": "Etapa 1: Pre-entrenamiento",
+          "children": [
+            {
+              "name": "Datos masivos de internet"
+            },
+            {
+              "name": "Auto-aprendizaje no supervisado"
+            },
+            {
+              "name": "Base de conocimientos"
+            }
+          ]
+        },
+        {
+          "name": "Etapa 2: Ajuste Fino (Fine-tuning)",
+          "children": [
+            {
+              "name": "Aprendizaje supervisado"
+            },
+            {
+              "name": "Instrucciones de etiquetado"
+            },
+            {
+              "name": "Modelo de asistente"
+            }
+          ]
+        },
+        {
+          "name": "Etapa 3: RLHF",
+          "children": [
+            {
+              "name": "Refuerzo por retroalimentación humana"
+            },
+            {
+              "name": "Comparación de respuestas"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mecanismo de Atención (QKV)",
+      "children": [
+        {
+          "name": "Query (Consulta): Lo que buscamos"
+        },
+        {
+          "name": "Key (Clave): Coincidencias posibles"
+        },
+        {
+          "name": "Value (Valor): Información real"
+        },
+        {
+          "name": "Fórmula Softmax"
+        }
+      ]
+    },
+    {
+      "name": "Modelo Mental: Recuperación Aproximada",
+      "children": [
+        {
+          "name": "Mapa de lenguaje (Embeddings)"
+        },
+        {
+          "name": "Distancia semántica entre documentos"
+        },
+        {
+          "name": "Combinación de textos cercanos"
+        },
+        {
+          "name": "Origen de las alucinaciones"
+        }
+      ]
+    },
+    {
+      "name": "Capacidades y Futuro",
+      "children": [
+        {
+          "name": "Uso de herramientas (Navegador, Python)"
+        },
+        {
+          "name": "Multimodalidad (Imagen, Audio, Video)"
+        },
+        {
+          "name": "Razonamiento Sistema 2 (Lento/Lógico)"
+        },
+        {
+          "name": "Leyes de escala (Más datos/parámetros)"
+        }
+      ]
+    },
+    {
+      "name": "Seguridad y Riesgos",
+      "children": [
+        {
+          "name": "Jailbreaking (Ataques de abuela)"
+        },
+        {
+          "name": "Inyección de prompts (Hijacking)"
+        },
+        {
+          "name": "Envenenamiento de datos"
+        },
+        {
+          "name": "Antropomorfización engañosa"
+        }
+      ]
+    },
+    {
+      "name": "Tokenización",
+      "children": [
+        {
+          "name": "Byte Pair Encoding (BPE)"
+        },
+        {
+          "name": "WordPiece"
+        },
+        {
+          "name": "Unigram"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+## Cómo funcionan los LLMs
+
+Antes de usar cualquier herramienta de IA de forma efectiva, vale la pena entender qué está pasando por debajo de la superficie. No necesitas ser ingeniero para esto — basta con tener un modelo mental correcto.
+
+### El modelo predice, no "sabe"
+
+Los Modelos de Lenguaje Grande (LLMs, por sus siglas en inglés) hacen una sola cosa en su núcleo: **predicen cuál es el siguiente token más probable dado el contexto anterior**. Eso es todo. Y de esa operación simple, repetida millones de veces, surge todo lo que parece inteligencia conversacional.
+
+¿Qué es un **token**? Es la unidad mínima de texto que el modelo procesa. No es exactamente una palabra — puede ser una sílaba, una palabra completa, o un signo de puntuación. Por ejemplo, la palabra "predicción" podría dividirse en los tokens `pre`, `dic`, `ción`. La frase "La IA predice la siguiente palabra" se convierte en algo así como once fragmentos separados. El modelo nunca ve "palabras" — ve una secuencia de tokens y calcula probabilidades sobre qué viene después.
+
+<Callout type="tip">
+Un LLM no "consulta" una base de datos de hechos verificados. Genera texto que es estadísticamente plausible dado todo lo que aparece antes en la conversación. Cuando le preguntas "¿cuántos países tiene América Latina?", no busca la respuesta — produce la secuencia de tokens más probable según lo que aprendió de enormes volúmenes de texto.
+</Callout>
+
+### Cómo se entrena un LLM: del texto crudo al asistente útil
+
+Para entender por qué un LLM se comporta como se comporta, es fundamental conocer las tres etapas de su entrenamiento. Pensemos en una analogía: imagina que estás entrenando a un médico.
+
+**Etapa 1: Pre-entrenamiento — "Leer todo internet"**
+
+La primera etapa es como los años de universidad del estudiante de medicina. El modelo procesa cantidades gigantescas de texto: páginas web, libros, artículos científicos, foros, código fuente, documentos legales, recetas de cocina — básicamente, una porción enorme de todo el texto disponible en internet y en bibliotecas digitalizadas. Estamos hablando de billones de palabras (trillions en inglés).
+
+Durante esta etapa, el modelo no está aprendiendo a "ser útil" ni a "responder preguntas". Está aprendiendo patrones del lenguaje: cómo se construyen oraciones, qué palabras tienden a aparecer juntas, cómo se estructura un argumento, cuáles son las convenciones de un correo formal versus un mensaje informal. Es como el estudiante de medicina que lee todos los libros de texto — todavía no sabe atender pacientes, pero tiene una base enorme de conocimiento.
+
+El resultado de esta etapa es un modelo que puede predecir texto con alta calidad, pero que no es particularmente útil como asistente. Si le preguntas algo, puede que simplemente continúe escribiendo como si fuera un artículo de Wikipedia en lugar de responder directamente a tu pregunta.
+
+**Etapa 2: Fine-tuning — "La residencia médica"**
+
+Aquí el modelo aprende a ser un asistente. Los equipos de entrenamiento le muestran miles de ejemplos de conversaciones bien hechas: un usuario pregunta algo, y un asistente responde de manera útil, clara y segura. Es como la residencia médica, donde el estudiante trabaja bajo supervisión con pacientes reales y aprende no solo qué sabe, sino cómo aplicar lo que sabe en situaciones prácticas.
+
+Después del fine-tuning, el modelo ya sabe que cuando alguien hace una pregunta, se espera que dé una respuesta directa. Sabe que debe ser cortés, que debe reconocer cuando no tiene información suficiente, y que debe seguir instrucciones.
+
+**Etapa 3: RLHF — "Aprender de la retroalimentación"**
+
+RLHF significa "Reinforcement Learning from Human Feedback" (Aprendizaje por Refuerzo con Retroalimentación Humana). En esta etapa, evaluadores humanos califican distintas respuestas del modelo: "esta respuesta fue mejor que esta otra", "esta es más precisa", "esta tiene un tono inapropiado".
+
+Volviendo a nuestra analogía médica: es como cuando el doctor ya formado recibe retroalimentación de sus pacientes y colegas. "Me explicaste el diagnóstico muy bien" versus "no entendí nada de lo que dijiste". Con el tiempo, el médico aprende no solo a dar el diagnóstico correcto, sino a comunicarlo de la forma que más ayuda al paciente.
+
+Esta etapa es la que hace que modelos como Claude, ChatGPT o Gemini se sientan tan naturales en una conversación. Sin RLHF, el modelo sería técnicamente capaz pero torpe al comunicarse. Con RLHF, aprende a ser útil de una forma que se siente intuitiva.
+
+<Callout type="example">
+Cuando un LLM te da una respuesta que suena enciclopédica pero no responde exactamente lo que preguntaste, es probable que el comportamiento de pre-entrenamiento esté dominando. Cuando es demasiado cauteloso, es posible que el RLHF haya sido calibrado de manera conservadora. Y cuando entiende exactamente qué necesitas, es señal de que fine-tuning y RLHF están funcionando bien juntos.
+</Callout>
+
+También explica por qué distintos modelos se sienten diferentes: aunque la arquitectura base puede ser similar, las decisiones tomadas en el fine-tuning y especialmente en el RLHF definen la "personalidad" del modelo — cuán formal es, cuánto riesgo asume al responder, qué tan largo o conciso es por defecto, y cómo maneja la incertidumbre.
+
+### La arquitectura Transformer: atención como sistema de relevancia
+
+Los LLMs modernos están construidos sobre una arquitectura llamada **Transformer**, y su ingrediente clave es el mecanismo de **atención**. No necesitas entender la matemática para captar la idea central, y esa idea es poderosa.
+
+Piensa en cómo funciona un buen motor de búsqueda. Cuando buscas "mejores restaurantes italianos cerca de mi oficina", el motor no le da el mismo peso a cada palabra. "Restaurantes" e "italianos" son más importantes que "mejores" o "de". El motor sabe qué palabras son relevantes para entender lo que realmente estás buscando.
+
+La atención en un Transformer funciona de manera similar, pero dentro de una oración. Cuando el modelo procesa la frase **"El banco del río estaba lodoso"**, el mecanismo de atención permite que la palabra "banco" preste especial atención a "río" y "lodoso". Esas conexiones le permiten al modelo entender que aquí "banco" significa la orilla del río, no una institución financiera. Sin atención, el modelo trataría cada palabra de forma aislada y perdería estos matices fundamentales del lenguaje.
+
+<Accordion title="Profundizar: Multi-head attention y por qué importa">
+Lo que hace aún más poderoso al Transformer es que tiene **múltiples cabezas de atención** (multi-head attention). Esto significa que el modelo mira el mismo texto desde varios ángulos simultáneamente: una cabeza puede enfocarse en las relaciones gramaticales (sujeto-verbo), otra en las relaciones semánticas (significados relacionados), otra en la estructura del discurso (si estamos en una introducción o una conclusión). Es como tener un equipo de analistas, cada uno mirando el mismo documento desde una perspectiva diferente, y luego combinando sus observaciones para una comprensión más completa.
+
+Esta capacidad de procesar todas las palabras en paralelo y entender sus relaciones mutuas es lo que distingue a los Transformers de arquitecturas anteriores que procesaban el texto palabra por palabra, de izquierda a derecha. Es la razón por la que los LLMs modernos pueden mantener coherencia en textos largos y entender referencias complejas.
+
+Un detalle interesante: el paper original que introdujo el Transformer en 2017 se tituló "Attention Is All You Need" ("La atención es todo lo que necesitas"). En aquel momento, era una propuesta de investigación entre muchas. Hoy, prácticamente todos los modelos de lenguaje grandes — Claude, GPT, Gemini, Llama, Mistral — están construidos sobre variantes de esta misma arquitectura. Es uno de esos momentos donde una idea aparentemente simple transformó una industria entera.
+</Accordion>
+
+### Embeddings: mapas del significado
+
+Hay un concepto fundamental que subyace a todo lo que hace un LLM: los **embeddings**. La idea es elegante: cada palabra, cada fragmento de texto, se convierte en un punto en un espacio multidimensional — un "mapa del significado" donde las palabras con significados similares están cerca unas de otras.
+
+Imagina un mapa de una ciudad, pero en lugar de calles y edificios, lo que está mapeado son conceptos. En este mapa, "feliz" estaría muy cerca de "contento" y "alegre", pero lejos de "triste". "Perro" estaría cerca de "gato" y "mascota", pero lejos de "matemática". "Doctor" estaría cerca de "hospital" y "paciente".
+
+El ejemplo más famoso de cómo funcionan los embeddings es la ecuación conceptual: **"Rey" - "Hombre" + "Mujer" ≈ "Reina"**. Lo que esto significa es que en el mapa del significado, la relación entre "Rey" y "Reina" es la misma que entre "Hombre" y "Mujer". El modelo capturó, a partir de millones de textos, que la realeza y el género son dimensiones independientes del significado. No fue programado para saber esto — lo aprendió de los patrones del lenguaje.
+
+<Callout type="deep-dive">
+Los embeddings también son la base de tecnologías como la **búsqueda semántica** y el **RAG (Retrieval Augmented Generation)**, que permiten a los LLMs trabajar con documentos específicos de tu organización. Cuando una empresa conecta sus documentos internos a un modelo, esos documentos se convierten en embeddings, y el modelo puede encontrar los fragmentos más relevantes para tu pregunta — no buscando palabras exactas, sino buscando significados cercanos.
+</Callout>
+
+Esto tiene implicaciones prácticas enormes. Cuando le preguntas al modelo sobre un tema y usa sinónimos o paráfrasis que nunca aparecieron juntos en su entrenamiento, puede entender que significan algo similar gracias a la cercanía en el espacio de embeddings. Es la razón por la que puedes preguntarle algo con tus propias palabras y obtener una respuesta relevante, aunque nadie haya formulado esa pregunta exacta antes.
+
+Otro aspecto fascinante de los embeddings: funcionan a través de idiomas. En modelos multilingues, la palabra "perro" en español, "dog" en inglés, y "chien" en francés están relativamente cerca en el espacio de embeddings, porque aparecen en contextos similares en sus respectivos idiomas. Es como si el modelo hubiera descubierto que, a pesar de sonar completamente diferente, estas palabras significan lo mismo — y las puso juntas en su mapa de significado. Esto es lo que permite a los modelos traducir entre idiomas y responder preguntas en un idioma usando conocimiento que adquirieron en otro.
+
+### Temperatura y creatividad: controlando la aleatoriedad
+
+¿Alguna vez notaste que a veces un modelo te da respuestas muy directas y predecibles, y otras veces te sorprende con ideas inesperadas? Esto no es casualidad — está controlado por un parámetro llamado **temperatura**.
+
+Recuerda que el modelo calcula probabilidades para el siguiente token. Si la pregunta es "La capital de México es ____", el modelo asigna una probabilidad altísima a "Ciudad de México" y probabilidades muy bajas a cualquier otra cosa. Pero si el prompt es "Escribe un poema sobre la lluvia", hay muchas continuaciones válidas, cada una con probabilidades similares.
+
+La temperatura controla cuánto el modelo se apega a las opciones más probables:
+
+- **Temperatura baja (cercana a 0)**: El modelo casi siempre elige el token con mayor probabilidad. Las respuestas son consistentes, predecibles y seguras. Si le pides lo mismo dos veces, obtendrás respuestas casi idénticas.
+- **Temperatura alta (cercana a 1 o más)**: El modelo considera opciones menos probables con más frecuencia. Las respuestas son más variadas, creativas y a veces sorprendentes — pero también más propensas a errores o incoherencias.
+
+La mejor analogía: **temperatura 0 es como siempre pedir tu plato favorito en un restaurante** — sabes exactamente qué vas a obtener y te gusta. **Temperatura 1 es como decir "sorpréndeme"** al mesero — puede ser una experiencia increíble o algo que no te encante.
+
+En la práctica, esto importa más de lo que parece. Si estás usando un modelo para extraer datos de un documento o responder preguntas factuales, quieres temperatura baja: consistencia y precisión. Si estás haciendo lluvia de ideas, generando nombres para un proyecto, o escribiendo ficción, quieres temperatura más alta para que el modelo explore opciones que no son las más obvias.
+
+La mayoría de las interfaces de usuario (como Claude.ai o ChatGPT) manejan la temperatura automáticamente, pero cuando usas la API o herramientas avanzadas, puedes ajustar este parámetro directamente. Es una de las formas más simples y efectivas de controlar el comportamiento del modelo.
+
+Hay otros parámetros relacionados que vale la pena conocer conceptualmente. **Top-p** (también llamado "nucleus sampling") es otro control de creatividad: en lugar de ajustar las probabilidades de todos los tokens, selecciona solo los tokens más probables que sumen hasta cierto porcentaje de probabilidad. Piensa en top-p como definir el "menú" de opciones: top-p bajo es como un menú de tres platos; top-p alto es como un buffet completo. En la práctica, temperatura y top-p logran resultados similares, y rara vez necesitas ajustar ambos.
+
+Lo importante no es memorizar estos parámetros, sino entender el principio: **el mismo modelo puede comportarse de manera muy diferente según cómo configures estos controles**. Un modelo que parece "poco creativo" con configuración por defecto puede sorprenderte cuando le das más libertad, y un modelo que parece "poco confiable" puede volverse muy preciso cuando reduces su aleatoriedad.
+
+### El contexto es todo — y tiene límites
+
+El modelo únicamente "ve" lo que está dentro de su **ventana de contexto**: el conjunto de tokens que conforman la conversación actual. No tiene acceso a conversaciones anteriores, no recuerda que hablaron ayer, no sabe quién eres a menos que se lo digas dentro de esa misma sesión.
+
+Piénsalo como una pizarra que se borra al terminar cada conversación. Cada vez que abres una nueva sesión, el modelo parte de cero. Esto explica por qué cuando le dices "como te mencioné la semana pasada" en una nueva conversación, el modelo no tiene idea de qué estás hablando — literalmente no tiene acceso a esa información.
+
+La ventana de contexto también tiene un tamaño máximo. Los modelos más recientes pueden manejar cientos de miles de tokens (equivalente a libros enteros), pero hay un límite. Si una conversación se extiende demasiado, el modelo puede "olvidar" lo que se dijo al inicio.
+
+<Callout type="warning">
+Cuando una conversación excede la capacidad del modelo, puede descartar silenciosamente los mensajes más antiguos, o la aplicación te avisa que necesitas iniciar una nueva conversación. También existe el **"problema del medio"**: los modelos tienden a prestar más atención al inicio y al final de la conversación, y menos a lo que está en el medio — como cuando lees un documento muy largo y recuerdas bien la intro y las conclusiones, pero los detalles del medio se difuminan.
+</Callout>
+
+**Consejos prácticos para manejar la ventana de contexto:**
+
+- Si tienes instrucciones importantes, repítelas periódicamente en la conversación, no asumas que el modelo las "recuerda" de 50 mensajes atrás.
+- Cuando una conversación se vuelve muy larga, considera empezar una nueva sesión con un resumen de lo acordado hasta ahora.
+- Para tareas complejas, divide el trabajo en conversaciones más cortas y enfocadas en lugar de una sola conversación maratónica.
+- Si notas que el modelo empieza a contradecir instrucciones que le diste antes, probablemente esa información ya salió de su ventana de atención efectiva.
+- Pon la información más crítica al inicio del prompt y al final, no enterrada en el medio de un bloque de texto largo.
+
+### Un modelo útil: recuperación aproximada
+
+Una forma de entender cómo el LLM genera respuestas es pensar en él como un sistema de **recuperación aproximada**. Durante su entrenamiento, el modelo procesó cantidades masivas de texto — páginas web, libros, artículos, código — que equivalen a millones de veces el contenido de todos los libros de Harry Potter. Toda esa información quedó codificada en sus parámetros como una especie de "mapa del lenguaje", donde los textos con significados similares quedan cerca entre sí.
+
+Cuando escribes un prompt, el modelo ubica tu texto en ese mapa y combina los documentos cercanos para generar una respuesta nueva. No copia textualmente — sintetiza. Por eso puede responder preguntas que nunca vio formuladas exactamente así, pero también por eso puede mezclar información de fuentes distintas de forma incorrecta.
+
+<AnimatedDiagram>
+  <div style={{fontFamily:'monospace',fontSize:'13px',lineHeight:'1.8',color:'#18181b',padding:'8px'}}>
+    <p style={{marginBottom:'12px',fontWeight:'600'}}>Ejemplo: "La IA predice la siguiente palabra"</p>
+    <div style={{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap',marginBottom:'16px'}}>
+      {['La', ' IA', ' pre', 'di', 'ce', ' la', ' siguien', 'te', ' pa', 'la', 'bra'].map((t,i) => (
+        <span key={i} style={{background:'#f4f4f5',border:'1px solid #e4e4e7',borderRadius:'4px',padding:'2px 8px',fontSize:'12px'}}>{t}</span>
+      ))}
+    </div>
+    <p style={{color:'#71717a',fontSize:'12px'}}>Cada fragmento es un "token". El modelo predice qué token viene después basándose en el contexto de todos los tokens anteriores.</p>
+  </div>
+</AnimatedDiagram>
+
+<MiniQuiz
+  question="¿Qué hace fundamentalmente un LLM cuando genera texto?"
+  options={[
+    "Busca la respuesta en una base de datos de hechos verificados",
+    "Predice el siguiente token más probable dado el contexto anterior",
+    "Copia y pega fragmentos de textos que vio durante el entrenamiento",
+    "Ejecuta reglas lógicas programadas por los desarrolladores"
+  ]}
+  correct={1}
+  explanation="Los LLMs funcionan prediciendo cuál es el siguiente token más probable. No consultan bases de datos ni copian texto — sintetizan respuestas basadas en patrones estadísticos aprendidos durante el entrenamiento."
+/>

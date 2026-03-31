@@ -3,24 +3,36 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X, BookOpen } from 'lucide-react'
-import { modules } from '@/lib/modules'
-import { getAllModulesProgress, ModuleStatus } from '@/lib/progress'
+import { modules, getModuleSections } from '@/lib/modules'
+import { getAllModulesProgress, ModuleStatus, getSectionVisited } from '@/lib/progress'
 import { NovartisLogo } from '@/components/NovartisLogo'
+import type { Section } from '@/lib/modules'
 
 interface ModuleSidebarProps {
   currentSlug: string
   trackSlug: string
+  currentPage?: number
 }
 
-export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
+export function ModuleSidebar({ currentSlug, trackSlug, currentPage }: ModuleSidebarProps) {
   const [progress, setProgress] = useState<Record<string, ModuleStatus>>({})
+  const [sectionVisits, setSectionVisits] = useState<Record<number, boolean>>({})
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const currentModule = modules.find((m) => m.slug === currentSlug)
+  const sections = getModuleSections(currentSlug)
+  const isPaginated = sections.length > 0
 
   useEffect(() => {
     setProgress(getAllModulesProgress())
-  }, [currentSlug])
-
-  const currentModule = modules.find((m) => m.slug === currentSlug)
+    if (isPaginated) {
+      const visits: Record<number, boolean> = {}
+      for (let i = 1; i <= sections.length; i++) {
+        visits[i] = getSectionVisited(currentSlug, i)
+      }
+      setSectionVisits(visits)
+    }
+  }, [currentSlug, currentPage, isPaginated, sections.length])
 
   const sidebarContent = (
     <div className="flex flex-col h-full pb-16">
@@ -77,7 +89,47 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
         </nav>
       </div>
 
-      {currentModule && currentModule.toc.length > 0 && (
+      {/* Section navigation for paginated modules */}
+      {isPaginated && sections.length > 0 && (
+        <div className="mb-6">
+          <p className="text-xs font-semibold text-novartis-blue uppercase tracking-wider mb-3">
+            Secciones
+          </p>
+          <nav className="space-y-1">
+            {sections.map((section: Section, idx: number) => {
+              const pageNum = idx + 1
+              const isCurrentPage = currentPage === pageNum
+              const isVisited = sectionVisits[pageNum] || isCurrentPage
+              return (
+                <Link
+                  key={section.id}
+                  href={`/modules/${currentSlug}/${pageNum}`}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    isCurrentPage
+                      ? 'bg-novartis-blue-light text-novartis-blue font-medium'
+                      : 'text-gray-500 hover:text-novartis-blue-dark hover:bg-novartis-blue-light/50'
+                  }`}
+                >
+                  <span
+                    className={`flex-shrink-0 w-3 h-3 rounded-full ${
+                      isCurrentPage
+                        ? 'bg-novartis-blue'
+                        : isVisited
+                          ? 'bg-novartis-blue/40'
+                          : 'bg-gray-300'
+                    }`}
+                  />
+                  <span className="leading-snug">{section.title}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      )}
+
+      {/* TOC for non-paginated modules */}
+      {!isPaginated && currentModule && currentModule.toc.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-novartis-blue uppercase tracking-wider mb-3">
             En este módulo
@@ -96,7 +148,6 @@ export function ModuleSidebar({ currentSlug, trackSlug }: ModuleSidebarProps) {
           </nav>
         </div>
       )}
-
     </div>
   )
 

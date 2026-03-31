@@ -1,0 +1,152 @@
+{
+  "ai-fundamentals": {
+    "title": "Cómo Funcionan los LLMs",
+    "research_query": "How LLMs work tokenization context windows transformer architecture tutorial",
+    "teoria_pdfs": [
+      "Teoria/S01 Intro (OIDD6670).pdf",
+      "Teoria/S02 Understanding LLMs (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [],
+    "urls": [
+      "https://www.anthropic.com/research",
+      "https://www.deeplearning.ai/the-batch/",
+      "https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026"
+    ],
+    "youtube": [
+      "https://www.youtube.com/watch?v=zjkBMFhNj_g"
+    ]
+  },
+  "prompting-fundamentals": {
+    "title": "Prompting Efectivo",
+    "research_query": "prompt engineering techniques few-shot chain-of-thought structured prompting tutorial",
+    "teoria_pdfs": [
+      "Teoria/S02 Understanding LLMs (OIDD6670).pdf",
+      "Teoria/S07 Prompts to APIs (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [],
+    "urls": [
+      "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+    ],
+    "youtube": []
+  },
+  "reliable-ai-systems": {
+    "title": "Sistemas de IA Confiables",
+    "research_query": "reliable AI systems LLM production failures evaluation guardrails schema-guided reasoning",
+    "teoria_pdfs": [
+      "Teoria/S03 Understanding LRMs (OIDD6670).pdf",
+      "Teoria/S05 Compound AI Systems (OIDD6670).pdf",
+      "Teoria/S08 Evaluation Parts 1 and 2 (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [],
+    "urls": [
+      "https://arxiv.org/abs/2402.01817",
+      "https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/increase-consistency",
+      "https://www.anthropic.com/research/building-effective-agents",
+      "https://crfm.stanford.edu/helm/"
+    ],
+    "youtube": []
+  },
+  "vibe-coding": {
+    "title": "Vibe-Coding",
+    "research_query": "vibe coding AI-assisted programming no-code automation Claude Code tutorial",
+    "teoria_pdfs": [
+      "Teoria/S07 Prompts to APIs (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [],
+    "urls": [
+      "https://docs.anthropic.com/en/docs/claude-code/overview",
+      "https://simonwillison.net",
+      "https://www.vodafone.es/c/empresas/grandes-clientes/es/nuestra-vision/vibe-coding/"
+    ],
+    "youtube": []
+  },
+  "agents-and-skills": {
+    "title": "Agentes y Skills de IA",
+    "research_query": "AI agents tool use orchestration skills plugins n8n automation tutorial",
+    "teoria_pdfs": [
+      "Teoria/S05 Compound AI Systems (OIDD6670).pdf",
+      "Teoria/S06 AI and Business Workflows (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [],
+    "urls": [
+      "https://github.com/obra/superpowers",
+      "https://docs.anthropic.com/en/docs/build-with-claude/tool-use",
+      "https://docs.anthropic.com/en/docs/claude-code/mcp"
+    ],
+    "youtube": [
+      "https://www.youtube.com/playlist?list=PLlET0GsrLUL5HKJk1rb7t32sAs_iAlpZe"
+    ]
+  },
+  "legal-ai-risks": {
+    "title": "Riesgos Legales de la IA",
+    "research_query": "AI legal risks governance EU AI Act privacy intellectual property compliance",
+    "teoria_pdfs": [
+      "Teoria/S04 Strategy (OIDD6670).pdf"
+    ],
+    "legal_pdfs": [
+      "Legal/LGST 6420 S26 classes 1-4.pdf",
+      "Legal/LGST 6420 S26 classes 5-6.pdf",
+      "Legal/LGST 6420 S26 classes 7-10.pdf",
+      "Legal/LGST 6420 S26 classes 11-12.pdf"
+    ],
+    "urls": [
+      "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689",
+      "https://www.anthropic.com/news/anthropics-responsible-scaling-policy",
+      "https://www.lexisnexis.com/en-us/products/nexis-plus-ai/future-of-work.page",
+      "https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026",
+      "https://www.mlaw.gov.sg/launch-of-guide-for-using-generative-artificial-intelligence-in-the-legal-sector/"
+    ],
+    "youtube": []
+  },
+  "copilot-m365": {
+    "title": "Copilot en Microsoft 365",
+    "research_query": "Microsoft 365 Copilot tutorial Excel Teams Outlook Word Copilot Studio agents",
+    "teoria_pdfs": [],
+    "legal_pdfs": [],
+    "urls": [
+      "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-overview",
+      "https://copilot.cloud.microsoft/en-US/prompts",
+      "https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio",
+      "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy"
+    ],
+    "youtube": []
+  },
+  "microsoft-fabric": {
+    "title": "Microsoft Fabric",
+    "research_query": "Microsoft Fabric tutorial data pipelines Copilot Power BI Data Factory OneLake",
+    "teoria_pdfs": [],
+    "legal_pdfs": [],
+    "urls": [
+      "https://learn.microsoft.com/en-us/fabric/get-started/microsoft-fabric-overview",
+      "https://learn.microsoft.com/en-us/fabric/get-started/copilot-fabric-overview",
+      "https://learn.microsoft.com/en-us/fabric/governance/microsoft-purview-fabric"
+    ],
+    "youtube": []
+  },
+  "azure-ai-foundry": {
+    "title": "Azure AI Foundry",
+    "research_query": "Azure AI Foundry tutorial Prompt Flow RAG Azure AI Search deployment",
+    "teoria_pdfs": [],
+    "legal_pdfs": [],
+    "urls": [
+      "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry",
+      "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/flow-develop",
+      "https://learn.microsoft.com/en-us/azure/search/search-get-started-rag",
+      "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-approach-gen-ai"
+    ],
+    "youtube": []
+  },
+  "aws-bedrock": {
+    "title": "AWS Bedrock",
+    "research_query": "Amazon Bedrock tutorial Knowledge Bases RAG Guardrails Claude on AWS",
+    "teoria_pdfs": [],
+    "legal_pdfs": [],
+    "urls": [
+      "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html",
+      "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html",
+      "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+      "https://docs.anthropic.com/en/api/claude-on-amazon-bedrock"
+    ],
+    "youtube": []
+  }
+}

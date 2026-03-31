@@ -1,0 +1,144 @@
+## El ecosistema de herramientas
+
+El mercado de herramientas de IA conversacional creció de forma explosiva en los últimos años. Hoy existe una cantidad abrumadora de opciones, y cada semana aparece algo nuevo. En lugar de memorizar cada producto, lo más valioso es entender el **modelo mental** para elegir la herramienta correcta según la tarea.
+
+### Modelos de código abierto vs. modelos cerrados
+
+Antes de hablar de herramientas específicas, vale la pena entender una distinción fundamental en el ecosistema: modelos **de código abierto (open source)** versus modelos **cerrados (propietarios)**.
+
+Los **modelos cerrados** — como GPT (OpenAI), Claude (Anthropic) y Gemini (Google) — se acceden exclusivamente a través de las interfaces o APIs de sus empresas creadoras. No puedes ver cómo están construidos internamente, no puedes modificarlos, y dependes completamente de la empresa para usarlos. A cambio, estos modelos suelen estar a la vanguardia en capacidad y cuentan con infraestructura robusta.
+
+Los **modelos de código abierto** — como Llama (Meta), Mistral (Mistral AI), y otros como Qwen o DeepSeek — publican los pesos del modelo para que cualquiera pueda descargarlos, ejecutarlos en sus propios servidores, modificarlos y adaptarlos a sus necesidades.
+
+<Callout type="tip">
+La brecha de calidad entre modelos abiertos y cerrados se ha reducido significativamente. Modelos como Llama 3 de Meta y Mistral Large compiten directamente con modelos cerrados en muchas tareas. Esto beneficia a todos los usuarios, ya que los avances de los modelos abiertos presionan a los proveedores cerrados a mejorar y justificar sus precios.
+</Callout>
+
+¿Cuándo importa que un modelo sea de código abierto?
+
+- **Soberanía de datos**: Si tu organización maneja datos altamente sensibles (salud, finanzas, gobierno) y no puede enviar información a servidores externos, ejecutar un modelo localmente puede ser la única opción viable.
+- **Personalización**: Si necesitas un modelo especializado en un dominio muy específico (por ejemplo, terminología legal de tu país, o nomenclatura interna de tu empresa), puedes tomar un modelo abierto y entrenarlo adicionalmente con tus propios datos.
+- **Costo a escala**: Si tu organización hace millones de consultas al mes, el costo por token de las APIs cerradas puede volverse prohibitivo. Ejecutar un modelo propio tiene un costo fijo de infraestructura que no escala linealmente con el uso.
+- **Independencia del proveedor**: Evitas el riesgo de que el proveedor cambie sus precios, sus políticas de uso, o descontinúe el modelo que estás usando.
+
+Para la mayoría de los profesionales en su día a día, los modelos cerrados con sus interfaces amigables son la opción más práctica. Pero es importante saber que el código abierto existe y es una alternativa real, especialmente para equipos técnicos dentro de organizaciones con necesidades específicas.
+
+### Las cuatro herramientas principales
+
+**Claude (Anthropic)** es un modelo conocido por su capacidad en tareas que requieren razonamiento cuidadoso, textos largos y análisis matizados. Destaca en redacción de documentos extensos, análisis de contratos o reportes, tareas de codificación complejas, y situaciones donde la precisión y el tono importan. Su ventana de contexto extensa lo hace especialmente útil cuando necesitas que el modelo procese documentos largos completos. También es el modelo detrás de herramientas como Claude Code, orientadas a flujos de trabajo técnicos.
+
+**ChatGPT (OpenAI)** es el más conocido del mercado y el punto de entrada para la mayoría de las personas. Su fortaleza está en la versatilidad: es un buen generador de propósito general para lluvia de ideas, borradores rápidos, preguntas exploratorias y tareas cotidianas. Tiene integraciones con plugins y capacidad de búsqueda web en tiempo real en sus versiones más recientes.
+
+**Gemini (Google)** es la apuesta de Google para el ecosistema empresarial. Su integración nativa con Google Workspace (Docs, Sheets, Gmail, Meet) es su ventaja competitiva principal — similar a cómo Copilot domina en el ecosistema Microsoft. Las versiones recientes de Gemini incluyen una ventana de contexto de hasta 1 millón de tokens, lo que lo hace competitivo para análisis de documentos masivos. Si tu organización trabaja principalmente en Google Workspace, Gemini es la opción con menor fricción.
+
+**Copilot (Microsoft/GitHub)** toma un enfoque diferente: en lugar de ser una herramienta standalone, está **integrado directamente en los entornos donde ya trabajas**. En Microsoft 365 aparece dentro de Word, Excel, Outlook y Teams. En el ecosistema de desarrollo, GitHub Copilot vive dentro de VS Code y otros editores, sugiriendo código línea a línea. Su ventaja principal es la fricción cero — no tienes que cambiar de aplicación para usarlo.
+
+<BeforeAfter
+  before={{ label: "Sin modelo mental", content: "Abres siempre la misma herramienta de IA para todo. Copias y pegas entre aplicaciones. Te frustras cuando el resultado no es óptimo porque no sabes que otra herramienta lo haría mejor." }}
+  after={{ label: "Con modelo mental", content: "Evalúas la tarea primero: ¿necesito contexto largo? ¿integración con mi suite de oficina? ¿razonamiento complejo? Eliges la herramienta adecuada y obtienes mejores resultados con menos esfuerzo." }}
+/>
+
+### Interfaz de chat vs. API: dos formas de usar el mismo modelo
+
+Una distinción clave que muchos pasan por alto: la **interfaz de chat** (como claude.ai o chat.openai.com) y la **API** son dos formas de acceder al mismo modelo subyacente, pero sirven para propósitos muy diferentes.
+
+**La interfaz de chat** es lo que la mayoría de las personas conoce. Abres un navegador, escribes tu pregunta, recibes una respuesta. Es ideal para:
+- Exploración y lluvia de ideas
+- Tareas puntuales que no se repiten
+- Personas que no programan
+- Situaciones donde quieres revisar cada respuesta manualmente
+
+Piensa en un gerente de marketing que necesita ideas para una campaña, o un abogado que quiere explorar argumentos para un caso. La interfaz de chat es su herramienta natural.
+
+**La API (Application Programming Interface)** es una forma de que tu software se comunique directamente con el modelo. No hay interfaz visual — es código hablando con código. Es ideal para:
+- Automatizar tareas repetitivas (procesar 500 correos de soporte al día)
+- Integrar IA en productos existentes (un chatbot en tu sitio web)
+- Construir flujos de trabajo personalizados (extraer datos de facturas y llenar una planilla automáticamente)
+- Procesar grandes volúmenes de información sin intervención manual
+
+Piensa en un equipo de desarrollo que quiere que cada ticket de soporte se clasifique automáticamente, o una empresa que necesita traducir miles de descripciones de producto a múltiples idiomas. Estas tareas requieren la API.
+
+<Callout type="example">
+Muchas personas no saben que cuando usan herramientas como Copilot en Word o Gemini en Google Docs, esas herramientas están usando la API por debajo. La interfaz bonita que ves es un "envoltorio" que hace llamadas a la API del modelo en cada interacción. La API no es solo para programadores — es la infraestructura que alimenta todas las experiencias de IA embebida que usas diariamente.
+</Callout>
+
+La diferencia no es solo técnica — es de mentalidad. La interfaz te da una **conversación**; la API te da un **servicio** que puedes integrar en cualquier proceso.
+
+### Consideraciones de costo
+
+El costo de la IA generativa puede ser desde cero hasta miles de dólares al mes, dependiendo de cómo la uses.
+
+**Niveles gratuitos**: Prácticamente todas las herramientas principales ofrecen un nivel gratuito con limitaciones. Esto es suficiente para exploración personal y para familiarizarte con las capacidades de cada herramienta. Las limitaciones típicas son: un número máximo de mensajes por día, acceso solo al modelo más básico, y sin funcionalidades avanzadas como análisis de archivos o generación de imágenes.
+
+**Suscripciones individuales (Pro/Plus)**: Por una tarifa mensual fija, obtienes acceso a los modelos más capaces, límites de uso más generosos, y funcionalidades adicionales. ¿Cuándo vale la pena pagar? Cuando la IA te ahorra más tiempo del que cuesta la suscripción — y para la mayoría de profesionales que la usan a diario, el retorno es evidente en la primera semana.
+
+**Precios por token (API)**: Cuando usas la API, pagas por cada token que envías al modelo (input) y cada token que el modelo genera (output). Los tokens de output suelen costar más que los de input. El concepto clave es que **no pagas por "consultas" sino por la cantidad de texto procesado**. Una consulta corta cuesta muy poco; enviar un documento de 100 páginas para análisis cuesta significativamente más. Los precios varían entre proveedores y entre modelos del mismo proveedor (los modelos más capaces cuestan más por token).
+
+**Planes empresariales**: Incluyen contratos de privacidad, administración de usuarios, facturación centralizada y, en muchos casos, la garantía de que tus datos no se usan para entrenar modelos futuros. Son la opción obligatoria para organizaciones que manejan información sensible.
+
+<Accordion title="Profundizar: Estructura de precios y cómo optimizar costos">
+Un consejo práctico: no intentes memorizar precios específicos — cambian constantemente y tienden a bajar con el tiempo. Lo que importa es entender la estructura (gratis vs. suscripción vs. por token vs. empresarial) para tomar decisiones informadas cuando necesites escalar tu uso.
+
+Si usas la API, hay estrategias para optimizar costos: usar modelos más pequeños y baratos para tareas simples (clasificación, extracción de datos), reservando los modelos más capaces para tareas que realmente lo requieren (análisis complejo, razonamiento). También puedes reducir costos siendo conciso en tus prompts y usando técnicas como caching de respuestas para consultas repetitivas.
+</Accordion>
+
+### Capacidades multimodales: más allá del texto
+
+Los LLMs dejaron de ser exclusivamente herramientas de texto. Las versiones más recientes son **multimodales**, lo que significa que pueden procesar y generar múltiples tipos de contenido.
+
+**Visión (análisis de imágenes)**: Puedes subir una imagen y pedirle al modelo que la analice. Ejemplos concretos:
+- Subir una captura de pantalla de un error y pedir que lo diagnostique
+- Fotografiar una pizarra de una reunión y pedir que transcriba y organice las notas
+- Enviar un gráfico y pedir que lo interprete y genere un resumen ejecutivo
+- Subir el diseño de una interfaz y pedir retroalimentación sobre usabilidad
+
+**Audio**: Algunos modelos pueden transcribir audio y, en algunos casos, procesar instrucciones habladas directamente. Esto es útil para transcribir reuniones, convertir notas de voz en texto estructurado, o interactuar con el modelo sin escribir.
+
+**Ejecución de código**: Herramientas como ChatGPT (con su Code Interpreter) y Claude (con su funcionalidad de Artifacts y Analysis) pueden escribir y ejecutar código en tiempo real. Esto transforma al modelo de un "asistente que habla" a uno que puede:
+- Analizar archivos CSV y generar visualizaciones
+- Hacer cálculos complejos y mostrar los resultados
+- Crear gráficos, tablas y reportes a partir de datos que le subas
+- Prototipar funcionalidades simples
+
+**Generación de imágenes**: Algunos modelos (como GPT-4 con DALL-E, o Gemini con Imagen) pueden generar imágenes a partir de descripciones en texto. Esto es útil para prototipos visuales rápidos, ilustraciones para presentaciones, o exploración creativa — aunque la calidad y precisión todavía tienen limitaciones.
+
+<Callout type="warning">
+La capacidad de los modelos de usar **herramientas externas (tool use)** — buscar en internet, ejecutar código, consultar bases de datos — los transforma de sistemas que solo generan texto a **agentes** que pueden tomar acciones en el mundo real. Esto es poderoso pero también introduce nuevos riesgos: un agente mal configurado puede ejecutar acciones no deseadas. Siempre verifica qué permisos tiene un agente antes de activarlo.
+</Callout>
+
+La tendencia es clara: los modelos están evolucionando de "herramientas de texto" a **interfaces universales** que pueden procesar y generar cualquier tipo de contenido. Para el profesional, esto significa que la barrera de entrada sigue bajando — no necesitas ser técnico para analizar datos, crear visualizaciones o procesar documentos multimedia.
+
+### IA embebida vs. IA independiente
+
+Esta distinción importa para tu flujo de trabajo:
+
+- La **IA independiente** (como Claude o ChatGPT en su interfaz web) exige que tú lleves el contexto: copias y pegas texto, describes la situación, exportas el resultado.
+- La **IA embebida** (como Copilot en Office o Gemini en Google Workspace) accede directamente a tu documento o correo, reduce la fricción y se integra con las acciones del sistema (puede enviar un correo, no solo redactarlo).
+
+### ¿Cómo elegir?
+
+Hazte estas preguntas antes de abrir cualquier herramienta:
+
+1. **¿La tarea requiere contexto muy largo?** Gemini (1M tokens) y Claude tienen ventaja sobre ChatGPT para documentos masivos.
+2. **¿Tu organización usa Google Workspace?** Gemini con la suite de Google es la opción de menor fricción.
+3. **¿Estás en un entorno de Office 365 o VS Code?** Copilot elimina el paso de copiar y pegar.
+4. **¿Es una exploración rápida o general?** ChatGPT es el punto de partida más familiar para la mayoría.
+5. **¿Importa mucho el tono, precisión o razonamiento complejo?** Vale la pena probar Claude.
+
+Lo más importante: **el paisaje cambia rápido**. Lo que hoy es ventaja de un modelo, mañana puede ser estándar en todos. Por eso el modelo mental — entender qué tipo de tarea estás haciendo — importa más que saber de memoria cuál herramienta ganó el último benchmark.
+
+Una recomendación práctica: si puedes, mantén acceso a al menos dos herramientas diferentes. No porque debas usar ambas para todo, sino porque cada herramienta tiene fortalezas sutiles que solo descubres al compararlas. Cuando una tarea es importante, obtener una "segunda opinión" de otro modelo puede revelar errores o perspectivas que el primero no ofreció. Además, si una herramienta tiene una interrupción de servicio o cambia sus términos de uso, no quedas sin alternativa.
+
+Finalmente, un consejo sobre benchmarks y comparativas: internet está lleno de comparaciones entre modelos con rankings, puntuaciones y pruebas estandarizadas. Estos pueden ser informativos como referencia general, pero la verdadera medida de utilidad es **qué tan bien funciona la herramienta para tus tareas específicas**. Un modelo que lidera todos los benchmarks puede no ser el mejor para tu caso de uso particular. La única forma de saberlo es probar.
+
+<MiniQuiz
+  question="¿Cuál es la principal diferencia entre usar la interfaz de chat y la API de un modelo de IA?"
+  options={[
+    "La API usa un modelo diferente y más potente",
+    "La interfaz de chat es gratis y la API siempre es de pago",
+    "La interfaz es para interacción manual; la API permite automatización e integración con otros sistemas",
+    "La API solo funciona para generar código"
+  ]}
+  correct={2}
+  explanation="Ambas acceden al mismo modelo subyacente, pero la interfaz de chat está diseñada para conversaciones manuales, mientras que la API permite que tu software se comunique directamente con el modelo para automatizar procesos e integrarse con otros sistemas."
+/>

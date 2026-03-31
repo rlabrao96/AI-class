@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation'
-import { modules, getModule } from '@/lib/modules'
+import { notFound, redirect } from 'next/navigation'
+import { modules, getModule, getModuleSections } from '@/lib/modules'
 import { ModuleSidebar } from '@/components/ModuleSidebar'
 import { MarkCompleteButton } from '@/components/MarkCompleteButton'
 import Link from 'next/link'
@@ -28,7 +28,15 @@ export default async function ModulePage({
   params: { slug: string }
 }) {
   const mod = getModule(params.slug)
-  if (!mod || !moduleMap[params.slug]) notFound()
+  if (!mod) notFound()
+
+  // Redirect to paginated route if module has sections
+  const sections = getModuleSections(params.slug)
+  if (sections.length > 0) {
+    redirect(`/modules/${params.slug}/1`)
+  }
+
+  if (!moduleMap[params.slug]) notFound()
 
   const { default: ModuleContent } = await moduleMap[params.slug]()
 

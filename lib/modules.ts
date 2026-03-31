@@ -3,12 +3,19 @@ export interface TocItem {
   label: string
 }
 
+export interface Section {
+  id: string
+  title: string
+  file: string
+}
+
 export interface Module {
   slug: string
   number: number
   title: string
   estimatedTime: string
   track: string
+  sections?: Section[]
   toc: TocItem[]
 }
 
@@ -24,8 +31,14 @@ export const modules: Module[] = [
     slug: 'ai-fundamentals',
     number: 1,
     title: 'Fundamentos de IA',
-    estimatedTime: '45 min',
+    estimatedTime: '2 hrs',
     track: 'fundamentos',
+    sections: [
+      { id: 'como-funcionan-los-llms', title: 'Cómo funcionan los LLMs', file: '01-como-funcionan-los-llms' },
+      { id: 'ecosistema-de-herramientas', title: 'El ecosistema de herramientas', file: '02-ecosistema-de-herramientas' },
+      { id: 'limites-reales', title: 'Límites reales', file: '03-limites-reales' },
+      { id: 'el-mindset-correcto', title: 'El mindset correcto', file: '04-el-mindset-correcto' },
+    ],
     toc: [
       { id: 'cómo-funcionan-los-llms', label: 'Cómo funcionan los LLMs' },
       { id: 'el-ecosistema-de-herramientas', label: 'El ecosistema de herramientas' },
@@ -174,4 +187,9 @@ export function getModule(slug: string): Module | undefined {
 
 export function getTrack(slug: string): Track | undefined {
   return tracks.find((t) => t.slug === slug)
+}
+
+export function getModuleSections(slug: string): Section[] {
+  const mod = getModule(slug)
+  return mod?.sections ?? []
 }
