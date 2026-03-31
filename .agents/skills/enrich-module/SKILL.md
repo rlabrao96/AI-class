@@ -1,11 +1,11 @@
 ---
 name: enrich-module
-description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, cinematic videos) by orchestrating browser-use and notebooklm in a 8-phase pipeline. Use when the user wants to add visual/audio content to a course module.
+description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, cinematic videos) by orchestrating browser-use and notebooklm in a 9-phase pipeline. Use when the user wants to add visual/audio content to a course module.
 ---
 
 # Enrich Module
 
-Orchestrates `/browser-use` and `/notebooklm` to produce rich media content for a course module. Runs a 8-phase pipeline: Research → Collect → Notebook → Generate → Generate Video → Download → Integrate → Paginate.
+Orchestrates `/browser-use` and `/notebooklm` to produce rich media content for a course module. Runs a 9-phase pipeline: Research → Collect → Notebook → Generate → Generate Video → Download → Images → Integrate → Paginate.
 
 ## Prerequisites
 
@@ -21,12 +21,12 @@ If `notebooklm status` fails, run `notebooklm login`.
 ## Invocation
 
 ```
-/enrich-module <slug> [--phase research|collect|notebook|generate|generate-video|download|integrate|paginate] [--sources url1,url2,...] [--lang es_419] [--duration 2h]
+/enrich-module <slug> [--phase research|collect|notebook|generate|generate-video|download|images|integrate|paginate] [--sources url1,url2,...] [--lang es_419] [--duration 2h]
 ```
 
 **Arguments:**
 - `<slug>` — Required. One of: `ai-fundamentals`, `prompting-fundamentals`, `reliable-ai-systems`, `vibe-coding`, `agents-and-skills`, `legal-ai-risks`, `copilot-m365`, `microsoft-fabric`, `azure-ai-foundry`, `aws-bedrock`
-- `--phase` — Optional. Run only one phase. Omit to run all 8 sequentially.
+- `--phase` — Optional. Run only one phase. Omit to run all 9 sequentially.
 - `--sources` — Optional. Additional source URLs (comma-separated), added on top of the base mapping.
 - `--lang` — Optional. Output language for NotebookLM artifacts. Default: `es` (Spanish).
 - `--duration` — Optional. Target duration for the module. Controls content density and pagination. Default: `1h`. Examples: `30m`, `1h`, `2h`, `3h`.
@@ -608,9 +608,119 @@ Print progress at each step:
 
 ---
 
-## Phase 5 — Integrate
+## Phase 5 — Generate Images (Gemini Imagen)
 
-**When:** `--phase integrate` or running all phases (after Phase 4).
+**When:** `--phase images` or running all phases (after Phase 4).
+
+**Purpose:** Generate educational infographic images for the module using Google's Imagen API. Images must be **informative and descriptive**, not decorative.
+
+**Prerequisites:**
+- `GEMINI_API_KEY` environment variable must be set (from Google AI Studio)
+- Model: `imagen-4.0-generate-001` (standard) or `imagen-4.0-fast-generate-001` (cheaper)
+- Cost: ~$0.04/image (standard) or ~$0.02/image (fast). Choose based on budget.
+
+**Image Targets by Duration:**
+
+| Duration | Images total | Per section page |
+|----------|-------------|-----------------|
+| `30m` | 2-3 | 2-3 (single page) |
+| `1h` | 4-6 | 1-2 |
+| `2h` | 7-10 | 2-3 |
+| `3h` | 10-14 | 2-3 |
+
+**Steps:**
+
+1. **Read the module content** (MDX files in `content/<slug>/` or `content/<slug>.mdx`) to understand what concepts need visual explanation.
+
+2. **Identify image opportunities.** For each section, ask: "What concept here would a student understand better with a diagram?" Good candidates:
+   - Process flows (e.g., how training works, how a prompt gets processed)
+   - Comparisons (e.g., open vs closed models, API vs interface)
+   - Abstract concepts that benefit from spatial representation (e.g., embeddings, attention)
+   - Warning/risk scenarios (e.g., bias, prompt injection, hallucinations)
+   - Before/after workflows (e.g., working with vs without AI)
+
+3. **Write descriptive prompts** following these strict rules:
+
+   **PROMPT RULES — MANDATORY:**
+   - Every prompt MUST describe **specific labeled elements** the image should contain
+   - Every prompt MUST describe the **layout/structure** (left vs right, top vs bottom, grid, flow)
+   - Every prompt MUST end with "Clean professional infographic style, white background, clear readable labels"
+   - NEVER use vague prompts like "abstract visualization of X" or "conceptual illustration of X"
+   - NEVER request dark/gradient backgrounds (they don't match the course's white design)
+   - NEVER generate images without text labels — the image must communicate WITHOUT the caption
+
+   **PROMPT TEMPLATE:**
+   ```
+   An educational infographic showing [WHAT THE CONCEPT IS].
+   [LAYOUT: left side shows X, right side shows Y / top-to-bottom flow / 2x2 grid].
+   [SPECIFIC ELEMENTS: list each labeled element that must appear].
+   [RELATIONSHIPS: arrows, dotted lines, groupings between elements].
+   Clean professional infographic style, white background, [accent color] accents, clear readable labels.
+   ```
+
+   **GOOD prompt example:**
+   ```
+   An educational infographic showing how word embeddings work in AI.
+   On the left side, the words happy, joy, and content are clustered together as colored circles.
+   On the right side, sad, gloomy, and depressed are clustered together.
+   In the middle, the word bank appears twice: once near river and water, once near money and finance.
+   Dotted lines connect related words showing semantic distance.
+   Clean professional infographic style, white background, blue accents, clear readable labels.
+   ```
+
+   **BAD prompt example:**
+   ```
+   A clean minimal tech illustration of semantic embedding space with glowing nodes
+   on dark blue gradient background, professional futuristic style
+   ```
+   This produces pretty but useless images with random gibberish labels.
+
+4. **Generate images** using the Gemini API:
+
+   ```bash
+   curl -s "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=$GEMINI_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "instances": [{"prompt": "<YOUR DESCRIPTIVE PROMPT>"}],
+       "parameters": {"sampleCount": 1, "aspectRatio": "16:9"}
+     }'
+   ```
+
+   Parse the response: `predictions[0].bytesBase64Encoded` → decode base64 → save as PNG.
+
+5. **Save images** to `public/media/<slug>/diagrams/<descriptive-name>.png`
+
+6. **Verify each image** before proceeding:
+   - Does it have readable labels?
+   - Does it communicate the concept without a caption?
+   - Does it match the white/professional style of the course?
+   - If not → regenerate with a more specific prompt. Do NOT keep decorative-only images.
+
+7. **Record in sources.json:**
+   ```json
+   {
+     "type": "generated-image",
+     "path": "public/media/<slug>/diagrams/<name>.png",
+     "prompt": "<the prompt used>",
+     "model": "imagen-4.0-generate-001",
+     "concept": "<what this image explains>"
+   }
+   ```
+
+8. Print summary:
+   ```
+   [Phase 5/9] Image generation complete:
+     - 7 educational infographics generated
+     - Model: imagen-4.0-generate-001
+     - Cost: ~$0.28
+     - All images verified as informative (not decorative)
+   ```
+
+---
+
+## Phase 6 — Integrate
+
+**When:** `--phase integrate` or running all phases (after Phase 5 Images).
 
 **Purpose:** Embed generated media into the course website by modifying the module's MDX file and copying lightweight assets to `public/`.
 
