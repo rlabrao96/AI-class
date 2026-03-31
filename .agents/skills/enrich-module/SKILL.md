@@ -644,10 +644,11 @@ Print progress at each step:
    **PROMPT RULES — MANDATORY:**
    - Every prompt MUST describe **specific labeled elements** the image should contain
    - Every prompt MUST describe the **layout/structure** (left vs right, top vs bottom, grid, flow)
-   - Every prompt MUST end with "Clean professional infographic style, white background, clear readable labels"
+   - Every prompt MUST end with "Clean professional infographic style, white background, clear readable labels in Spanish"
    - NEVER use vague prompts like "abstract visualization of X" or "conceptual illustration of X"
    - NEVER request dark/gradient backgrounds (they don't match the course's white design)
    - NEVER generate images without text labels — the image must communicate WITHOUT the caption
+   - ALL text labels in the image MUST be in Spanish (matching the course language). Write the prompt in English but specify: "All labels and text in the image must be in Spanish"
 
    **PROMPT TEMPLATE:**
    ```
@@ -655,17 +656,19 @@ Print progress at each step:
    [LAYOUT: left side shows X, right side shows Y / top-to-bottom flow / 2x2 grid].
    [SPECIFIC ELEMENTS: list each labeled element that must appear].
    [RELATIONSHIPS: arrows, dotted lines, groupings between elements].
-   Clean professional infographic style, white background, [accent color] accents, clear readable labels.
+   All labels and text in the image must be in Spanish.
+   Clean professional infographic style, white background, [accent color] accents, clear readable labels in Spanish.
    ```
 
    **GOOD prompt example:**
    ```
    An educational infographic showing how word embeddings work in AI.
-   On the left side, the words happy, joy, and content are clustered together as colored circles.
-   On the right side, sad, gloomy, and depressed are clustered together.
-   In the middle, the word bank appears twice: once near river and water, once near money and finance.
+   On the left side, the words feliz, alegría, and contento are clustered together as colored circles.
+   On the right side, triste, sombrío, and deprimido are clustered together.
+   In the middle, the word banco appears twice: once near río and agua, once near dinero and finanzas.
    Dotted lines connect related words showing semantic distance.
-   Clean professional infographic style, white background, blue accents, clear readable labels.
+   All labels and text in the image must be in Spanish.
+   Clean professional infographic style, white background, blue accents, clear readable labels in Spanish.
    ```
 
    **BAD prompt example:**
