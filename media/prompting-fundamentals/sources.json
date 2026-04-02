@@ -1,0 +1,50 @@
+{
+  "module": "prompting-fundamentals",
+  "title": "Prompting Efectivo",
+  "duration": "2h",
+  "research_notebook_id": "dfe55022-3887-4ecd-a7c1-bafa3ced5039",
+  "module_notebook_id": "55eee3c3-51c0-41cd-9912-305fa7bacf8a",
+  "research_sources_found": 139,
+  "research_sources_imported": 21,
+  "phases_completed": ["research", "notebook", "generate", "download", "images", "integrate"],
+  "artifacts": {
+    "audio": {
+      "id": "d8fe690b-d6a8-49b7-a924-1346bb620c3d",
+      "title": "La realidad matemática tras los chatbots",
+      "local_path": "media/prompting-fundamentals/audio/podcast.mp3",
+      "status": "completed"
+    },
+    "infographic_1": {
+      "id": "f3f03cf3-76ea-460b-b8cc-e51c1f7ff7a9",
+      "title": "El modelo de recuperación aproximada",
+      "local_path": "media/prompting-fundamentals/infographics/infographic-1.png",
+      "status": "completed"
+    },
+    "infographic_2": {
+      "id": "787cadaf-3452-4364-8d77-cfeaf57df1bd",
+      "title": "El Modelo de Búsqueda Aproximada",
+      "local_path": "media/prompting-fundamentals/infographics/infographic-2.png",
+      "status": "completed"
+    },
+    "mind_map": {
+      "id": "0adca7d7-f1a8-46af-bdfd-0bbe7c959047",
+      "title": "Comprendiendo los LLMs",
+      "local_path": "media/prompting-fundamentals/infographics/mindmap.json",
+      "status": "completed"
+    }
+  },
+  "generated_images": [
+    "public/media/prompting-fundamentals/diagrams/prompt-structure.png",
+    "public/media/prompting-fundamentals/diagrams/specificity-spectrum.png",
+    "public/media/prompting-fundamentals/diagrams/system-prompt-layers.png",
+    "public/media/prompting-fundamentals/diagrams/few-shot-examples.png",
+    "public/media/prompting-fundamentals/diagrams/chain-of-thought.png",
+    "public/media/prompting-fundamentals/diagrams/iterative-refinement.png",
+    "public/media/prompting-fundamentals/diagrams/prompt-patterns-toolkit.png",
+    "public/media/prompting-fundamentals/diagrams/structured-output.png"
+  ],
+  "integrated": true,
+  "integrated_at": "2026-04-02T14:55:00Z",
+  "mdx_modified": "content/prompting-fundamentals.mdx",
+  "word_count": 10167
+}

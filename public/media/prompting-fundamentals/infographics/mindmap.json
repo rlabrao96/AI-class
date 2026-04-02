@@ -1,0 +1,97 @@
+{
+  "name": "Comprendiendo los LLMs",
+  "children": [
+    {
+      "name": "La Necesidad de Modelos Mentales",
+      "children": [
+        {
+          "name": "Complejidad matemática y de ingeniería"
+        },
+        {
+          "name": "Naturaleza alienígena vs. apariencia humana"
+        },
+        {
+          "name": "Superar interfaces de chat engañosas"
+        }
+      ]
+    },
+    {
+      "name": "Modelo de Recuperación Aproximada",
+      "children": [
+        {
+          "name": "Conceptos Clave",
+          "children": [
+            {
+              "name": "Mapa del lenguaje"
+            },
+            {
+              "name": "Embeddings de texto (vectores)"
+            },
+            {
+              "name": "Cálculo de distancias y similitudes"
+            }
+          ]
+        },
+        {
+          "name": "Evolución de la Búsqueda",
+          "children": [
+            {
+              "name": "Base de datos: Coincidencia exacta"
+            },
+            {
+              "name": "Motor de búsqueda: Recuperación exacta"
+            },
+            {
+              "name": "LLM: Recuperación aproximada"
+            }
+          ]
+        },
+        {
+          "name": "Funcionamiento",
+          "children": [
+            {
+              "name": "Posicionamiento del prompt en el mapa"
+            },
+            {
+              "name": "Combinación de textos cercanos"
+            },
+            {
+              "name": "Predicción de la siguiente palabra"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Entrenamiento y Datos",
+      "children": [
+        {
+          "name": "Aprendizaje no supervisado (Cuerpo del Shoggoth)"
+        },
+        {
+          "name": "Ajuste fino supervisado (SFT)"
+        },
+        {
+          "name": "Aprendizaje por refuerzo (RLHF)"
+        }
+      ]
+    },
+    {
+      "name": "Utilidad Práctica",
+      "children": [
+        {
+          "name": "Explicar origen de alucinaciones"
+        },
+        {
+          "name": "Mejorar resultados mediante prompts"
+        },
+        {
+          "name": "Distinguir promesas falsas de realidades"
+        },
+        {
+          "name": "Aumentar confiabilidad y transparencia"
+        }
+      ]
+    }
+  ]
+}
