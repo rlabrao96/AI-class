@@ -1,11 +1,11 @@
 ---
 name: enrich-module
-description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, cinematic videos) by orchestrating browser-use and notebooklm in a 9-phase pipeline. Use when the user wants to add visual/audio content to a course module.
+description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, cinematic videos) by orchestrating browser-use and notebooklm in a 10-phase pipeline. Use when the user wants to add visual/audio content to a course module.
 ---
 
 # Enrich Module
 
-Orchestrates `/browser-use` and `/notebooklm` to produce rich media content for a course module. Runs a 9-phase pipeline: Research → Collect → Notebook → Generate → Generate Video → Download → Images → Integrate → Paginate.
+Orchestrates `/browser-use` and `/notebooklm` to produce rich media content for a course module. Runs a 10-phase pipeline: Research → Collect → Notebook → Generate → Generate Video → Download → Images → Integrate → Paginate → Verify Images.
 
 ## Prerequisites
 
@@ -21,12 +21,12 @@ If `notebooklm status` fails, run `notebooklm login`.
 ## Invocation
 
 ```
-/enrich-module <slug> [--phase research|collect|notebook|generate|generate-video|download|images|integrate|paginate] [--sources url1,url2,...] [--lang es_419] [--duration 2h]
+/enrich-module <slug> [--phase research|collect|notebook|generate|generate-video|download|images|integrate|paginate|verify-images] [--sources url1,url2,...] [--lang es_419] [--duration 2h]
 ```
 
 **Arguments:**
 - `<slug>` — Required. One of: `ai-fundamentals`, `prompting-fundamentals`, `reliable-ai-systems`, `vibe-coding`, `agents-and-skills`, `legal-ai-risks`, `copilot-m365`, `microsoft-fabric`, `azure-ai-foundry`, `aws-bedrock`
-- `--phase` — Optional. Run only one phase. Omit to run all 9 sequentially.
+- `--phase` — Optional. Run only one phase. Omit to run all 10 sequentially.
 - `--sources` — Optional. Additional source URLs (comma-separated), added on top of the base mapping.
 - `--lang` — Optional. Output language for NotebookLM artifacts. Default: `es` (Spanish).
 - `--duration` — Optional. Target duration for the module. Controls content density and pagination. Default: `1h`. Examples: `30m`, `1h`, `2h`, `3h`.
@@ -722,30 +722,112 @@ Print progress at each step:
 
 5. **Save images** to `public/media/<slug>/diagrams/<descriptive-name>.png`
 
-6. **Verify each image** before proceeding:
-   - Does it have NO text/labels baked in? (any text = regenerate)
-   - Does the visual composition leave space for HTML overlay labels?
-   - Does it match the white/professional style of the course?
-   - If not → regenerate with a more specific prompt. Do NOT keep images with hallucinated text.
-
-7. **Record in sources.json:**
+6. **Record in sources.json:**
    ```json
    {
      "type": "generated-image",
      "path": "public/media/<slug>/diagrams/<name>.png",
      "prompt": "<the prompt used>",
      "model": "imagen-4.0-generate-001",
-     "concept": "<what this image explains>"
+     "concept": "<what this image explains>",
+     "labels": [{ "text": "...", "position": "...", "style": "..." }]
    }
    ```
 
-8. Print summary:
+7. Print summary:
    ```
-   [Phase 5/9] Image generation complete:
-     - 7 educational infographics generated
+   [Phase 5/10] Image generation complete:
+     - 7 images generated (no text baked in)
+     - 7 label sets planned for HTML overlay
      - Model: imagen-4.0-generate-001
      - Cost: ~$0.28
-     - All images verified as informative (not decorative)
+   ```
+
+---
+
+## Phase 5b — Verify Images (browser-use)
+
+**When:** `--phase verify-images` or running all phases (after Phase 5 Images, after Phase 7 Integrate + Phase 8 Paginate).
+
+**Purpose:** Use browser-use to visually inspect each generated image as it appears on the live page. Detect hallucinated text baked into images and flag for regeneration. This is the final quality gate before the module is considered done.
+
+**Why this phase exists:** AI image models frequently ignore "NO TEXT" instructions and bake in gibberish text (e.g., "EDUSIATIONAY AI BIAS", "Corem Ipsem", "FILTER"). This text is undetectable from the prompt or file alone — you must visually inspect the rendered page.
+
+**Steps:**
+
+1. **Start the dev server** (if not already running):
+   ```bash
+   npm run dev
+   ```
+
+2. **Navigate to each section page:**
+   ```bash
+   browser-use open "http://localhost:3000/modules/<slug>/1"
+   ```
+
+3. **For each ModuleImage on the page:**
+
+   a. Scroll to the image:
+   ```bash
+   browser-use scroll down
+   ```
+
+   b. Take a screenshot of the image area:
+   ```bash
+   browser-use screenshot "media/<slug>/verify/page-<N>-img-<M>.png"
+   ```
+
+   c. **Visually inspect the screenshot.** Look for:
+   - Any text baked INTO the image (not the HTML overlay labels — those are fine)
+   - Gibberish words, lorem ipsum, partial words, misspelled labels
+   - "FILTER", "LOREM", "TEXT", or any recognizable but wrong text
+   - Characters that look like text but aren't real words
+
+   d. **Classify the image:**
+   - `clean` — no baked-in text visible, only HTML overlays → PASS
+   - `minor-text` — small/subtle text that doesn't distract → PASS with note
+   - `hallucinated-text` — obvious fake text visible → FAIL, must regenerate
+
+4. **For each FAIL image, regenerate with a stronger prompt:**
+
+   Add these reinforcements to the original prompt:
+   ```
+   CRITICAL: This image must contain ZERO text, ZERO letters, ZERO numbers, ZERO words.
+   Do not render any characters, labels, captions, titles, watermarks, or annotations.
+   The image should be purely visual — shapes, colors, icons, arrows only.
+   ```
+
+   Then re-run steps 5-6 from Phase 5 (save + record).
+
+5. **Repeat verification** for regenerated images. Max 3 attempts per image. If still failing after 3 attempts, report to user:
+   ```
+   ⚠️ Image <name>.png still has hallucinated text after 3 regeneration attempts.
+   Options:
+     a) Keep it — the HTML overlay labels partially cover the bad text
+     b) Replace with a pure SVG/HTML diagram (no AI image)
+     c) Use a different visual concept that's less prone to text generation
+   ```
+
+6. **Navigate through all section pages** (repeat for /1, /2, /3, /4, etc.)
+
+7. **Also verify:**
+   - HTML overlay labels are positioned correctly (not overlapping, not off-screen)
+   - Labels are readable against the image background
+   - Captions match the image content
+
+8. **Close the browser:**
+   ```bash
+   browser-use close
+   ```
+
+9. **Print verification report:**
+   ```
+   [Phase 5b/10] Image verification complete:
+     - Page 1: 3 images — 2 clean, 1 regenerated (now clean)
+     - Page 2: 1 image — clean
+     - Page 3: 2 images — 1 clean, 1 minor-text (acceptable)
+     - Page 4: 1 image — clean
+     - Total: 7 images verified, 1 regenerated, 0 failures
    ```
 
 ---
