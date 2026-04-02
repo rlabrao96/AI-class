@@ -1,0 +1,202 @@
+## Patrones de prompting para el trabajo diario
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/prompt-patterns-toolkit.png"
+  alt="6 patrones de prompting reutilizables"
+  caption="Tu toolkit de patrones: 6 herramientas para cubrir la mayoría de tareas profesionales."
+  labels={[
+    { text: "Extractor", position: "top-left", style: "accent" },
+    { text: "Transformador", position: "top-center", style: "success" },
+    { text: "Evaluador", position: "top-right", style: "warning" },
+    { text: "Generador", position: "bottom-left", style: "dark" },
+    { text: "Simulador", position: "bottom-center", style: "danger" },
+    { text: "Maestro", position: "bottom-right", style: "accent" }
+  ]}
+/>
+
+Más allá de las técnicas individuales, existen **patrones reutilizables** que puedes adaptar a distintas situaciones laborales. Un patrón es como una plantilla de prompt que has probado y refinado, y que puedes aplicar a nuevos problemas con ajustes mínimos. Dominar 5-6 patrones cubre la gran mayoría de las tareas profesionales.
+
+### Patrón 1: El extractor
+
+Convierte texto desestructurado en datos estructurados. Esencial para procesar emails, contratos, formularios, o cualquier documento donde necesitas extraer información específica.
+
+```
+Del siguiente [tipo de documento], extrae la siguiente información
+en formato [tabla/JSON/lista]:
+
+- Campo 1: [descripción]
+- Campo 2: [descripción]
+- Campo 3: [descripción]
+
+Si algún campo no está presente en el texto, indica "No encontrado".
+
+[Pegar documento aquí]
+```
+
+**Casos de uso:** Extraer datos de facturas, parsear CVs, sacar métricas de reportes, extraer cláusulas de contratos.
+
+### Patrón 2: El transformador
+
+Toma contenido existente y lo adapta a un nuevo formato, audiencia, o propósito. No crea contenido nuevo — transforma el que ya existe.
+
+```
+Transforma el siguiente [contenido original] en [formato destino].
+
+Audiencia original: [quién]
+Nueva audiencia: [quién]
+
+Mantén: [qué conservar]
+Cambia: [qué adaptar]
+Elimina: [qué remover]
+
+[Contenido aquí]
+```
+
+**Casos de uso:** Convertir un reporte técnico en un resumen ejecutivo, adaptar un email formal a un mensaje de Slack, transformar notas de reunión en tareas de Jira.
+
+### Patrón 3: El evaluador
+
+Analiza contenido contra criterios específicos y produce un veredicto estructurado. Útil para revisiones, auditorías, y control de calidad.
+
+```
+Evalúa el siguiente [objeto] contra estos criterios:
+
+1. [Criterio 1]: [descripción y estándar esperado]
+2. [Criterio 2]: [descripción y estándar esperado]
+3. [Criterio 3]: [descripción y estándar esperado]
+
+Para cada criterio, indica:
+- Cumple / No cumple / Parcial
+- Evidencia específica del texto
+- Recomendación de mejora (si aplica)
+
+[Objeto a evaluar aquí]
+```
+
+**Casos de uso:** Revisar propuestas contra requirements, evaluar emails antes de enviarlos, auditar documentos contra checklist de compliance, revisar código contra estándares.
+
+### Patrón 4: El generador con restricciones
+
+Crea contenido nuevo dentro de límites bien definidos. La clave es que las restricciones no limitan — enfocan.
+
+```
+Genera [tipo de contenido] con las siguientes especificaciones:
+
+- Propósito: [para qué se usará]
+- Audiencia: [quién lo leerá]
+- Tono: [cómo debe sonar]
+- Longitud: [cuánto]
+- Debe incluir: [elementos obligatorios]
+- Debe evitar: [elementos prohibidos]
+- Ejemplo de referencia: [si aplica]
+```
+
+**Casos de uso:** Redactar emails, crear descripciones de producto, escribir posts para redes sociales, generar preguntas de entrevista.
+
+### Patrón 5: El simulador
+
+Le pides al modelo que simule una perspectiva o situación para generar insights que no obtiendrías con un análisis directo.
+
+```
+Simula ser [persona/rol] y responde a la siguiente situación:
+
+Contexto: [la situación]
+Tu perspectiva: [qué priorizas, qué te preocupa]
+Tu objetivo: [qué quieres lograr]
+
+Responde como lo haría [persona/rol], incluyendo objeciones,
+preguntas, y preocupaciones que tendría.
+```
+
+**Casos de uso:** Preparar objeciones de clientes antes de una presentación, anticipar preguntas del comité de dirección, simular feedback de usuarios, practicar negociaciones.
+
+<Callout type="example">
+"Simula ser el CFO de una empresa farmacéutica con 5,000 empleados. Estoy por presentarle una propuesta de inversión en IA de $500K para automatizar reportes regulatorios. ¿Qué preguntas me haría? ¿Qué objeciones tendría? ¿Qué información necesitaría ver para aprobar la propuesta?"
+</Callout>
+
+### Patrón 6: El maestro
+
+Le pides al modelo que te enseñe algo, adaptando la explicación a tu nivel y estilo de aprendizaje.
+
+```
+Explícame [concepto] como si fuera [nivel de conocimiento].
+
+Usa [tipo de analogías/ejemplos] que me sean familiares.
+Estructura la explicación en: concepto básico → por qué importa → ejemplo práctico.
+Al final, dame una pregunta para verificar que entendí.
+```
+
+**Casos de uso:** Aprender conceptos técnicos nuevos, entender regulaciones, prepararse para reuniones sobre temas fuera de tu expertise.
+
+### Combinando patrones
+
+En la práctica, rara vez usas un solo patrón en aislamiento. Los mejores prompts combinan elementos de múltiples patrones:
+
+- **Extractor + Evaluador:** "Extrae las cláusulas de indemnización de este contrato, luego evalúa cada una contra nuestro estándar de riesgo máximo de $1M."
+- **Simulador + Generador:** "Simula ser un cliente escéptico, genera las 5 objeciones principales, y luego escribe una respuesta para cada una."
+- **Maestro + Transformador:** "Explícame el concepto de RAG como si fuera un gerente de negocio, luego transforma esa explicación en 3 slides para una presentación."
+
+Dominar los patrones individuales es el primer paso. Combinarlos es donde la productividad se multiplica.
+
+<MiniQuiz
+  question="Necesitas prepararte para una reunión con el equipo legal donde presentarás un proyecto de IA. Quieres anticipar sus preocupaciones. ¿Qué patrón usarías?"
+  options={[
+    "El extractor — para sacar datos relevantes de documentos legales",
+    "El evaluador — para revisar tu propuesta contra criterios legales",
+    "El simulador — para que el modelo simule la perspectiva del equipo legal",
+    "El transformador — para convertir tu propuesta técnica en lenguaje legal"
+  ]}
+  correct={2}
+  explanation="El simulador te permite anticipar objeciones, preguntas y preocupaciones desde la perspectiva del equipo legal. Esto te prepara mejor que solo revisar tu propuesta, porque te da la perspectiva del otro lado de la mesa."
+/>
+
+---
+
+## Prompts multiturno: el arte de la conversación
+
+Hasta ahora hemos hablado de prompts individuales — una instrucción, un resultado. Pero en la práctica, la mayoría del trabajo con IA sucede en **conversaciones de varios turnos**: le das una instrucción, evalúas el resultado, y luego le das otra instrucción que se construye sobre lo anterior. Dominar esta dinámica multiturnno es tan importante como escribir un buen prompt inicial.
+
+### El modelo recuerda — pero no para siempre
+
+En una conversación, el modelo tiene acceso a todo lo que se ha dicho antes — tanto tus mensajes como sus propias respuestas. Esto significa que puedes construir progresivamente:
+
+1. **Turno 1:** "Aquí tienes el reporte trimestral de ventas. [pegar reporte]"
+2. **Turno 2:** "Identifica los 3 productos con mayor crecimiento."
+3. **Turno 3:** "Para el producto con mayor crecimiento, sugiere 3 acciones para mantener ese momentum en Q4."
+4. **Turno 4:** "Redacta un email al director comercial con esas 3 acciones. Tono ejecutivo, máximo 200 palabras."
+
+Cada turno se construye sobre el anterior. No necesitas repetir el contexto del reporte en cada mensaje — el modelo lo tiene presente. Pero hay un límite importante: la **ventana de contexto**. Cada modelo tiene un límite de cuánto texto puede "recordar" a la vez (desde 8,000 tokens en modelos básicos hasta 200,000+ en modelos avanzados). Si la conversación se vuelve muy larga, los primeros mensajes empiezan a "caerse" de la ventana.
+
+<Callout type="tip">
+Si estás en una conversación larga y el modelo empieza a olvidar cosas que dijiste al principio, la solución más simple es copiar la información clave en un nuevo mensaje: "Para contexto, estos son los puntos principales que ya establecimos: [lista]". Esto refresca la información dentro de la ventana activa.
+</Callout>
+
+### Estrategias de conversación efectiva
+
+**Divide y conquista:** En lugar de pedir todo en un prompt complejo, divide la tarea en pasos conversacionales. Primero pide el análisis, luego las conclusiones, luego el formato final. Cada paso es más fácil de evaluar y corregir.
+
+**Correcciones quirúrgicas:** Cuando el modelo produce algo que es 90% correcto, no le pidas que repita todo. Sé específico: "En el punto 3, reemplaza la referencia a 'costos operativos' por 'eficiencia del proceso'. Mantén todo lo demás igual." Esto es más eficiente y más predecible que regenear toda la respuesta.
+
+**Ancla con resúmenes:** En conversaciones largas, periódicamente pide un resumen de lo acordado: "Resume en 5 puntos lo que hemos definido hasta ahora." Esto sirve como checkpoint y te permite corregir malos entendidos antes de que se propaguen.
+
+**Cambio de modo explícito:** Si necesitas que el modelo cambie de comportamiento (de analítico a creativo, de formal a informal), dilo explícitamente: "Cambiemos de modo. Ahora necesito que generes ideas creativas, sin filtro de viabilidad. Lista 10 ideas, incluso las más arriesgadas." Sin esta señal explícita, el modelo mantiene el comportamiento establecido por la conversación previa.
+
+### Cuándo empezar una conversación nueva
+
+No todas las tareas deben vivir en la misma conversación. Empieza una nueva cuando:
+
+- **Cambias de tema completamente.** El contexto de una conversación sobre finanzas va a contaminar una conversación sobre marketing.
+- **La conversación se volvió muy larga** y el modelo empieza a ser inconsistente o a olvidar instrucciones del principio.
+- **Necesitas un "reset" de comportamiento.** Si el modelo está atrapado en un patrón de respuestas que no te sirve, a veces es más rápido empezar limpio que intentar corregir el rumbo.
+
+<MiniQuiz
+  question="Estás en el turno 15 de una conversación larga sobre un proyecto y el modelo empieza a contradecir cosas que dijo al principio. ¿Cuál es la causa más probable?"
+  options={[
+    "El modelo se está volviendo menos inteligente con el uso",
+    "La conversación excedió la ventana de contexto y los primeros mensajes se perdieron",
+    "El modelo decidió cambiar de opinión basándose en nueva información",
+    "Hay un bug en la plataforma de chat"
+  ]}
+  correct={1}
+  explanation="La ventana de contexto tiene un límite fijo. Cuando la conversación lo excede, los primeros mensajes salen de la ventana y el modelo ya no los 'recuerda'. La solución: resumir los puntos clave en un nuevo mensaje o empezar una conversación fresca con el contexto necesario."
+/>

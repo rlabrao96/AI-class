@@ -1,0 +1,175 @@
+## Estructura del prompt
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/prompt-structure.png"
+  alt="Los 4 elementos de un prompt efectivo"
+  caption="Los cuatro bloques de un prompt bien construido: Rol, Contexto, Tarea y Formato."
+  labels={[
+    { text: "Rol", position: "top-left", style: "accent" },
+    { text: "Contexto", position: "top-center", style: "success" },
+    { text: "Tarea", position: "top-right", style: "warning" },
+    { text: "Formato", position: "center-right", style: "dark" }
+  ]}
+/>
+
+Un prompt bien construido no es simplemente una pregunta. Es una instrucción completa que le da al modelo todo lo que necesita para producir exactamente lo que tú quieres. Los mejores prompts comparten cuatro elementos clave: **Rol, Contexto, Tarea y Formato**. No todos los prompts necesitan los cuatro en todo momento, pero conocer cada uno te permite diagnosticar por qué un resultado no fue el esperado y saber exactamente qué ajustar.
+
+### Rol: "Eres un experto en..."
+
+El rol le da al modelo una perspectiva desde la cual operar. Cuando le dices "Eres un analista financiero senior", el modelo no solo cambia el vocabulario que usa — ajusta su nivel de asunciones, la profundidad técnica de sus respuestas y el tipo de matices que incluye. Piénsalo como elegir qué colega le pides consejo: no le preguntas lo mismo al área legal que al área de marketing, aunque la pregunta de fondo sea la misma.
+
+El rol funciona porque durante el entrenamiento, el modelo aprendió patrones de cómo distintos profesionales escriben y razonan. Al asignar un rol, estás activando ese conjunto de patrones. Un "médico especialista en cardiología" producirá respuestas con terminología médica precisa y considerará contraindicaciones. Un "periodista de investigación" priorizará verificación de fuentes y estructura narrativa. Un "consultor de estrategia" pensará en frameworks y recomendaciones accionables.
+
+<Callout type="tip">
+El rol no tiene que ser un título profesional. Puedes decir "Eres un revisor de textos extremadamente detallista que nunca deja pasar un error gramatical" o "Eres un traductor que prioriza naturalidad sobre literalidad". Lo que importa es que el rol oriente la perspectiva y el nivel de detalle.
+</Callout>
+
+### Contexto: la información de fondo
+
+El modelo solo sabe lo que está en su entrenamiento y lo que tú le proporcionas en el prompt. Si le pides un análisis sin darle el documento, si le pides un email sin explicarle la relación con el cliente, o si le pides un resumen sin decirle para quién es, el modelo tiene que adivinar — y cuando adivina, generaliza. El contexto elimina esa ambigüedad. No significa escribir párrafos enteros de antecedentes; significa incluir la información mínima que cambia el resultado.
+
+Hay tres tipos de contexto que debes considerar:
+
+**Contexto del dominio:** ¿En qué industria o área estamos? "Estamos en el sector farmacéutico, regulados por la FDA" cambia completamente cómo el modelo aborda una pregunta sobre etiquetado de productos.
+
+**Contexto de la audiencia:** ¿Quién va a leer el output? Un resumen para el CEO requiere métricas de alto nivel y recomendaciones claras. El mismo resumen para el equipo técnico necesita detalles de implementación y dependencias.
+
+**Contexto de la situación:** ¿Qué pasó antes y qué sigue? "El cliente lleva 3 semanas sin responder y tenemos una fecha límite el viernes" transforma un email genérico de seguimiento en algo con la urgencia apropiada.
+
+<Callout type="example">
+Sin contexto: "Escribe un email al cliente sobre el proyecto."
+
+Con contexto: "Escribe un email a María García, directora de operaciones en Acme Corp. Llevamos 3 semanas sin recibir la aprobación del presupuesto para la Fase 2. La fecha límite para iniciar la implementación es el viernes. El tono debe ser profesional pero con sentido de urgencia. María prefiere comunicaciones concisas."
+</Callout>
+
+### Tarea: exactamente qué quieres
+
+La tarea es el núcleo del prompt. El error más común aquí es ser demasiado general: "analiza esto", "ayúdame con esto", "dame algo sobre este tema". Cuanto más específica es la tarea, más enfocada es la respuesta. Define el verbo de acción (resume, clasifica, redacta, compara, extrae), el objeto (este contrato, este email, este conjunto de datos) y, si aplica, los criterios de éxito.
+
+La diferencia entre un verbo genérico y uno específico es enorme:
+
+| Verbo genérico | Verbos específicos |
+|---|---|
+| "Analiza" | Compara, evalúa, diagnostica, clasifica, descompone |
+| "Escribe" | Redacta, reformula, sintetiza, expande, adapta |
+| "Ayúdame" | Genera, corrige, optimiza, traduce, estructura |
+
+Cada verbo específico orienta al modelo hacia un tipo de output distinto. "Compara estos dos contratos" produce una tabla de diferencias. "Evalúa este contrato" produce un análisis de riesgos. "Diagnostica este contrato" busca cláusulas problemáticas. Mismo documento, resultados completamente diferentes.
+
+### Formato: cómo quieres el resultado
+
+Sin instrucciones de formato, el modelo elige por ti — y su elección puede no coincidir con tu necesidad. ¿Quieres una lista con viñetas o prosa continua? ¿Un párrafo o cinco? ¿Tono formal o conversacional? ¿En español o en inglés? ¿Con encabezados o sin ellos? Especificar el formato no es un detalle menor: es lo que convierte una respuesta correcta en una respuesta utilizable.
+
+Formatos útiles que puedes especificar:
+
+- **Estructura:** tabla, lista numerada, viñetas, prosa, JSON, Markdown
+- **Longitud:** "máximo 200 palabras", "exactamente 5 puntos", "un párrafo"
+- **Tono:** formal, conversacional, técnico, empático, directo
+- **Delimitadores:** "usa ### para encabezados", "separa cada sección con ---"
+- **Idioma:** especifica si quieres la respuesta en un idioma distinto al del prompt
+
+<Callout type="warning">
+Si necesitas el output en un formato específico para procesamiento posterior (por ejemplo, JSON para importar a una herramienta), sé explícito: "Responde ÚNICAMENTE con el JSON, sin texto adicional antes ni después." Los modelos tienden a agregar explicaciones a menos que les pidas que no lo hagan.
+</Callout>
+
+### Ejemplo comparativo
+
+Veamos la diferencia en la práctica:
+
+<BeforeAfter
+  before={{ label: "Prompt débil", content: "Resume este documento." }}
+  after={{ label: "Prompt fuerte", content: "Eres un analista de comunicaciones. Resume el siguiente informe en 3 puntos clave, cada uno de máximo 2 oraciones, enfocados en implicaciones para el negocio. Tono formal." }}
+/>
+
+El segundo prompt tiene los cuatro elementos: el rol (analista de comunicaciones) orienta la perspectiva; el contexto está implícito en el documento que se adjunta; la tarea es precisa (3 puntos clave, máximo 2 oraciones, enfocados en implicaciones de negocio); y el formato está definido (tono formal, estructura de lista). El modelo no tiene que adivinar nada — puede enfocar toda su capacidad en hacer exactamente lo que necesitas.
+
+Cuando un resultado no te satisface, antes de reescribir el prompt completo, pregúntate cuál de los cuatro elementos estaba ausente o era vago. Esa diagnosis te ahorra mucho tiempo.
+
+<MiniQuiz
+  question="Tienes un resultado del modelo que es correcto pero demasiado largo y en un tono informal. ¿Cuál de los cuatro elementos del prompt deberías ajustar?"
+  options={[
+    "El rol, para que use un vocabulario más conciso",
+    "El contexto, para que entienda mejor la situación",
+    "La tarea, para que sepa qué hacer de otra forma",
+    "El formato, para especificar longitud y tono"
+  ]}
+  correct={3}
+  explanation="Cuando el contenido es correcto pero la presentación no, el problema casi siempre está en el formato. Especificar longitud máxima y tono resuelve este tipo de issues sin cambiar la tarea."
+/>
+
+---
+
+## Especificidad > brevedad
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/specificity-spectrum.png"
+  alt="Espectro de especificidad en prompts"
+  caption="A mayor especificidad, más enfocado y útil es el resultado."
+  labels={[
+    { text: "Prompt vago → resultado genérico", position: "top-left", style: "danger" },
+    { text: "Prompt específico → resultado preciso", position: "top-right", style: "success" }
+  ]}
+/>
+
+Hay un mito extendido sobre los modelos de lenguaje: que los prompts cortos son mejores porque "el modelo ya entiende". La realidad es la opuesta. Los prompts vagos producen respuestas genéricas, y los prompts específicos producen respuestas útiles. Las restricciones no limitan la creatividad del modelo — la enfocan.
+
+Piénsalo así: si le pides a un diseñador gráfico "hazme algo bonito", recibirás algo que a él le parezca bonito. Si le dices "hazme un banner de 1200x628 píxeles para LinkedIn, fondo azul marino, texto blanco, con el logo en la esquina superior izquierda y el mensaje 'Evento 15 de abril'", recibirás exactamente lo que necesitas. Las instrucciones adicionales no complican el trabajo — lo aclaran.
+
+### La economía de la especificidad
+
+Ser específico en el prompt te ahorra tiempo neto. Un prompt vago de 10 palabras que produce un resultado inutilizable te obliga a hacer 3-4 rondas de corrección, cada una de las cuales consume tiempo y tokens. Un prompt específico de 80 palabras que produce un resultado usable en el primer intento es dramáticamente más eficiente.
+
+La clave es entender que la "brevedad" en prompting no significa pocas palabras — significa pocas palabras **innecesarias**. Cada restricción que agregas debe aportar información que cambie el output. Si una restricción no cambia nada, es ruido. Si cambiaría el resultado, es señal.
+
+### Comparaciones concretas
+
+**Caso 1 — Email de seguimiento**
+
+<BeforeAfter
+  before={{ label: "Vago", content: "Escribe un email." }}
+  after={{ label: "Específico", content: "Escribe un email de seguimiento de 150 palabras a un cliente que no respondió en 2 semanas. Tono profesional pero cercano. No mencionar explícitamente la falta de respuesta ni presionar por una decisión. El objetivo es reabrir el canal de comunicación y ofrecer una llamada breve." }}
+/>
+
+El segundo prompt genera un email que puedes enviar directamente. El primero genera un borrador que todavía necesita varias rondas de ajuste.
+
+**Caso 2 — Análisis de texto**
+
+<BeforeAfter
+  before={{ label: "Vago", content: "Analiza esto." }}
+  after={{ label: "Específico", content: "Identifica los 3 principales riesgos de negocio en este texto y clasifícalos por impacto potencial (alto / medio / bajo). Para cada riesgo incluye: una descripción de una oración, el nivel de impacto y la evidencia textual que lo sustenta." }}
+/>
+
+La segunda versión produce un output estructurado que puedes llevar directamente a una reunión. La primera produce... algo. Quizás útil, quizás no.
+
+**Caso 3 — Generación de contenido**
+
+<BeforeAfter
+  before={{ label: "Vago", content: "Escribe sobre inteligencia artificial." }}
+  after={{ label: "Específico", content: "Escribe una introducción de 300 palabras sobre IA generativa para el blog interno de una empresa farmacéutica. Audiencia: managers no técnicos. Incluye un ejemplo concreto de cómo afecta al descubrimiento de fármacos. Tono: accesible pero no simplista. Evita jerga técnica sin explicar." }}
+/>
+
+### El hábito práctico más valioso
+
+Cuando el primer resultado no es lo que esperabas, el instinto natural es pedir de nuevo con otras palabras. Pero antes de hacer eso, hazte esta pregunta: **¿qué restricción podría agregar que acote el espacio de respuestas posibles?**
+
+Las restricciones más útiles suelen ser:
+- **Longitud**: "no más de 100 palabras", "exactamente 3 puntos"
+- **Audiencia**: "para alguien sin conocimientos técnicos", "para el comité directivo"
+- **Alcance**: "solo basándote en este texto, sin información externa"
+- **Estructura**: "en forma de tabla", "con encabezados para cada sección"
+- **Tono**: "directo y sin rodeos", "empático y sin lenguaje técnico"
+- **Exclusiones**: "no incluyas recomendaciones", "omite los detalles técnicos"
+
+Agregar una o dos restricciones bien elegidas transforma un prompt mediocre en uno efectivo, sin necesidad de reescribirlo desde cero.
+
+<MiniQuiz
+  question="Un compañero te muestra este prompt: 'Resume las ventas del Q3'. El resultado fue un párrafo genérico. ¿Cuál es la forma más eficiente de mejorar el prompt?"
+  options={[
+    "Reescribirlo completamente desde cero",
+    "Agregar 'por favor' y 'gracias' para que el modelo se esfuerce más",
+    "Agregar restricciones: formato (tabla), métricas (top 3 productos), comparación (vs Q2)",
+    "Cambiar a un modelo más grande y más caro"
+  ]}
+  correct={2}
+  explanation="No necesitas reescribir — solo agregar restricciones que acotan el espacio de respuestas posibles. Formato, métricas específicas y punto de comparación transforman un prompt vago en uno preciso."
+/>

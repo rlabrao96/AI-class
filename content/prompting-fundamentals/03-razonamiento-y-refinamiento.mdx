@@ -1,0 +1,161 @@
+## Chain of thought
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/chain-of-thought.png"
+  alt="Chain of thought: razonamiento paso a paso"
+  caption="El razonamiento paso a paso mejora la precisión en problemas complejos."
+  labels={[
+    { text: "Salto directo (riesgo de error)", position: "top-center", style: "danger" },
+    { text: "Paso a paso (mayor precisión)", position: "bottom-center", style: "success" }
+  ]}
+/>
+
+Los modelos de lenguaje tienen una tendencia natural a "saltar" a una respuesta. Para preguntas simples, eso es una ventaja — es rápido y eficiente. Pero para problemas complejos, saltar a una conclusión sin razonar el camino aumenta significativamente la probabilidad de error. El **chain of thought** (cadena de pensamiento) es la técnica que corrige esto: le pides al modelo que trabaje el problema paso a paso antes de dar una respuesta final.
+
+La instrucción puede ser tan simple como:
+
+> "Piensa paso a paso antes de responder."
+
+> "Razona en voz alta y luego dame tu conclusión."
+
+> "Antes de responder, analiza los pros y contras de cada opción."
+
+Cuando el modelo sigue este proceso, su razonamiento intermedio se vuelve visible — y eso mejora tanto la calidad del resultado como tu capacidad de detectar dónde algo salió mal.
+
+### Por qué mejora la precisión
+
+Cuando el modelo escribe su razonamiento en pasos, cada paso actúa como un punto de control. Un error lógico en el paso 2 se vuelve visible antes de que contamine la conclusión. Sin chain of thought, ese mismo error queda oculto dentro de una respuesta que suena confiada pero es incorrecta.
+
+La investigación en este campo es clara: para problemas de múltiples pasos, pedir razonamiento explícito mejora la precisión de forma sustancial. No porque el modelo "piense más" en sentido humano, sino porque el proceso secuencial de generar texto lo fuerza a ser consistente paso a paso — cada token generado depende de los anteriores, así que escribir el razonamiento crea un andamiaje que guía la conclusión.
+
+### Ejemplo: evaluación de proveedor
+
+Veamos la diferencia con un caso de negocio real:
+
+<BeforeAfter
+  before={{ label: "Sin chain of thought", content: "¿Deberíamos cambiar de proveedor de cloud? → 'Sí, recomiendo migrar a AWS por su mejor relación costo-beneficio.'" }}
+  after={{ label: "Con chain of thought", content: "Analiza paso a paso si deberíamos cambiar de proveedor de cloud. Considera: costos actuales vs. proyectados, tiempo de migración, riesgo operativo, capacitación necesaria, y dependencias de servicios específicos. Luego dame tu recomendación con los factores decisivos." }}
+/>
+
+El segundo prompt no solo produce una mejor recomendación — te permite ver si el modelo consideró todos los factores relevantes y dónde puso más peso. Si su razonamiento dice "el costo de migración es bajo" y tú sabes que tienen 200 microservicios acoplados al proveedor actual, puedes corregir esa asunción en una segunda iteración.
+
+### Variantes del chain of thought
+
+No existe una sola forma de pedir razonamiento explícito. Distintas variantes funcionan mejor para distintos tipos de problemas:
+
+**Chain of thought estándar:** "Piensa paso a paso."
+- Mejor para: problemas secuenciales con un camino lógico claro.
+
+**Pros y contras:** "Antes de decidir, enumera las ventajas y desventajas de cada opción."
+- Mejor para: decisiones con múltiples alternativas.
+
+**Abogado del diablo:** "Primero argumenta a favor, luego argumenta en contra, y finalmente da tu conclusión considerando ambos lados."
+- Mejor para: evaluaciones donde el sesgo de confirmación es un riesgo.
+
+**Verificación explícita:** "Resuelve el problema, luego verifica tu respuesta paso a paso."
+- Mejor para: cálculos, estimaciones y problemas con una respuesta verificable.
+
+**Descomposición en sub-problemas:** "Divide este problema en 3 sub-problemas más simples. Resuelve cada uno por separado y luego combina las respuestas."
+- Mejor para: problemas complejos que son más manejables cuando se descomponen.
+
+<Callout type="deep-dive">
+Los modelos más recientes como Claude y los modelos de la familia o1/o3 de OpenAI tienen "razonamiento interno" — piensan paso a paso automáticamente antes de responder, sin que tú se lo pidas explícitamente. Sin embargo, pedirle chain of thought explícito sigue siendo útil porque hace el razonamiento visible para ti, permitiéndote auditarlo y corregirlo.
+</Callout>
+
+### Cuándo usarlo
+
+**Tiene mayor impacto en:**
+- Análisis complejos con múltiples variables o factores
+- Razonamiento lógico y deducciones encadenadas
+- Problemas con cálculos o estimaciones
+- Decisiones de negocio con trade-offs que necesitan ser sopesados explícitamente
+- Debugging o diagnóstico de problemas
+
+**Es innecesario para:**
+- Búsquedas de información directa ("¿qué dice la cláusula 3.2?")
+- Traducciones o reformulaciones de texto
+- Tareas donde quieres una respuesta concisa sin justificación
+
+### El trade-off: output más largo, razonamiento mejor
+
+Chain of thought produce respuestas más largas. Si necesitas el razonamiento visible para auditarlo o explicarlo, eso es una ventaja. Si solo necesitas la conclusión, puedes pedir lo mejor de los dos mundos:
+
+> "Piensa paso a paso, pero al final dame solo tu conclusión en 2 oraciones."
+
+Esto aprovecha el razonamiento mejorado sin obligarte a leer un análisis extenso cuando no lo necesitas. Como toda técnica de prompting, no es una regla universal — es una herramienta que usas cuando el problema lo justifica.
+
+---
+
+## Refinamiento iterativo
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/iterative-refinement.png"
+  alt="Ciclo de refinamiento iterativo"
+  caption="El ciclo de mejora continua: escribir, evaluar, ajustar."
+  labels={[
+    { text: "1. Escribir prompt", position: "top-center", style: "accent" },
+    { text: "2. Evaluar resultado", position: "bottom-left", style: "warning" },
+    { text: "3. Ajustar", position: "bottom-right", style: "success" }
+  ]}
+/>
+
+Una de las ideas más importantes sobre prompting es que casi nunca necesitas el prompt perfecto en el primer intento. Lo que necesitas es un **proceso de refinamiento** — empezar con algo razonable, evaluar el resultado, y ajustar de forma dirigida. Los mejores usuarios de IA no escriben mejores prompts iniciales; tienen mejor proceso iterativo.
+
+### El ciclo de refinamiento
+
+El proceso tiene tres pasos que se repiten:
+
+**1. Prompt inicial → Resultado**
+Escribe tu primer prompt con los cuatro elementos (rol, contexto, tarea, formato) y evalúa el resultado.
+
+**2. Diagnóstico → ¿Qué falló?**
+No reescribas el prompt entero. Identifica qué aspecto específico del resultado no es satisfactorio:
+- ¿El contenido es incorrecto o incompleto? → Ajusta el **contexto** o la **tarea**.
+- ¿El formato no es el que necesitas? → Ajusta el **formato**.
+- ¿El nivel de detalle es incorrecto? → Agrega **restricciones** de longitud o profundidad.
+- ¿El tono es inapropiado? → Ajusta el **rol** o agrega instrucciones de tono.
+
+**3. Ajuste mínimo → Nuevo resultado**
+Cambia solo el elemento que diagnosticaste. Un cambio a la vez te permite entender qué funciona y qué no.
+
+<Callout type="tip">
+Guarda las versiones de tus prompts que funcionan bien. Con el tiempo, construirás una biblioteca personal de prompts probados para tus tareas frecuentes. Es más eficiente partir de un prompt que ya funciona al 80% y ajustar el 20% restante.
+</Callout>
+
+### Técnicas de refinamiento
+
+**Agregar restricciones negativas:** A veces es más fácil decir qué NO quieres que describir lo que sí quieres. "No uses lenguaje técnico", "No incluyas recomendaciones", "No excedas 200 palabras" son restricciones que reducen rápidamente el espacio de respuestas.
+
+**Pedir autocrítica:** Después de un primer resultado, puedes pedir: "Revisa tu respuesta anterior e identifica 3 cosas que podrías mejorar. Luego reescríbela incorporando esas mejoras." Esto aprovecha la capacidad del modelo de evaluar su propio output.
+
+**Escalar progresivamente:** Empieza con una tarea simple y ve agregando complejidad. En lugar de pedir un análisis completo de 5 páginas de entrada, empieza con "Resume los puntos principales" y luego "Ahora profundiza en el punto 2 con ejemplos concretos".
+
+**Usar el output como input:** Toma el resultado de un prompt y úsalo como contexto para el siguiente. "Basándote en el análisis anterior, redacta un email ejecutivo de 3 párrafos con las conclusiones clave."
+
+### Ejemplo de refinamiento en acción
+
+**Iteración 1:**
+> "Escribe una propuesta comercial para un servicio de consultoría de IA."
+> **Resultado:** Genérico, sin personalización, demasiado largo.
+
+**Iteración 2 (diagnóstico: falta contexto y formato):**
+> "Escribe una propuesta comercial de máximo 1 página para un servicio de consultoría de IA dirigida al director de innovación de una empresa farmacéutica de 5,000 empleados. La propuesta es para un piloto de 3 meses enfocado en automatizar reportes regulatorios."
+> **Resultado:** Mucho mejor, pero el tono es demasiado técnico para un director.
+
+**Iteración 3 (diagnóstico: falta ajuste de tono):**
+> (mismo prompt + ) "Tono: ejecutivo, enfocado en ROI y resultados de negocio, no en tecnología. Evita jerga de IA."
+> **Resultado:** Listo para enviar.
+
+Tres iteraciones, cada una con un cambio específico. El prompt final tiene ~80 palabras — no es "largo" ni "corto", es **preciso**.
+
+<MiniQuiz
+  question="Tu prompt produjo un análisis correcto pero con 1,500 palabras cuando necesitabas máximo 300. ¿Cuál es el ajuste más eficiente?"
+  options={[
+    "Reescribir todo el prompt desde cero con instrucciones más cortas",
+    "Agregar al final: 'Máximo 300 palabras. Prioriza las conclusiones sobre el análisis detallado.'",
+    "Pedirle al modelo que resuma su propia respuesta",
+    "Cambiar a un modelo diferente que sea más conciso"
+  ]}
+  correct={1}
+  explanation="El contenido era correcto — solo necesitas agregar una restricción de longitud y priorización. Un ajuste mínimo (una línea) resuelve el problema sin perder lo que ya funcionaba del prompt original."
+/>

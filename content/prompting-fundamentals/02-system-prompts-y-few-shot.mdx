@@ -1,0 +1,205 @@
+## System prompts: la configuración invisible
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/system-prompt-layers.png"
+  alt="Capas del system prompt"
+  caption="El system prompt envuelve la conversación, definiendo reglas persistentes."
+  labels={[
+    { text: "System prompt (reglas base)", position: "top-center", style: "dark" },
+    { text: "Mensaje del usuario", position: "center", style: "accent" },
+    { text: "Respuesta del modelo", position: "bottom-center", style: "default" }
+  ]}
+/>
+
+Hay un elemento del prompting que no se ve en la interfaz de chat pero que tiene un impacto enorme: el **system prompt** (o prompt de sistema). Es una instrucción especial que se coloca antes de la conversación y que define el comportamiento base del modelo — su personalidad, sus reglas, y sus límites.
+
+Cuando usas ChatGPT, Claude, o Copilot directamente, ya hay un system prompt activo que tú no ves. Es lo que hace que Claude sea "útil, inofensivo y honesto" por defecto, o que Copilot integre resultados de Bing. Pero cuando construyes aplicaciones con IA, o cuando usas la API directamente, tienes control total sobre el system prompt — y eso cambia las reglas del juego.
+
+### Qué va en un system prompt
+
+Un system prompt efectivo define tres cosas:
+
+**1. Identidad y comportamiento:** Quién es el asistente y cómo debe actuar.
+
+```
+Eres un asistente legal especializado en compliance regulatorio para empresas farmacéuticas en la Unión Europea. Respondes en español, con tono profesional. Cuando no estás seguro de algo, lo dices explícitamente en lugar de inventar.
+```
+
+**2. Reglas y restricciones:** Qué debe y qué no debe hacer.
+
+```
+Reglas:
+- Cita siempre el artículo o regulación específica cuando hagas referencia a normativa.
+- Si la pregunta está fuera de tu dominio (por ejemplo, derecho penal), responde: "Esta pregunta está fuera de mi especialidad. Te recomiendo consultar con un abogado penalista."
+- Nunca inventes artículos o números de regulación.
+- Si el usuario pide algo que podría tener implicaciones legales serias, incluye un disclaimer.
+```
+
+**3. Formato de respuesta:** Cómo estructurar el output por defecto.
+
+```
+Formato de respuesta:
+- Usa encabezados con ## para cada sección.
+- Incluye al final una sección "Próximos pasos" con acciones concretas.
+- Limita cada respuesta a un máximo de 500 palabras.
+```
+
+<Callout type="deep-dive">
+La diferencia entre poner instrucciones en el system prompt versus en el mensaje del usuario es sutil pero importante. El system prompt persiste a lo largo de toda la conversación — cada mensaje del usuario se procesa con esas reglas activas. Las instrucciones en el mensaje del usuario solo aplican a esa interacción específica. Para comportamientos que quieres que sean consistentes, usa el system prompt. Para instrucciones puntuales, usa el mensaje.
+</Callout>
+
+### System prompts en la práctica empresarial
+
+Las empresas que usan IA de forma sofisticada no dependen de los system prompts genéricos de las herramientas de chat. Construyen system prompts específicos para cada caso de uso:
+
+- **Atención al cliente:** El system prompt define el catálogo de productos, las políticas de devolución, el tono de la marca, y cuándo escalar a un agente humano.
+- **Análisis financiero:** El system prompt especifica las métricas relevantes, el formato de reportes internos, y las fuentes de datos que el modelo puede referenciar.
+- **Revisión de contratos:** El system prompt contiene las cláusulas estándar de la empresa, los riesgos típicos a buscar, y el formato de reporte de hallazgos.
+
+En cada caso, el system prompt convierte un modelo general en un asistente especializado para una tarea específica. Es la diferencia entre tener un consultor genérico y uno que ya conoce tu empresa, tu industria y tus procesos.
+
+### Errores comunes con system prompts
+
+**System prompt demasiado largo:** Si metes todas las instrucciones posibles, el modelo pierde el foco. Un system prompt efectivo tiene entre 200 y 800 palabras. Si necesitas más, probablemente necesitas dividir el caso de uso en múltiples asistentes especializados.
+
+**Instrucciones contradictorias:** "Sé conciso" y "incluye todos los detalles relevantes" se contradicen. El modelo hará su mejor esfuerzo, pero el resultado será inconsistente. Prioriza: ¿qué importa más para este caso de uso?
+
+**Reglas sin ejemplos:** Decir "usa tono profesional" es ambiguo. ¿Profesional como un email corporativo o profesional como un informe técnico? Un ejemplo corto aclara más que tres párrafos de instrucciones.
+
+<MiniQuiz
+  question="Estás construyendo un chatbot de soporte para tu empresa. ¿Dónde deberías poner la instrucción 'Cuando el usuario pida hablar con un humano, transfiere la conversación al equipo de soporte'?"
+  options={[
+    "En el mensaje del usuario, cada vez que inicie una conversación",
+    "En el system prompt, porque debe aplicar consistentemente en toda interacción",
+    "No es necesario, el modelo lo hará automáticamente",
+    "En un documento separado que el modelo pueda consultar"
+  ]}
+  correct={1}
+  explanation="Las reglas de comportamiento que deben aplicar en toda la conversación van en el system prompt. Esto garantiza que el modelo siga la regla consistentemente sin que el usuario tenga que recordárselo."
+/>
+
+---
+
+## Few-shot prompting
+
+<ModuleImage
+  src="/media/prompting-fundamentals/diagrams/few-shot-examples.png"
+  alt="Few-shot prompting: aprender de ejemplos"
+  caption="El modelo infiere el patrón de los ejemplos y lo aplica al caso nuevo."
+  labels={[
+    { text: "Ejemplo 1", position: "top-left", style: "accent" },
+    { text: "Ejemplo 2", position: "center-left", style: "accent" },
+    { text: "Ejemplo 3", position: "bottom-left", style: "accent" },
+    { text: "Tu caso → ?", position: "center-right", style: "warning" }
+  ]}
+/>
+
+Hay tareas donde describir lo que quieres con palabras es más difícil que simplemente mostrarlo. Para esos casos existe el **few-shot prompting**: incluir 2 o 3 ejemplos dentro del prompt para que el modelo aprenda el patrón exacto de formato, tono o estructura que buscas, antes de aplicarlo a tu caso real.
+
+El nombre viene del campo del aprendizaje automático: "few-shot" significa "aprender de pocos ejemplos". En la práctica, funciona así: en lugar de solo describir lo que quieres, muestras al modelo entradas y salidas de referencia, y luego le das la entrada real. El modelo infiere el patrón a partir de los ejemplos — no solo de la instrucción.
+
+### Por qué funciona
+
+Cuando describes un formato con palabras ("quiero que la respuesta tenga este estilo..."), el modelo interpreta esa descripción. Cuando muestras ejemplos reales, el modelo puede leer el patrón directamente. Para tareas donde el estilo importa tanto como el contenido, los ejemplos son más precisos que cualquier descripción verbal.
+
+Técnicamente, few-shot prompting funciona porque aprovecha una capacidad llamada **in-context learning** (aprendizaje en contexto). El modelo no se re-entrena con tus ejemplos — pero los usa para calibrar sus probabilidades de generación. Si los tres ejemplos terminan con un formato de tabla, el modelo asigna una probabilidad mucho más alta a generar una tabla para tu caso real.
+
+### Ejemplo concreto: resúmenes de reunión
+
+Imagina que tu equipo tiene un formato específico para resumir reuniones — y quieres que el modelo lo replique de forma consistente para todas las reuniones del trimestre:
+
+```
+Tarea: Resume la siguiente transcripción de reunión usando el formato de los ejemplos.
+
+Ejemplo 1:
+Transcripción: [Reunión del 3 de marzo sobre presupuesto Q2...]
+Resumen:
+**Decisiones tomadas:** Se aprobó aumento del 15% en presupuesto de marketing.
+**Próximos pasos:** Ana envía propuesta formal antes del viernes.
+**Pendientes sin resolver:** Definir criterios de medición de ROI.
+
+Ejemplo 2:
+Transcripción: [Reunión del 7 de marzo sobre lanzamiento de producto...]
+Resumen:
+**Decisiones tomadas:** Fecha de lanzamiento confirmada para el 20 de abril.
+**Próximos pasos:** Carlos coordina con el equipo de ventas esta semana.
+**Pendientes sin resolver:** Aprobación final del precio por parte de dirección.
+
+Ahora resume esta transcripción usando el mismo formato:
+[Transcripción de tu reunión aquí]
+```
+
+Con dos ejemplos, el modelo no tiene que adivinar qué significa "mismo formato". Lo ve, lo entiende y lo replica — incluso en transcripciones de reuniones con contenidos completamente distintos.
+
+### Zero-shot vs. few-shot: cuándo usar cada uno
+
+La terminología puede sonar intimidante, pero es simple:
+
+- **Zero-shot:** Le das la instrucción sin ningún ejemplo. Funciona bien para tareas claras y comunes ("traduce esto", "resume en 3 puntos").
+- **One-shot:** Le das un solo ejemplo. Útil cuando el formato es simple pero no estándar.
+- **Few-shot:** Le das 2-5 ejemplos. Necesario cuando el formato o el estilo es específico de tu organización.
+
+La regla práctica: empieza con zero-shot. Si el resultado no tiene el formato o estilo que necesitas, agrega un ejemplo. Si sigue sin ser consistente, agrega dos más. Rara vez necesitarás más de 3-5 ejemplos.
+
+<Callout type="tip">
+Elige ejemplos que cubran la variación que esperas. Si tus reuniones pueden ser de ventas, de producto o de operaciones, incluye un ejemplo de cada tipo. Tres ejemplos del mismo tipo enseñan menos que tres ejemplos diversos.
+</Callout>
+
+### Ejemplo avanzado: clasificación de tickets de soporte
+
+Few-shot brilla especialmente en tareas de clasificación donde las categorías son propias de tu empresa:
+
+```
+Clasifica el siguiente ticket de soporte en una de estas categorías: 
+facturación, técnico, acceso, otro.
+
+Ticket: "No puedo ver mi factura del mes pasado en el portal"
+Categoría: facturación
+
+Ticket: "La página se queda en blanco cuando intento exportar el reporte"
+Categoría: técnico
+
+Ticket: "Mi contraseña no funciona después del cambio de dominio"
+Categoría: acceso
+
+Ticket: "¿Pueden agregar una función de exportar a Excel?"
+Categoría: otro
+
+Ticket: "Me cobraron dos veces el servicio de marzo"
+Categoría:
+```
+
+Sin los ejemplos, el modelo podría clasificar "Me cobraron dos veces" como "técnico" (porque involucra el sistema de pagos) o como "otro" (porque es una queja). Con los ejemplos, aprende que cualquier cosa relacionada con cobros va a "facturación".
+
+### Cuándo usar few-shot prompting
+
+**Funciona especialmente bien para:**
+- Tareas de formato específico (reportes, resúmenes, fichas estandarizadas)
+- Clasificación con categorías propias de tu organización
+- Escritura en la voz o estilo editorial de tu empresa
+- Extracción de datos estructurados desde texto libre (facturas, contratos, formularios)
+
+**Es innecesario para:**
+- Preguntas factuales simples ("¿cuál es la capital de Francia?")
+- Tareas creativas donde quieres diversidad, no uniformidad
+- Prompts donde la instrucción en palabras ya es completamente clara
+
+### Errores comunes con few-shot
+
+**Ejemplos inconsistentes entre sí:** Si tus ejemplos siguen formatos ligeramente distintos, el modelo no sabe cuál imitar. Asegúrate de que todos tus ejemplos sigan exactamente el mismo formato — la consistencia entre ejemplos es más importante que la calidad de cada uno individual.
+
+**Ejemplos demasiado similares:** Si tus tres ejemplos son variaciones del mismo caso, el modelo aprende un patrón demasiado estrecho. Elige ejemplos que cubran la diversidad de inputs que esperas encontrar.
+
+**Demasiados ejemplos:** Más de 5 ejemplos rara vez mejora el resultado y consume contexto valioso. Si necesitas más de 5 para que funcione, el problema probablemente está en la definición de la tarea, no en la cantidad de ejemplos.
+
+<MiniQuiz
+  question="Necesitas que el modelo extraiga datos de facturas en un formato JSON específico de tu sistema contable. ¿Cuál es el enfoque más efectivo?"
+  options={[
+    "Describir el formato JSON con palabras y esperar que el modelo lo infiera",
+    "Dar 2-3 ejemplos de facturas reales (datos ficticios) con el JSON esperado",
+    "Pedirle al modelo que invente su propio formato y luego adaptarlo",
+    "Escribir un prompt muy largo describiendo cada campo del JSON"
+  ]}
+  correct={1}
+  explanation="Para formatos estructurados específicos, los ejemplos son mucho más efectivos que las descripciones verbales. El modelo aprende el patrón exacto (nombres de campos, tipos de datos, estructura anidada) directamente de los ejemplos."
+/>
