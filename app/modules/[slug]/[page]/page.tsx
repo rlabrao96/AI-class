@@ -14,6 +14,13 @@ const sectionMap: Record<string, Record<string, () => Promise<{ default: React.C
     '03-limites-reales': () => import('@/content/ai-fundamentals/03-limites-reales.mdx'),
     '04-el-mindset-correcto': () => import('@/content/ai-fundamentals/04-el-mindset-correcto.mdx'),
   },
+  'prompting-fundamentals': {
+    '01-estructura-y-especificidad': () => import('@/content/prompting-fundamentals/01-estructura-y-especificidad.mdx'),
+    '02-system-prompts-y-few-shot': () => import('@/content/prompting-fundamentals/02-system-prompts-y-few-shot.mdx'),
+    '03-razonamiento-y-refinamiento': () => import('@/content/prompting-fundamentals/03-razonamiento-y-refinamiento.mdx'),
+    '04-patrones-y-conversaciones': () => import('@/content/prompting-fundamentals/04-patrones-y-conversaciones.mdx'),
+    '05-output-errores-y-biblioteca': () => import('@/content/prompting-fundamentals/05-output-errores-y-biblioteca.mdx'),
+  },
 }
 
 export function generateStaticParams() {
