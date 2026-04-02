@@ -1,6 +1,6 @@
 ---
 name: enrich-module
-description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, cinematic videos) by orchestrating browser-use and notebooklm in a 10-phase pipeline. Use when the user wants to add visual/audio content to a course module.
+description: Enriches course modules with rich media (screenshots, infographics, mind maps, podcasts, explainer videos) by orchestrating browser-use and notebooklm in a 10-phase pipeline. Use when the user wants to add visual/audio content to a course module.
 ---
 
 # Enrich Module
@@ -100,7 +100,7 @@ Print progress at each step:
 [Phase 2/8] Collecting screenshots (3/8): anthropic.com...
 [Phase 3/8] Loading source 5/12: S02 Understanding LLMs.pdf...
 [Phase 4/8] Generating audio, mind map, infographics...
-[Phase 5/8] Generating cinematic video... (polling, 12m elapsed)
+[Phase 5/8] Generating explainer video... (polling, 6m elapsed)
 [Phase 6/8] Downloading artifacts to media/<slug>/...
 ```
 
@@ -384,7 +384,7 @@ Print progress at each step:
 
 **When:** `--phase generate` or running all phases.
 
-**Purpose:** Generate audio podcast, mind map, and infographics from the notebook. These are relatively fast and run together, separate from video which can take 30+ minutes.
+**Purpose:** Generate audio podcast, mind map, and infographics from the notebook. These are relatively fast and run together, separate from video which can take 5-10 minutes.
 
 **Steps:**
 
@@ -478,12 +478,12 @@ Print progress at each step:
 
 **When:** `--phase generate-video` or running all phases (after Phase 3a).
 
-**Purpose:** Generate a cinematic video independently. This is separated from Phase 3a because video generation can take 30+ minutes and must not block or be blocked by other artifacts.
+**Purpose:** Generate an explainer video in classic style. This is separated from Phase 3a because video generation can take 5-10 minutes and must not block or be blocked by other artifacts.
 
 **Steps:**
 
 1. **Check idempotency:** If `sources.json` already has a video artifact with `"status": "completed"`, ask the user:
-   > "A cinematic video already exists. Regenerate or keep existing?"
+   > "An explainer video already exists. Regenerate or keep existing?"
    If keep, skip to end.
 
 2. **Set active notebook:**
@@ -491,26 +491,27 @@ Print progress at each step:
    notebooklm use <notebook_id>
    ```
 
-3. **Generate cinematic video:**
+3. **Generate explainer video:**
    ```bash
-   notebooklm generate video "Video explicativo cinematográfico del módulo <module_title>" --format cinematic --language <lang> --json
+   notebooklm generate video "Video explicativo del módulo <module_title>" --format explainer --style classic --language <lang> --json
    ```
    Parse `task_id` from output. Record in `sources.json`:
    ```json
    {
      "artifact_id": "<task_id>",
      "type": "video",
-     "format": "cinematic",
+     "format": "explainer",
+     "style": "classic",
      "status": "pending"
    }
    ```
 
-4. **Poll for completion with extended backoff:**
+4. **Poll for completion with backoff:**
    ```bash
-   notebooklm artifact wait <artifact_id> --timeout 2700
+   notebooklm artifact wait <artifact_id> --timeout 600
    ```
-   - Intervals: 10s → 30s → 60s → 120s → 120s (repeating)
-   - Timeout: **45 minutes**
+   - Intervals: 10s → 30s → 60s → 60s (repeating)
+   - Timeout: **10 minutes**
    - On timeout (exit code 2): mark as `"status": "timeout"`, report to user.
 
 5. **Update sources.json** with final status.
@@ -518,11 +519,11 @@ Print progress at each step:
 6. Print summary:
    ```
    [Phase 5/8] Video generation complete:
-     - Cinematic video: ✓ completed (23 min)
+     - Explainer video: ✓ completed (7 min)
    ```
    Or if timeout:
    ```
-   [Phase 5/8] Video generation timed out after 45 min.
+   [Phase 5/8] Video generation timed out after 10 min.
      Check status with: notebooklm artifact list
      Re-run with: /enrich-module <slug> --phase generate-video
    ```
@@ -563,9 +564,9 @@ Print progress at each step:
    notebooklm download infographic "media/<slug>/infographics/infographic-1.png" -a <artifact_id>
    ```
 
-   d. **Cinematic video** (only if Phase 3b completed):
+   d. **Explainer video** (only if Phase 3b completed):
    ```bash
-   notebooklm download video "media/<slug>/video/cinematic.mp4" -a <artifact_id>
+   notebooklm download video "media/<slug>/video/explainer.mp4" -a <artifact_id>
    ```
 
 4. **Update sources.json** with local paths and file sizes:
@@ -589,7 +590,7 @@ Print progress at each step:
      Mind map:      media/<slug>/infographics/mindmap.json
      Infographic:   media/<slug>/infographics/infographic-1.png
      Audio:         media/<slug>/audio/podcast.mp3 (12.3 MB)
-     Video:         media/<slug>/video/cinematic.mp4 (45.1 MB)
+     Video:         media/<slug>/video/explainer.mp4 (45.1 MB)
 
      Total: 60.4 MB in media/<slug>/
 
@@ -893,7 +894,7 @@ Print progress at each step:
    ### Material Descargable
 
    - [Escuchar podcast del módulo (MP3)](/api/media/<slug>/audio/podcast.mp3)
-   - [Ver video cinemático (MP4)](/api/media/<slug>/video/cinematic.mp4)
+   - [Ver video explicativo (MP4)](/api/media/<slug>/video/explainer.mp4)
    ```
 
    **Rules for building this section:**
