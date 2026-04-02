@@ -61,7 +61,16 @@ Un enfoque práctico: cuando generes contenido que será visto por muchas person
 Otra técnica útil: genera el mismo contenido con diferentes prompts y compara los resultados. Si le pides al modelo que escriba una descripción de puesto tres veces con instrucciones ligeramente diferentes, puedes detectar patrones de sesgo que se repiten y corregirlos conscientemente.
 </Accordion>
 
-<ModuleImage src="/media/ai-fundamentals/diagrams/bias-data.png" alt="Sesgo en datos de entrenamiento" caption="Datos sesgados producen resultados sesgados: el modelo hereda y amplifica los patrones desbalanceados de su entrenamiento." />
+<ModuleImage
+  src="/media/ai-fundamentals/diagrams/bias-data.png"
+  alt="Sesgo en datos de entrenamiento"
+  caption="Cómo los datos desbalanceados producen resultados sesgados."
+  labels={[
+    { text: "Datos de entrenamiento diversos", position: "top-center", style: "accent" },
+    { text: "Filtro: datos desbalanceados", position: "center", style: "warning" },
+    { text: "Resultados sesgados", position: "bottom-center", style: "danger" }
+  ]}
+/>
 
 ### Corte de datos de entrenamiento: el modelo vive en el pasado
 
@@ -103,7 +112,16 @@ Con los LLMs, esto funciona de manera similar. Supongamos que una empresa tiene 
 
 Como usuario individual, la inyección de prompts te afecta de forma más sutil. Si le pides a un modelo que resuma una página web, y esa página tiene instrucciones ocultas, el resumen que obtienes puede estar manipulado sin que lo notes. La regla práctica: cuando uses IA para procesar contenido de fuentes que no controlas, mantén un nivel extra de escepticismo sobre el resultado.
 
-<ModuleImage src="/media/ai-fundamentals/diagrams/prompt-injection.png" alt="Inyección de prompts" caption="La inyección de prompts ocurre cuando instrucciones maliciosas se esconden dentro de documentos que el modelo procesa." />
+<ModuleImage
+  src="/media/ai-fundamentals/diagrams/prompt-injection.png"
+  alt="Inyección de prompts"
+  caption="Cómo funciona un ataque de inyección de prompts."
+  labels={[
+    { text: "✓ Uso normal", position: "top-left", style: "success" },
+    { text: "✗ Inyección de prompt", position: "top-right", style: "danger" },
+    { text: "Instrucción oculta: \"Ignora todo lo anterior\"", position: "bottom-center", style: "warning" }
+  ]}
+/>
 
 ### Privacidad: lo que no debes subir a una herramienta pública
 

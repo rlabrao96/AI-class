@@ -44,7 +44,17 @@ Cuando un LLM te da una respuesta que suena enciclopédica pero no responde exac
 
 También explica por qué distintos modelos se sienten diferentes: aunque la arquitectura base puede ser similar, las decisiones tomadas en el fine-tuning y especialmente en el RLHF definen la "personalidad" del modelo — cuán formal es, cuánto riesgo asume al responder, qué tan largo o conciso es por defecto, y cómo maneja la incertidumbre.
 
-<ModuleImage src="/media/ai-fundamentals/diagrams/training-pipeline.png" alt="Pipeline de entrenamiento de un LLM" caption="Las tres etapas del entrenamiento: pre-entrenamiento (leer internet), ajuste fino (aprender a ser asistente) y RLHF (retroalimentación humana)." />
+<ModuleImage
+  src="/media/ai-fundamentals/diagrams/training-pipeline.png"
+  alt="Pipeline de entrenamiento de un LLM"
+  caption="Las tres etapas del entrenamiento de un modelo de lenguaje."
+  labels={[
+    { text: "1. Pre-entrenamiento", position: "top-left", style: "accent" },
+    { text: "2. Ajuste fino", position: "top-center", style: "accent" },
+    { text: "3. RLHF", position: "top-right", style: "accent" },
+    { text: "Leer internet → Ser asistente → Feedback humano", position: "bottom-center", style: "dark" }
+  ]}
+/>
 
 ### La arquitectura Transformer: atención como sistema de relevancia
 
@@ -78,7 +88,16 @@ Esto tiene implicaciones prácticas enormes. Cuando le preguntas al modelo sobre
 
 Otro aspecto fascinante de los embeddings: funcionan a través de idiomas. En modelos multilingues, la palabra "perro" en español, "dog" en inglés, y "chien" en francés están relativamente cerca en el espacio de embeddings, porque aparecen en contextos similares en sus respectivos idiomas. Es como si el modelo hubiera descubierto que, a pesar de sonar completamente diferente, estas palabras significan lo mismo — y las puso juntas en su mapa de significado. Esto es lo que permite a los modelos traducir entre idiomas y responder preguntas en un idioma usando conocimiento que adquirieron en otro.
 
-<ModuleImage src="/media/ai-fundamentals/diagrams/embeddings-space.png" alt="Espacio de embeddings semánticos" caption="Los embeddings organizan palabras por significado: conceptos similares quedan cerca en el espacio matemático del modelo." />
+<ModuleImage
+  src="/media/ai-fundamentals/diagrams/embeddings-space.png"
+  alt="Espacio de embeddings semánticos"
+  caption="Los embeddings organizan palabras por significado en un espacio matemático."
+  labels={[
+    { text: "Feliz · Alegría · Contento", position: "top-left", style: "success" },
+    { text: "Triste · Sombrío · Deprimido", position: "top-right", style: "danger" },
+    { text: "Significados similares = cercanía", position: "bottom-center", style: "dark" }
+  ]}
+/>
 
 ### Temperatura y creatividad: controlando la aleatoriedad
 
@@ -99,7 +118,15 @@ La mayoría de las interfaces de usuario (como Claude.ai o ChatGPT) manejan la t
 
 Hay otros parámetros relacionados que vale la pena conocer conceptualmente. **Top-p** (también llamado "nucleus sampling") es otro control de creatividad: en lugar de ajustar las probabilidades de todos los tokens, selecciona solo los tokens más probables que sumen hasta cierto porcentaje de probabilidad. Piensa en top-p como definir el "menú" de opciones: top-p bajo es como un menú de tres platos; top-p alto es como un buffet completo. En la práctica, temperatura y top-p logran resultados similares, y rara vez necesitas ajustar ambos.
 
-<ModuleImage src="/media/ai-fundamentals/diagrams/temperature-creativity.png" alt="Temperatura y creatividad en LLMs" caption="Temperatura baja produce respuestas predecibles y seguras; temperatura alta produce respuestas más creativas pero arriesgadas." />
+<ModuleImage
+  src="/media/ai-fundamentals/diagrams/temperature-creativity.png"
+  alt="Temperatura y creatividad en LLMs"
+  caption="El parámetro de temperatura controla la creatividad vs. predictibilidad del modelo."
+  labels={[
+    { text: "Temperatura baja → Seguro y predecible", position: "bottom-left", style: "accent" },
+    { text: "Temperatura alta → Creativo y arriesgado", position: "bottom-right", style: "warning" }
+  ]}
+/>
 
 Lo importante no es memorizar estos parámetros, sino entender el principio: **el mismo modelo puede comportarse de manera muy diferente según cómo configures estos controles**. Un modelo que parece "poco creativo" con configuración por defecto puede sorprenderte cuando le das más libertad, y un modelo que parece "poco confiable" puede volverse muy preciso cuando reduces su aleatoriedad.
 

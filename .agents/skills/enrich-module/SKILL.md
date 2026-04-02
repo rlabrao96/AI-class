@@ -641,42 +641,71 @@ Print progress at each step:
 
 3. **Write descriptive prompts** following these strict rules:
 
+   **CRITICAL: Labels are HTML overlays, NOT generated in the image.**
+
+   AI image models hallucinate text — they produce gibberish like "Tolqules de assistantos" instead of real words. This is especially bad in non-English languages. Therefore:
+
+   - Generate images **WITHOUT any text, labels, or words** in the image itself
+   - Add all labels as HTML overlays using the `labels` prop on `<ModuleImage>`
+   - The image provides the visual concept; the HTML provides perfect text in Spanish
+
+   **3-STEP PROCESS:**
+   1. **Plan labels first:** Decide what labels the image needs and where they go (top-left, bottom-center, etc.)
+   2. **Generate image:** Prompt describes visual layout with empty spaces for labels
+   3. **Add HTML labels:** Use `<ModuleImage labels={[...]}/>` in the MDX
+
    **PROMPT RULES — MANDATORY:**
-   - Every prompt MUST describe **specific labeled elements** the image should contain
+   - Every prompt MUST end with "NO TEXT, NO LABELS, NO WORDS anywhere in the image"
+   - Every prompt MUST say "Leave empty space at [position] for overlay labels"
    - Every prompt MUST describe the **layout/structure** (left vs right, top vs bottom, grid, flow)
-   - Every prompt MUST end with "Clean professional infographic style, white background, clear readable labels in Spanish"
-   - NEVER use vague prompts like "abstract visualization of X" or "conceptual illustration of X"
+   - Every prompt MUST end with "Clean professional infographic style, white background"
+   - NEVER use vague prompts like "abstract visualization of X"
    - NEVER request dark/gradient backgrounds (they don't match the course's white design)
-   - NEVER generate images without text labels — the image must communicate WITHOUT the caption
-   - ALL text labels in the image MUST be in Spanish (matching the course language). Write the prompt in English but specify: "All labels and text in the image must be in Spanish"
 
    **PROMPT TEMPLATE:**
    ```
-   An educational infographic showing [WHAT THE CONCEPT IS].
+   An educational diagram showing [WHAT THE CONCEPT IS].
    [LAYOUT: left side shows X, right side shows Y / top-to-bottom flow / 2x2 grid].
-   [SPECIFIC ELEMENTS: list each labeled element that must appear].
+   [SPECIFIC VISUAL ELEMENTS: describe shapes, colors, arrows, icons — NOT text].
    [RELATIONSHIPS: arrows, dotted lines, groupings between elements].
-   All labels and text in the image must be in Spanish.
-   Clean professional infographic style, white background, [accent color] accents, clear readable labels in Spanish.
+   Leave empty space at [positions] for overlay labels.
+   Clean professional infographic style, white background. NO TEXT, NO LABELS, NO WORDS anywhere in the image.
    ```
 
    **GOOD prompt example:**
    ```
-   An educational infographic showing how word embeddings work in AI.
-   On the left side, the words feliz, alegría, and contento are clustered together as colored circles.
-   On the right side, triste, sombrío, and deprimido are clustered together.
-   In the middle, the word banco appears twice: once near río and agua, once near dinero and finanzas.
-   Dotted lines connect related words showing semantic distance.
-   All labels and text in the image must be in Spanish.
-   Clean professional infographic style, white background, blue accents, clear readable labels in Spanish.
+   An educational diagram showing word embedding clusters in AI.
+   Left cluster: three warm-colored circles close together (representing similar positive emotions).
+   Right cluster: three cool-colored circles close together (representing similar negative emotions).
+   Center: two identical circles in different clusters (representing a word with two meanings).
+   Dotted lines show distances between clusters.
+   Leave empty space at top-left and top-right for overlay labels.
+   Clean professional infographic style, white background. NO TEXT, NO LABELS, NO WORDS anywhere in the image.
    ```
+
+   Then in MDX, add the labels:
+   ```jsx
+   <ModuleImage
+     src="/media/<slug>/diagrams/embeddings-space.png"
+     alt="Espacio de embeddings"
+     caption="Los embeddings organizan palabras por significado."
+     labels={[
+       { text: "Feliz · Alegría · Contento", position: "top-left", style: "success" },
+       { text: "Triste · Sombrío · Deprimido", position: "top-right", style: "danger" },
+       { text: "Significados similares = cercanía", position: "bottom-center", style: "dark" }
+     ]}
+   />
+   ```
+
+   **Label styles available:** `default` (white), `accent` (blue), `dark` (black), `success` (green), `warning` (amber), `danger` (red)
+   **Label positions available:** `top-left`, `top-center`, `top-right`, `center-left`, `center`, `center-right`, `bottom-left`, `bottom-center`, `bottom-right`
 
    **BAD prompt example:**
    ```
-   A clean minimal tech illustration of semantic embedding space with glowing nodes
-   on dark blue gradient background, professional futuristic style
+   An educational infographic with labels showing feliz, alegría, contento...
+   Clean professional infographic style, clear readable labels in Spanish.
    ```
-   This produces pretty but useless images with random gibberish labels.
+   This produces hallucinated gibberish text. NEVER ask the model to generate text.
 
 4. **Generate images** using the Gemini API:
 
@@ -694,10 +723,10 @@ Print progress at each step:
 5. **Save images** to `public/media/<slug>/diagrams/<descriptive-name>.png`
 
 6. **Verify each image** before proceeding:
-   - Does it have readable labels?
-   - Does it communicate the concept without a caption?
+   - Does it have NO text/labels baked in? (any text = regenerate)
+   - Does the visual composition leave space for HTML overlay labels?
    - Does it match the white/professional style of the course?
-   - If not → regenerate with a more specific prompt. Do NOT keep decorative-only images.
+   - If not → regenerate with a more specific prompt. Do NOT keep images with hallucinated text.
 
 7. **Record in sources.json:**
    ```json
