@@ -970,17 +970,46 @@ Print progress at each step:
    <SectionVisitBanner slug="<slug>" totalSections={N} />
    ```
 
-10. **Update `lib/modules.ts`:** Add `sections` array to the module:
+10. **Update `lib/modules.ts`:** Make TWO changes to the module entry:
+
+    a. **Set `estimatedTime`** to match the `--duration` flag:
+    ```typescript
+    estimatedTime: '2 hrs',  // or '45 min', '1 hr', '3 hrs' depending on --duration
+    ```
+
+    b. **Add `sections` array** (required for pagination routing):
     ```typescript
     sections: [
       { id: '<section-id>', title: '<Section Title>', file: 'NN-<section-id>' },
       ...
-    ]
+    ],
     ```
 
-11. **Update the section import map** in `app/modules/[slug]/[page]/page.tsx` to add the new module's MDX imports.
+    c. **Update `toc` array** to match the new section names.
 
-12. **Print summary:**
+11. **Register section imports in `app/modules/[slug]/[page]/page.tsx`:**
+
+    **CRITICAL:** Without this step, paginated pages will 404. Add an entry to the `sectionMap` object:
+
+    ```typescript
+    const sectionMap: Record<string, Record<string, () => Promise<{ default: React.ComponentType }>>> = {
+      // ... existing modules ...
+      '<slug>': {
+        'NN-<section-id>': () => import('@/content/<slug>/NN-<section-id>.mdx'),
+        // ... one entry per section file ...
+      },
+    }
+    ```
+
+    Each key must match the `file` value from the `sections` array in `lib/modules.ts`.
+
+12. **Verify the build passes:**
+    ```bash
+    npx next build --no-lint
+    ```
+    Check that the new paginated routes appear in the build output (e.g., `/modules/<slug>/1`, `/modules/<slug>/2`, etc.).
+
+13. **Print summary:**
     ```
     [Phase 8/8] Pagination complete — content/<slug>/:
       - 4 section files created
